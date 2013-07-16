@@ -17,9 +17,16 @@ IV = u'12345678abcdefgh'
 
 class PwProc(object):
     def __init__(self, key):
-        if len(key) != BLOCK_SIZE:
+        if len(key) == BLOCK_SIZE:
+            self.key = key
+        elif len(key) == 4:
+            self.key = key * 8
+        elif len(key) == 8:
+            self.key = key * 4
+        elif len(key) == 16:
+            self.key = key * 2
+        else:
             raise ValueError("Illegal key size! Must be %i" % BLOCK_SIZE)
-        self.key = key
 
     def encrypt(self, password):
         padded = self._pad(password)

@@ -12,6 +12,8 @@ import os
 from passsafe.secure import PwProc
 from passsafe.config import prepare_argparser
 from passsafe.cmd import Cmd
+from passsafe.gui import GtkGui
+from passsafe.store import Store
 
 def _initialize_working_dir(config):
     wdir = config.dir
@@ -24,4 +26,6 @@ config = prepare_argparser()
 _initialize_working_dir(config)
 if config.nogui:
     Cmd(config).start()
+else:
+    GtkGui(config, Store(config)).show()
 
