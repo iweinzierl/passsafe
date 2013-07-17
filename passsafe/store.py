@@ -29,10 +29,15 @@ SQL_INSERT_PWENTRY = """
         VALUES (?, ?, ?);
 """
 
+class StoreAppendListener(object):
+    def on_add(pw_entry):
+        raise NotImplemented("StoreAppendListener.on_add() is not implemented")
+
 class Store(object):
-    def __init__(self, config):
+    def __init__(self, config, append_listener=None):
         self.entries = []
         self.config  = config
+        self.append_listener = append_listener
         self.conn    = None
         self.cursor  = None
         self._init_from_db()
@@ -40,6 +45,11 @@ class Store(object):
     def add(self, pw_entry):
         self.entries.append(pw_entry)
         self._persist(pw_entry)
+        if self.append_listener is not None:
+            self.append_listener.on_add(pw_entry)
+
+    def set_append_listener(self, append_listener):
+        self.append_listener = append_listener
 
     def get_by_index(self, index):
         return self.entries[index]

@@ -7,6 +7,7 @@ from passsafe.ui.pwlist import PwList
 from passsafe.ui.detail_view import DetailView
 from passsafe.ui.button_groups import create_main_button_group
 from passsafe.ui.dialogs import NewEntryDialog, KeyPromptDialog
+from passsafe.ui.model import PwStoreListModelProxy
 
 class GtkGui(object):
     def __init__(self, config, pw_store):
@@ -71,9 +72,8 @@ class GtkGui(object):
 
 
 def create_pw_list(pw_store):
-    store = Gtk.ListStore(str)
-    for entry in pw_store.entries:
-        store.append([entry.title])
+    store = PwStoreListModelProxy(str, pw_store)
+    pw_store.set_append_listener(store)
     return PwList(store)
 
 def create_button(title, func):
