@@ -13,7 +13,10 @@ class GtkGui(object):
     def __init__(self, config, pw_store):
         self.window = Gtk.Window()
         self.window.connect('delete-event', Gtk.main_quit)
+        self.detail_view = DetailView()
         self.pw_store = pw_store
+        self.pw_list = create_pw_list(self.pw_store)
+        self.pw_list.get_selection().connect('changed', self.pw_entry_changed)
         self._init_layout()
         key = self._prompt_key()
         self.pw_proc = PwProc(key)
@@ -21,9 +24,9 @@ class GtkGui(object):
     def _init_layout(self):
         root_layout = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        middle_layout = Gtk.Box(spacing=6, homogeneous=True, orientation=Gtk.Orientation.HORIZONTAL)
-        middle_layout.pack_start(create_pw_list(self.pw_store), False, True, 0)
-        middle_layout.pack_start(DetailView(), False, True, 0)
+        middle_layout = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
+        middle_layout.add1(self.pw_list)
+        middle_layout.add2(self.detail_view)
 
         root_layout.pack_start(create_main_button_group(
             self.new_entry, self.delete_entry),
@@ -69,6 +72,9 @@ class GtkGui(object):
 
     def delete_entry(self, source):
         print "Show selected entry: %s" % source
+
+    def pw_entry_changed(self, selection):
+        self.detail_view.update(selection.get_selected())
 
 
 def create_pw_list(pw_store):

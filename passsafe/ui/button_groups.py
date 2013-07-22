@@ -7,7 +7,7 @@ def create_main_button_group(add_listener, delete_listener):
     add.connect('clicked', add_listener)
     remove.connect('clicked', delete_listener)
 
-    box = Gtk.Box(spacing=6, homogeneous=True)
+    box = Gtk.Box(spacing=6, homogeneous=False)
     box.pack_start(add, False, True, 0)
     box.pack_start(remove, False, True, 0)
     return box
