@@ -1,3 +1,6 @@
+import httplib2
+import os
+
 from apiclient.discovery import build
 from apiclient.http import MediaFileUpload
 from apiclient import errors
@@ -20,7 +23,7 @@ class GDriveClient(object):
             if self.credentials is not None:
                 self.storage.put(self.credentials)
         http = httplib2.Http()
-        http = credentials.authorize(http)
+        http = self.credentials.authorize(http)
         self.drive_service = build("drive", "v2", http=http)
 
     def sync(self, filename):
@@ -57,13 +60,14 @@ class GDriveClient(object):
 
     def _upload(self, filename):
         media_body = MediaFileUpload(filename, mimetype=MIME_TYPE, resumable=True)
+        path, name = os.path.split(filename)
         body = {
-            "title": "PassSafe Storage",
+            "title": name,
             "description": "The storage of PassSafe application",
             "mimeType": MIME_TYPE
         }
 
-        file = self.drive_service.files().insert(body, media_body=media_body).execute()
+        file = self.drive_service.files().insert(body=body, media_body=media_body).execute()
 
     def _update(self, filename, file_id):
         media_body = MediaFileUpload(filename, mimetype=MIME_TYPE, resumable=True)
