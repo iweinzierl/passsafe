@@ -11,9 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -71,7 +74,7 @@ public class Application extends JFrame {
     public void initialize() throws SQLException, ClassNotFoundException, IOException {
         initializeLayout();
 
-        setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
 
@@ -81,12 +84,26 @@ public class Application extends JFrame {
 
 
     private void initializeLayout() {
+        JScrollPane entryListPane = new JScrollPane(entryList);
+        entryListPane.setPreferredSize(new Dimension(200, 450));
+
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add(buttonBar, BorderLayout.NORTH);
-        contentPane.add(entryList, BorderLayout.WEST);
+        contentPane.add(entryListPane, BorderLayout.WEST);
 
-        contentPane.setSize(new Dimension(500, 500));
+        contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_WIDTH));
+        setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
+        center();
+    }
+
+
+    public void center() {
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (int) ((dimension.getWidth() - getWidth()) / 2);
+        int y = (int) ((dimension.getHeight() - getHeight()) / 2);
+        setLocation(x, y);
     }
 
 
