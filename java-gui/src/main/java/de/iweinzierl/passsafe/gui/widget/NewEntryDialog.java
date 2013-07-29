@@ -2,6 +2,7 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.gui.util.UiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,7 @@ public class NewEntryDialog extends JDialog {
         setContentPane(contentPane);
 
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        UiUtils.center(this);
     }
 
 

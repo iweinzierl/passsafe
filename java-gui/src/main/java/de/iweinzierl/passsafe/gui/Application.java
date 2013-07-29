@@ -3,6 +3,7 @@ package de.iweinzierl.passsafe.gui;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
+import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryListModel;
@@ -95,15 +96,7 @@ public class Application extends JFrame {
         contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_WIDTH));
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-        center();
-    }
-
-
-    public void center() {
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (int) ((dimension.getWidth() - getWidth()) / 2);
-        int y = (int) ((dimension.getHeight() - getHeight()) / 2);
-        setLocation(x, y);
+        UiUtils.center(this);
     }
 
 
