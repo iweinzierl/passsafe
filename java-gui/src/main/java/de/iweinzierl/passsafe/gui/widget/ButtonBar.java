@@ -5,13 +5,9 @@ import de.iweinzierl.passsafe.gui.ApplicationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class ButtonBar extends JPanel {
@@ -51,10 +47,10 @@ public class ButtonBar extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'new entry'");
-                List<NewEntryDialog.OnEntryAddedListener> listeners = new ArrayList<>();
-                listeners.add(controller);
 
-                new NewEntryDialog(parent, listeners).show();
+                NewEntryDialog dialog = new NewEntryDialog(parent, controller.getDataSource().getCategories());
+                dialog.addOnEntryAddedListeners(controller);
+                dialog.show();
             }
         });
     }

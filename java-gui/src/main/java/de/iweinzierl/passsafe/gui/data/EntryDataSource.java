@@ -16,4 +16,6 @@ public interface EntryDataSource {
     void addEntry(EntryCategory category, Entry entry);
 
     void setDataSourceChangedListener(DataSourceChangedListener listener);
+
+    void close();
 }

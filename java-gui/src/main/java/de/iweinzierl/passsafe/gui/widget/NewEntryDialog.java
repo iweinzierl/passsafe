@@ -6,23 +6,17 @@ import de.iweinzierl.passsafe.gui.util.UiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class NewEntryDialog extends JDialog {
+
+    private final List<EntryCategory> categories;
 
     public interface OnEntryAddedListener {
         void onEntryAdded(EntryCategory category, Entry entry);
@@ -40,14 +34,16 @@ public class NewEntryDialog extends JDialog {
 
     private List<OnEntryAddedListener> onEntryAddedListeners;
 
+    private JComboBox<EntryCategory> categoryBox;
     private JTextField titleField;
     private JTextField usernameField;
     private JTextField passwordField;
 
 
-    public NewEntryDialog(JFrame parent, List<OnEntryAddedListener> onEntryAddedListeners) {
+    public NewEntryDialog(JFrame parent, List<EntryCategory> categories) {
         super(parent, "Neuen Eintrag erstellen", true);
-        this.onEntryAddedListeners = onEntryAddedListeners;
+        this.categories = categories;
+        this.onEntryAddedListeners = new ArrayList<>();
         initialize();
     }
 
@@ -67,6 +63,13 @@ public class NewEntryDialog extends JDialog {
 
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         UiUtils.center(this);
+    }
+
+
+    public void addOnEntryAddedListeners(OnEntryAddedListener onEntryAddedListener) {
+        if (onEntryAddedListener != null) {
+            onEntryAddedListeners.add(onEntryAddedListener);
+        }
     }
 
 
@@ -125,12 +128,14 @@ public class NewEntryDialog extends JDialog {
 
 
     private Container createCategoryPanel() {
+        categoryBox = new JComboBox<EntryCategory>(categories.toArray(new EntryCategory[categories.size()]));
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
 
         panel.add(createLabel("Kategory:"));
-        panel.add(new JLabel("TODO"));
+        panel.add(categoryBox);
 
         return panel;
     }
@@ -145,11 +150,11 @@ public class NewEntryDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'save new entry'");
-                for (OnEntryAddedListener listener : onEntryAddedListeners) {
-                    listener.onEntryAdded(
-                            EntryCategory.DEFAULT_CATEGORY,
-                            new Entry(titleField.getText(), usernameField.getText(), passwordField.getToolTipText()));
-                }
+
+                fireOnEntryAdded(
+                        new Entry(titleField.getText(), usernameField.getText(), passwordField.getText()));
+
+                dispose();
             }
         }));
 
@@ -162,6 +167,12 @@ public class NewEntryDialog extends JDialog {
         }));
 
         return panel;
+    }
+
+    private void fireOnEntryAdded(Entry entry) {
+        for (OnEntryAddedListener listener : onEntryAddedListeners) {
+            listener.onEntryAdded((EntryCategory) categoryBox.getSelectedItem(), entry);
+        }
     }
 
 

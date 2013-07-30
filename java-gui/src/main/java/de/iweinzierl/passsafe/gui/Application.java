@@ -6,7 +6,6 @@ import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
-import de.iweinzierl.passsafe.gui.widget.tree.EntryListModel;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -46,7 +44,7 @@ public class Application extends JFrame {
         controller.setDataSource(dataSource);
 
         ButtonBar buttonBar = new ButtonBar(controller, app);
-        EntryList entryList = new EntryList(controller, app, EntryListModel.create(controller.getDataSource()));
+        EntryList entryList = EntryList.create(controller, app, controller.getDataSource());
 
         controller.setEntryList(entryList);
         controller.setButtonBar(buttonBar);
@@ -75,6 +73,7 @@ public class Application extends JFrame {
     public void initialize() throws SQLException, ClassNotFoundException, IOException {
         initializeLayout();
 
+        addWindowListener(controller);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 

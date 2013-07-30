@@ -10,8 +10,11 @@ import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
-public class ApplicationController implements NewEntryDialog.OnEntryAddedListener {
+
+public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
@@ -26,6 +29,18 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         this.configuration = configuration;
     }
 
+    @Override
+    public void onEntryAdded(EntryCategory category, Entry entry) {
+        LOGGER.debug("Caught 'onEntryAdded' event");
+
+        dataSource.addEntry(category, entry);
+
+        if (entryList.addEntry(category, entry)) {
+            LOGGER.info("Successfully added entry '{}'", entry);
+        } else {
+            LOGGER.error("Unable to add entry '{}'", entry);
+        }
+    }
 
     public EntryDataSource getDataSource() {
         return dataSource;
@@ -37,18 +52,6 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     }
 
 
-    @Override
-    public void onEntryAdded(EntryCategory category, Entry entry) {
-        LOGGER.debug("Caught 'onEntryAdded' event");
-
-        if (entryList.addEntry(category, entry)) {
-            LOGGER.info("Successfully added entry '{}'", entry);
-        } else {
-            LOGGER.error("Unable to add entry '{}'", entry);
-        }
-    }
-
-
     public void setEntryList(EntryList entryList) {
         this.entryList = entryList;
     }
@@ -56,5 +59,44 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
 
     public void setButtonBar(ButtonBar buttonBar) {
         this.buttonBar = buttonBar;
+    }
+
+    private void shutdown() {
+        dataSource.close();
+    }
+
+    @Override
+    public void windowOpened(WindowEvent windowEvent) {
+        // nothing to do
+    }
+
+    @Override
+    public void windowClosing(WindowEvent windowEvent) {
+        shutdown();
+    }
+
+    @Override
+    public void windowClosed(WindowEvent windowEvent) {
+        // nothing to do
+    }
+
+    @Override
+    public void windowIconified(WindowEvent windowEvent) {
+        // nothing to do
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent windowEvent) {
+        // nothing to do
+    }
+
+    @Override
+    public void windowActivated(WindowEvent windowEvent) {
+        // nothing to do
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent windowEvent) {
+        // nothing to do
     }
 }

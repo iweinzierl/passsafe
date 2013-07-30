@@ -18,26 +18,25 @@ import java.util.Map;
 
 public class SqliteDataSource implements EntryDataSource {
 
-    public static final String SQL_CREATE_CATEGORY =
-            "CREATE TABLE category (" +
-                    "  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "  title TEXT NOT NULL" +
-                    ");";
+    public static final String SQL_CREATE_CATEGORY = "CREATE TABLE category (" +
+            "  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "  title TEXT NOT NULL" +
+            ");";
 
-    public static final String SQL_CREATE_ENTRY =
-            "CREATE TABLE entry ( " +
-                    "  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "  category_id INTEGER NOT NULL, " +
-                    "  title TEXT NOT NULL, " +
-                    "  username TEXT, " +
-                    "  password TEXT NOT NULL " +
-                    ");";
+    public static final String SQL_CREATE_ENTRY = "CREATE TABLE entry ( " +
+            "  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "  category_id INTEGER NOT NULL, " +
+            "  title TEXT NOT NULL, " +
+            "  username TEXT, " +
+            "  password TEXT NOT NULL " +
+            ");";
 
-    public static final String SQL_LOAD_CATEGORIES =
-            "SELECT id, title FROM category ORDER BY title";
+    public static final String SQL_LOAD_CATEGORIES = "SELECT id, title FROM category ORDER BY title";
 
-    public static final String SQL_LOAD_ENTRIES =
-            "SELECT id, category_id, title, username, password FROM entry";
+    public static final String SQL_LOAD_ENTRIES = "SELECT id, category_id, title, username, password FROM entry";
+
+    public static final String SQL_INSERT_ENTRY = "INSERT INTO entry (category_id, title, username, " +
+            "" + "password) VALUES (?, ?, ?, ?)";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SqliteDataSource.class);
 
@@ -67,6 +66,7 @@ public class SqliteDataSource implements EntryDataSource {
         boolean isNew = !db.exists();
 
         conn = DriverManager.getConnection("jdbc:sqlite:" + dbfile);
+        conn.setAutoCommit(true);
 
         if (isNew) {
             LOGGER.info("SQLite database is new. Initialize now...");
@@ -158,7 +158,9 @@ public class SqliteDataSource implements EntryDataSource {
 
     @Override
     public int getItemCount(EntryCategory category) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        List<Entry> entries = entryMap.get(category);
+
+        return entries == null || entries.isEmpty() ? 0 : entries.size();
     }
 
 
@@ -187,14 +189,70 @@ public class SqliteDataSource implements EntryDataSource {
 
     @Override
     public void addEntry(EntryCategory category, Entry entry) {
+        SqliteEntryCategory sqliteCategory;
 
-        // TODO add to database
+        if (!(category instanceof SqliteEntryCategory)) {
+            sqliteCategory = findCategory(category);
+        } else {
+            sqliteCategory = (SqliteEntryCategory) category;
+        }
 
-        if (dataSourceChangedListener != null) {
-            dataSourceChangedListener.onEntryAdded(category, entry);
+        if (sqliteCategory == null) {
+            LOGGER.error("Did not find sqlite category '{}'", category);
+            return;
+        }
+
+        try {
+            if (conn.isReadOnly()) {
+                LOGGER.error("Database is read-only!");
+                return;
+            }
+
+            PreparedStatement statement = conn.prepareStatement(SQL_INSERT_ENTRY);
+            statement.setInt(1, sqliteCategory.getId());
+            statement.setString(2, entry.getTitle());
+            statement.setString(3, entry.getUsername());
+            statement.setString(4, entry.getPassword());
+
+            int result = statement.executeUpdate();
+            if (result <= 0) {
+                LOGGER.error("Storage of entry '{}' was not successful", entry.toString());
+                return;
+            }
+
+            if (dataSourceChangedListener != null) {
+                dataSourceChangedListener.onEntryAdded(category, entry);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Unable to create new entry", e);
         }
     }
 
+
+    public SqliteEntryCategory findCategory(EntryCategory category) {
+        for (EntryCategory tmp : categories) {
+            if (tmp.getTitle().equals(category.getTitle())) {
+                return (SqliteEntryCategory) category;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void close() {
+        if (conn != null) {
+
+            try {
+
+                LOGGER.info("Close connection to SQLite database '{}'", dbfile);
+                conn.close();
+
+            } catch (SQLException e) {
+                LOGGER.error("Error while closing connection.", e);
+            }
+        }
+    }
 
     private static class SqliteEntryCategory extends EntryCategory {
 
