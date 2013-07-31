@@ -3,11 +3,9 @@ package de.iweinzierl.passsafe.gui.widget.tree;
 import de.iweinzierl.passsafe.gui.data.Entry;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-import java.util.Enumeration;
 
 
-public class EntryNode extends DefaultMutableTreeNode {
+public class EntryNode extends DefaultMutableTreeNode implements EntryListNode {
 
     private Entry entry;
 

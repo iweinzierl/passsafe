@@ -8,7 +8,7 @@ import javax.swing.tree.TreeNode;
 import java.util.List;
 
 
-public class CategoryNode extends DefaultMutableTreeNode {
+public class CategoryNode extends DefaultMutableTreeNode implements EntryListNode {
 
     private TreeNode parent;
 

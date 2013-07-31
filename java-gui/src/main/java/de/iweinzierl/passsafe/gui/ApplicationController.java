@@ -4,6 +4,7 @@ import de.iweinzierl.passsafe.gui.configuration.Configuration;
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
+import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
@@ -14,7 +15,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 
-public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener {
+public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
@@ -40,6 +41,18 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         } else {
             LOGGER.error("Unable to add entry '{}'", entry);
         }
+    }
+
+    @Override
+    public void onEntryRemoved(Entry entry) {
+        dataSource.removeEntry(entry);
+        entryList.removeEntry(entry);
+    }
+
+    @Override
+    public void onCategoryRemoved(EntryCategory category) {
+        dataSource.removeCategory(category);
+        entryList.removeCategory(category);
     }
 
     public EntryDataSource getDataSource() {

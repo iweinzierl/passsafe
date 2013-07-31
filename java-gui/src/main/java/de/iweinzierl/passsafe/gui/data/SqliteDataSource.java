@@ -28,7 +28,8 @@ public class SqliteDataSource implements EntryDataSource {
             "  category_id INTEGER NOT NULL, " +
             "  title TEXT NOT NULL, " +
             "  username TEXT, " +
-            "  password TEXT NOT NULL " +
+            "  password TEXT NOT NULL, " +
+            "  FOREIGN KEY (category_id) REFERENCES category(id)" +
             ");";
 
     public static final String SQL_LOAD_CATEGORIES = "SELECT id, title FROM category ORDER BY title";
@@ -37,6 +38,12 @@ public class SqliteDataSource implements EntryDataSource {
 
     public static final String SQL_INSERT_ENTRY = "INSERT INTO entry (category_id, title, username, " +
             "" + "password) VALUES (?, ?, ?, ?)";
+
+    public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE id = ?";
+
+    public static final String SQL_REMOVE_CATEGORY = "DELETE FROM category WHERE id = ?";
+
+    public static final String SQL_REMOVE_CATEGORY_ENTRIES = "DELETE FROM entry WHERE category_id = ?";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SqliteDataSource.class);
 
@@ -237,6 +244,60 @@ public class SqliteDataSource implements EntryDataSource {
         }
 
         return null;
+    }
+
+    @Override
+    public void removeEntry(Entry entry) {
+        LOGGER.debug("Go an remove entry '{}'", entry);
+
+        if (!(entry instanceof SqliteEntry)) {
+            LOGGER.warn("Cannot remove entry from type '{}'", entry.getClass());
+            return;
+        }
+
+        try {
+            PreparedStatement remove = conn.prepareStatement(SQL_REMOVE_ENTRY);
+            remove.setInt(1, ((SqliteEntry) entry).getId());
+            int affected = remove.executeUpdate();
+
+            if (affected <= 0) {
+                LOGGER.error("Deletion of entry was not successful.");
+            }
+
+            LOGGER.info("Successfully deleted entry '{}'", entry);
+
+        } catch (SQLException e) {
+            LOGGER.error("Unable to remove entry '{}'", entry);
+        }
+    }
+
+    @Override
+    public void removeCategory(EntryCategory category) {
+        LOGGER.debug("Go an remove category '{}'", category);
+
+        if (!(category instanceof SqliteEntryCategory)) {
+            LOGGER.warn("Cannot remove category from type '{}'", category.getClass());
+            return;
+        }
+
+        try {
+            PreparedStatement removeEntries = conn.prepareStatement(SQL_REMOVE_CATEGORY_ENTRIES);
+            removeEntries.setInt(1, ((SqliteEntryCategory) category).getId());
+            removeEntries.execute();
+
+            PreparedStatement remove = conn.prepareStatement(SQL_REMOVE_CATEGORY);
+            remove.setInt(1, ((SqliteEntryCategory) category).getId());
+            int affected = remove.executeUpdate();
+
+            if (affected <= 0) {
+                LOGGER.error("Deletion of category was not successful.");
+            }
+
+            LOGGER.info("Successfully deleted category '{}'", category);
+
+        } catch (SQLException e) {
+            LOGGER.error("Unable to remove category '{}'", category);
+        }
     }
 
     @Override

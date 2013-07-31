@@ -17,5 +17,9 @@ public interface EntryDataSource {
 
     void setDataSourceChangedListener(DataSourceChangedListener listener);
 
+    void removeEntry(Entry entry);
+
+    void removeCategory(EntryCategory category);
+
     void close();
 }
