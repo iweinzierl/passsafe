@@ -5,7 +5,10 @@ import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
+import de.iweinzierl.passsafe.gui.widget.Display;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
+import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
+import de.iweinzierl.passsafe.gui.widget.table.EntryTableModel;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,8 @@ public class Application extends JFrame {
 
     private ButtonBar buttonBar;
     private EntryList entryList;
+    private Display display;
+
     private ApplicationController controller;
 
 
@@ -45,12 +50,17 @@ public class Application extends JFrame {
 
         ButtonBar buttonBar = new ButtonBar(controller, app);
         EntryList entryList = EntryList.create(controller, app, controller.getDataSource());
+        EntryTable entryTable = new EntryTable(controller, new EntryTableModel());
+
+        Display display = new Display(controller, entryTable);
 
         controller.setEntryList(entryList);
+        controller.setEntryTable(entryTable);
         controller.setButtonBar(buttonBar);
 
         app.setButtonBar(buttonBar);
         app.setEntryList(entryList);
+        app.setDisplay(display);
 
         try {
             app.initialize();
@@ -91,6 +101,7 @@ public class Application extends JFrame {
         contentPane.setLayout(new BorderLayout());
         contentPane.add(buttonBar, BorderLayout.NORTH);
         contentPane.add(entryListPane, BorderLayout.WEST);
+        contentPane.add(display, BorderLayout.CENTER);
 
         contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_WIDTH));
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -106,5 +117,9 @@ public class Application extends JFrame {
 
     public void setEntryList(EntryList entryList) {
         this.entryList = entryList;
+    }
+
+    public void setDisplay(Display display) {
+        this.display = display;
     }
 }

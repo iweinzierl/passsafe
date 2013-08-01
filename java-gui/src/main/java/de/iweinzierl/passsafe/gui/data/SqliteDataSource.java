@@ -1,5 +1,7 @@
 package de.iweinzierl.passsafe.gui.data;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 
 public class SqliteDataSource implements EntryDataSource {
@@ -52,7 +53,7 @@ public class SqliteDataSource implements EntryDataSource {
     private Connection conn;
 
     private List<EntryCategory> categories;
-    private Map<EntryCategory, List<Entry>> entryMap;
+    private Multimap<EntryCategory, Entry> entryMap;
 
 
     public SqliteDataSource(String dbfile) throws SQLException, ClassNotFoundException, IOException {
@@ -60,7 +61,7 @@ public class SqliteDataSource implements EntryDataSource {
 
         this.dbfile = dbfile;
         this.categories = new ArrayList<>();
-        this.entryMap = new HashMap<>();
+        this.entryMap = ArrayListMultimap.create();
 
         initialize(dbfile);
         preLoad();
@@ -136,14 +137,14 @@ public class SqliteDataSource implements EntryDataSource {
             EntryCategory category = getCategoryById(categoryId);
 
             if (category != null) {
-                List<Entry> entries = entryMap.get(category);
+                Collection<Entry> entries = entryMap.get(category);
 
                 if (entries == null) {
                     entries = new ArrayList<>();
-                    entryMap.put(category, entries);
+                    entryMap.put(category, (Entry) entries);
                 }
 
-                entries.add(new SqliteEntry(id, title, username, password));
+                entries.add(new SqliteEntry(category, id, title, username, password));
                 loaded++;
             }
         }
@@ -165,7 +166,7 @@ public class SqliteDataSource implements EntryDataSource {
 
     @Override
     public int getItemCount(EntryCategory category) {
-        List<Entry> entries = entryMap.get(category);
+        Collection<Entry> entries = entryMap.get(category);
 
         return entries == null || entries.isEmpty() ? 0 : entries.size();
     }
@@ -179,13 +180,13 @@ public class SqliteDataSource implements EntryDataSource {
 
     @Override
     public List<Entry> getAllEntries(EntryCategory category) {
-        return entryMap.get(category);
+        return (List<Entry>) entryMap.get(category);
     }
 
 
     @Override
     public Entry getEntry(EntryCategory category, int index) {
-        List<Entry> entries = entryMap.get(category);
+        List<Entry> entries = (List<Entry>) entryMap.get(category);
         if (entries != null && !entries.isEmpty() && entries.size() > index) {
             return entries.get(index);
         }
@@ -227,6 +228,8 @@ public class SqliteDataSource implements EntryDataSource {
                 return;
             }
 
+            entryMap.put(category, entry);
+
             if (dataSourceChangedListener != null) {
                 dataSourceChangedListener.onEntryAdded(category, entry);
             }
@@ -262,8 +265,10 @@ public class SqliteDataSource implements EntryDataSource {
 
             if (affected <= 0) {
                 LOGGER.error("Deletion of entry was not successful.");
+                return;
             }
 
+            entryMap.remove(entry.getCategory(), entry);
             LOGGER.info("Successfully deleted entry '{}'", entry);
 
         } catch (SQLException e) {
@@ -291,8 +296,10 @@ public class SqliteDataSource implements EntryDataSource {
 
             if (affected <= 0) {
                 LOGGER.error("Deletion of category was not successful.");
+                return;
             }
 
+            categories.remove(category);
             LOGGER.info("Successfully deleted category '{}'", category);
 
         } catch (SQLException e) {
@@ -348,13 +355,13 @@ public class SqliteDataSource implements EntryDataSource {
         private int id;
 
 
-        public SqliteEntry(String title, String username, String password) {
-            super(title, username, password);
+        public SqliteEntry(EntryCategory category, String title, String username, String password) {
+            super(category, title, username, password);
         }
 
 
-        public SqliteEntry(int id, String title, String username, String password) {
-            this(title, username, password);
+        public SqliteEntry(EntryCategory category, int id, String title, String username, String password) {
+            this(category, title, username, password);
             this.id = id;
         }
 

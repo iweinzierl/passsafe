@@ -1,5 +1,6 @@
 package de.iweinzierl.passsafe.gui;
 
+import com.google.common.collect.Lists;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
@@ -8,14 +9,20 @@ import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
+import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
+import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
+import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 
-public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener {
+public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener, TreeSelectionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
@@ -23,6 +30,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
 
     private EntryDataSource dataSource;
     private EntryList entryList;
+    private EntryTable entryTable;
     private ButtonBar buttonBar;
 
 
@@ -38,6 +46,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
 
         if (entryList.addEntry(category, entry)) {
             LOGGER.info("Successfully added entry '{}'", entry);
+            entryTable.tableChanged();
         } else {
             LOGGER.error("Unable to add entry '{}'", entry);
         }
@@ -55,6 +64,41 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         entryList.removeCategory(category);
     }
 
+    /**
+     * Used to keep track on EntryList changes. The selected entries are published to the EntryTable.
+     *
+     * @param treeSelectionEvent Event that keeps an instance of the selected tree item.
+     */
+    @Override
+    public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
+        TreePath newLeadSelectionPath = treeSelectionEvent.getNewLeadSelectionPath();
+        TreePath oldLeadSelectionPath = treeSelectionEvent.getOldLeadSelectionPath();
+
+        if (newLeadSelectionPath == null) {
+            if (oldLeadSelectionPath.getLastPathComponent() instanceof EntryNode) {
+                entryTable.getEntryTableModel().setEntries(null);
+                entryTable.tableChanged();
+            }
+            return;
+        }
+
+        Object lastPathComponent = newLeadSelectionPath.getLastPathComponent();
+
+        if (lastPathComponent instanceof CategoryNode) {
+            EntryCategory category = ((CategoryNode) lastPathComponent).getCategory();
+            LOGGER.debug("Selected category '{}'", category);
+
+            entryTable.getEntryTableModel().setEntries(getDataSource().getAllEntries(category));
+            entryTable.tableChanged();
+        } else if (lastPathComponent instanceof EntryNode) {
+            Entry entry = ((EntryNode) lastPathComponent).getEntry();
+            LOGGER.debug("Selected entry '{}'", entry);
+
+            entryTable.getEntryTableModel().setEntries(Lists.newArrayList(entry));
+            entryTable.tableChanged();
+        }
+    }
+
     public EntryDataSource getDataSource() {
         return dataSource;
     }
@@ -69,6 +113,9 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         this.entryList = entryList;
     }
 
+    public void setEntryTable(EntryTable table) {
+        this.entryTable = table;
+    }
 
     public void setButtonBar(ButtonBar buttonBar) {
         this.buttonBar = buttonBar;

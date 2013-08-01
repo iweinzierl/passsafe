@@ -40,6 +40,7 @@ public class EntryList extends JTree {
         setMinimumSize(new Dimension(150, 300));
 
         initialize();
+        addTreeSelectionListener(controller);
     }
 
     private void initialize() {

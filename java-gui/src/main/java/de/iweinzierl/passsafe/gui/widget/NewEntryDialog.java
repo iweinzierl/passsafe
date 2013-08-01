@@ -151,8 +151,8 @@ public class NewEntryDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'save new entry'");
 
-                fireOnEntryAdded(
-                        new Entry(titleField.getText(), usernameField.getText(), passwordField.getText()));
+                fireOnEntryAdded(new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
+                        usernameField.getText(), passwordField.getText()));
 
                 dispose();
             }
