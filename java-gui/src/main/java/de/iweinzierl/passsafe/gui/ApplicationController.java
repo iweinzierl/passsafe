@@ -8,6 +8,7 @@ import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
+import de.iweinzierl.passsafe.gui.widget.EntryView;
 import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
@@ -22,7 +23,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 
-public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener, TreeSelectionListener {
+public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener,
+        TreeSelectionListener, EntryTable.SelectionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
@@ -31,6 +33,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private EntryDataSource dataSource;
     private EntryList entryList;
     private EntryTable entryTable;
+    private EntryView entryView;
     private ButtonBar buttonBar;
 
 
@@ -99,6 +102,16 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         }
     }
 
+    @Override
+    public void onSelectionChanged(Entry entry) {
+        if (entry != null) {
+            entryView.apply(entry);
+        }
+        else {
+            entryView.reset();
+        }
+    }
+
     public EntryDataSource getDataSource() {
         return dataSource;
     }
@@ -115,6 +128,10 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
 
     public void setEntryTable(EntryTable table) {
         this.entryTable = table;
+    }
+
+    public void setEntryView(EntryView entryView) {
+        this.entryView = entryView;
     }
 
     public void setButtonBar(ButtonBar buttonBar) {

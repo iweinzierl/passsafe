@@ -7,6 +7,7 @@ import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.Display;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
+import de.iweinzierl.passsafe.gui.widget.EntryView;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTableModel;
 import org.apache.log4j.BasicConfigurator;
@@ -50,12 +51,14 @@ public class Application extends JFrame {
 
         ButtonBar buttonBar = new ButtonBar(controller, app);
         EntryList entryList = EntryList.create(controller, app, controller.getDataSource());
-        EntryTable entryTable = new EntryTable(controller, new EntryTableModel());
+        EntryTable entryTable = new EntryTable(controller, new EntryTableModel(), controller);
+        EntryView entryView = new EntryView(controller);
 
-        Display display = new Display(controller, entryTable);
+        Display display = new Display(controller, entryTable, entryView);
 
         controller.setEntryList(entryList);
         controller.setEntryTable(entryTable);
+        controller.setEntryView(entryView);
         controller.setButtonBar(buttonBar);
 
         app.setButtonBar(buttonBar);

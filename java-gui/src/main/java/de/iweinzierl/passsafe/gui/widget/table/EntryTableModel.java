@@ -2,12 +2,11 @@ package de.iweinzierl.passsafe.gui.widget.table;
 
 import de.iweinzierl.passsafe.gui.data.Entry;
 
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntryTableModel implements TableModel {
+public class EntryTableModel extends AbstractTableModel {
 
     public static final String[] COLUMNS_NAMES = {"title", "username", "password"};
     public static final Class[] COLUMNS_CLASSES = {String.class, String.class, String.class};
@@ -15,7 +14,16 @@ public class EntryTableModel implements TableModel {
     private List<Entry> entries;
 
     public EntryTableModel() {
+        super();
         this.entries = new ArrayList<>(0);
+    }
+
+    public Entry getEntry(int row) {
+        if (row < entries.size()) {
+            return  entries.get(row);
+        }
+
+        return null;
     }
 
     @Override
@@ -63,16 +71,6 @@ public class EntryTableModel implements TableModel {
     @Override
     public void setValueAt(Object o, int i, int i2) {
         // table will not be editable
-    }
-
-    @Override
-    public void addTableModelListener(TableModelListener tableModelListener) {
-        // TODO
-    }
-
-    @Override
-    public void removeTableModelListener(TableModelListener tableModelListener) {
-        // TODO
     }
 
     public void setEntries(List<Entry> entries) {

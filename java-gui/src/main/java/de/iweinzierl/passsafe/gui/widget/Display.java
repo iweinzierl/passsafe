@@ -12,13 +12,14 @@ public class Display extends JPanel {
     private ApplicationController controller;
 
     private EntryTable entryTable;
-    //private EntryView entryView;
+    private EntryView entryView;
 
-    public Display(ApplicationController controller, EntryTable entryTable) {
+    public Display(ApplicationController controller, EntryTable entryTable, EntryView entryView) {
         super();
 
         this.controller = controller;
         this.entryTable = entryTable;
+        this.entryView = entryView;
 
         initialize();
     }
@@ -26,5 +27,6 @@ public class Display extends JPanel {
     private void initialize() {
         setLayout(new BorderLayout());
         add(new JScrollPane(entryTable), BorderLayout.CENTER);
+        add(new JScrollPane(entryView), BorderLayout.SOUTH);
     }
 }
