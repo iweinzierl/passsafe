@@ -4,18 +4,90 @@ import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.widget.secret.SwitchablePasswordField;
 
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
 
 // TODO make text fields smaller
 public class EntryView extends JPanel {
+
+    private class ClipboardMenu extends JMenuItem {
+
+        private ClipboardMenu(JComponent component) {
+            super(new ClipboardMenuAction(component));
+        }
+    }
+
+    private class ClipboardMenuAction implements Action {
+
+        private JComponent component;
+
+        private ClipboardMenuAction(JComponent component) {
+            this.component = component;
+        }
+
+        @Override
+        public Object getValue(String key) {
+            switch (key) {
+                case "Name":
+                    return "in die Zwischenablage kopieren";
+            }
+
+            return null;
+        }
+
+        @Override
+        public void putValue(String key, Object value) {
+            // nothing to do here
+        }
+
+        @Override
+        public void setEnabled(boolean b) {
+            // nothing to do here
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        @Override
+        public void addPropertyChangeListener(PropertyChangeListener listener) {
+            // nothing to do here
+        }
+
+        @Override
+        public void removePropertyChangeListener(PropertyChangeListener listener) {
+            // nothing to do here
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Clipboard clipboard = getToolkit().getSystemClipboard();
+            String text = null;
+            if (component instanceof JTextField) {
+                text = ((JTextField) component).getText();
+            } else if (component instanceof SwitchablePasswordField) {
+                text = ((SwitchablePasswordField) component).getPassword();
+            }
+
+            StringSelection stringSelection = new StringSelection(text);
+            clipboard.setContents(stringSelection, null);
+        }
+    }
 
     private ApplicationController controller;
 
@@ -58,6 +130,20 @@ public class EntryView extends JPanel {
 
         setPreferredSize(new Dimension(300, 150));
         setMinimumSize(new Dimension(300, 150));
+
+        initializeClipboardFunctions(titleField);
+        initializeClipboardFunctions(usernameField);
+        initializeClipboardFunctions(passwordField);
+    }
+
+    private void initializeClipboardFunctions(JComponent textField) {
+        JPopupMenu componentPopupMenu = textField.getComponentPopupMenu();
+        if (componentPopupMenu == null) {
+            componentPopupMenu = new JPopupMenu("Clipboard");
+            textField.setComponentPopupMenu(componentPopupMenu);
+        }
+
+        componentPopupMenu.add(new ClipboardMenu(textField));
     }
 
     public void apply(Entry entry) {

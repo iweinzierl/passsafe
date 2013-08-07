@@ -3,6 +3,7 @@ package de.iweinzierl.passsafe.gui.widget.secret;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
 public class SwitchablePasswordField extends JPanel {
@@ -60,5 +61,11 @@ public class SwitchablePasswordField extends JPanel {
     public void setEditable(boolean editable) {
         visibleField.setEditable(editable);
         invisibleField.setEditable(editable);
+    }
+
+    @Override
+    public void setComponentPopupMenu(JPopupMenu popup) {
+        visibleField.setComponentPopupMenu(popup);
+        invisibleField.setComponentPopupMenu(popup);
     }
 }
