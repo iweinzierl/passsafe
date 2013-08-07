@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui.widget.tree;
 
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
-import de.iweinzierl.passsafe.gui.i18n.Messages;
+import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

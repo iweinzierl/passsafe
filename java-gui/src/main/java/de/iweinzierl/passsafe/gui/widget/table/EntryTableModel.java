@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui.widget.table;
 
 import de.iweinzierl.passsafe.gui.data.Entry;
-import de.iweinzierl.passsafe.gui.i18n.Messages;
+import de.iweinzierl.passsafe.gui.resources.Messages;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;

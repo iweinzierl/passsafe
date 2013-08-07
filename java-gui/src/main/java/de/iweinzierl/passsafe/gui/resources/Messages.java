@@ -1,4 +1,4 @@
-package de.iweinzierl.passsafe.gui.i18n;
+package de.iweinzierl.passsafe.gui.resources;
 
 import java.util.ResourceBundle;
 

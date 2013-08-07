@@ -2,7 +2,9 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.data.Entry;
-import de.iweinzierl.passsafe.gui.i18n.Messages;
+import de.iweinzierl.passsafe.gui.resources.Images;
+import de.iweinzierl.passsafe.gui.resources.Messages;
+import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.secret.SwitchablePasswordField;
 
 import javax.swing.Action;
@@ -166,9 +168,9 @@ public class EntryView extends JPanel {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        final JButton edit = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_EDIT));
-        final JButton save = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_SAVE));
-        final JButton cancel = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_CANCEL));
+        final JButton edit = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
+        final JButton save = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
+        final JButton cancel = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
 
         edit.addActionListener(new ActionListener() {
             @Override
@@ -216,9 +218,9 @@ public class EntryView extends JPanel {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        final JButton edit = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_EDIT));
-        final JButton save = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_SAVE));
-        final JButton cancel = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_CANCEL));
+        final JButton edit = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
+        final JButton save = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
+        final JButton cancel = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
         final JButton visible = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_VISIBLE));
         final JButton invisible = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_INVISIBLE));
 

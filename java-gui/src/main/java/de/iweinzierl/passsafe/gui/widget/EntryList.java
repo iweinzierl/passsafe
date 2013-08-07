@@ -5,7 +5,7 @@ import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
-import de.iweinzierl.passsafe.gui.i18n.Messages;
+import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryListNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;

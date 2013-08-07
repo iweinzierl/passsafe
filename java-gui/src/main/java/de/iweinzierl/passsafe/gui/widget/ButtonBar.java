@@ -2,7 +2,7 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.gui.i18n.Messages;
+import de.iweinzierl.passsafe.gui.resources.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
