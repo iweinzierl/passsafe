@@ -5,6 +5,7 @@ import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
+import de.iweinzierl.passsafe.gui.i18n.Messages;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryListNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
@@ -46,7 +47,7 @@ public class EntryList extends JTree {
     private void initialize() {
         JPopupMenu menu = getComponentPopupMenu();
         if (menu == null) {
-            menu = new JPopupMenu("Kategorien");
+            menu = new JPopupMenu(Messages.getMessage(Messages.ENTRYLIST_CATEGORIES));
             setComponentPopupMenu(menu);
         }
 
@@ -164,7 +165,7 @@ public class EntryList extends JTree {
     }
 
     public static TreeNode createRootNode(EntryDataSource dataSource) {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(Messages.getMessage(Messages.ENTRYLIST_ROOTNODE));
 
         for (EntryCategory category : dataSource.getCategories()) {
             CategoryNode categoryNode = new CategoryNode(category);

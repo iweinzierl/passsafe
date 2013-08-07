@@ -3,6 +3,7 @@ package de.iweinzierl.passsafe.gui;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
+import de.iweinzierl.passsafe.gui.i18n.Messages;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.Display;
@@ -88,6 +89,7 @@ public class Application extends JFrame {
 
         addWindowListener(controller);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setTitle(Messages.getMessage(Messages.APP_TITLE));
     }
 
 

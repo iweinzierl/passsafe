@@ -2,6 +2,7 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.data.Entry;
+import de.iweinzierl.passsafe.gui.i18n.Messages;
 import de.iweinzierl.passsafe.gui.widget.secret.SwitchablePasswordField;
 
 import javax.swing.Action;
@@ -43,7 +44,7 @@ public class EntryView extends JPanel {
         public Object getValue(String key) {
             switch (key) {
                 case "Name":
-                    return "in die Zwischenablage kopieren";
+                    return Messages.getMessage(Messages.ENTRYVIEW_MENU_COPYTOCLIPBOARD);
             }
 
             return null;
@@ -116,15 +117,15 @@ public class EntryView extends JPanel {
         usernameField.setEditable(false);
         passwordField.setEditable(false);
 
-        add(new JLabel("Titel:"));
+        add(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_TITLE)));
         add(titleField);
         add(createStandardButtons(titleField));
 
-        add(new JLabel("User:"));
+        add(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_USERNAME)));
         add(usernameField);
         add(createSecretButtons(usernameField));
 
-        add(new JLabel("Passwort:"));
+        add(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_PASSWORD)));
         add(passwordField);
         add(createSecretButtons(passwordField));
 
@@ -139,7 +140,7 @@ public class EntryView extends JPanel {
     private void initializeClipboardFunctions(JComponent textField) {
         JPopupMenu componentPopupMenu = textField.getComponentPopupMenu();
         if (componentPopupMenu == null) {
-            componentPopupMenu = new JPopupMenu("Clipboard");
+            componentPopupMenu = new JPopupMenu(Messages.getMessage(Messages.ENTRYVIEW_MENU_TITLE));
             textField.setComponentPopupMenu(componentPopupMenu);
         }
 
@@ -165,9 +166,9 @@ public class EntryView extends JPanel {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        final JButton edit = new JButton("Bearbeiten");
-        final JButton save = new JButton("Speichern");
-        final JButton cancel = new JButton("Cancel");
+        final JButton edit = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_EDIT));
+        final JButton save = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_SAVE));
+        final JButton cancel = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_CANCEL));
 
         edit.addActionListener(new ActionListener() {
             @Override
@@ -215,11 +216,11 @@ public class EntryView extends JPanel {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        final JButton edit = new JButton("Bearbeiten");
-        final JButton save = new JButton("Speichern");
-        final JButton cancel = new JButton("Cancel");
-        final JButton visible = new JButton("Visible");
-        final JButton invisible = new JButton("Invisible");
+        final JButton edit = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_EDIT));
+        final JButton save = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_SAVE));
+        final JButton cancel = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_CANCEL));
+        final JButton visible = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_VISIBLE));
+        final JButton invisible = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_INVISIBLE));
 
         edit.addActionListener(new ActionListener() {
             @Override

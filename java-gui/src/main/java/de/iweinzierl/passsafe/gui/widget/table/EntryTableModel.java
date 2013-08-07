@@ -1,6 +1,7 @@
 package de.iweinzierl.passsafe.gui.widget.table;
 
 import de.iweinzierl.passsafe.gui.data.Entry;
+import de.iweinzierl.passsafe.gui.i18n.Messages;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -8,7 +9,10 @@ import java.util.List;
 
 public class EntryTableModel extends AbstractTableModel {
 
-    public static final String[] COLUMNS_NAMES = {"title", "username", "password"};
+    public static final String[] COLUMNS_NAMES = {Messages.getMessage(
+            Messages.ENTRYTABLE_COLUMN_TITLE), Messages.getMessage(
+            Messages.ENTRYTABLE_COLUMN_USERNAME), Messages.getMessage(Messages.ENTRYTABLE_COLUMN_PASSWORD)};
+
     public static final Class[] COLUMNS_CLASSES = {String.class, String.class, String.class};
 
     private List<Entry> entries;
@@ -20,7 +24,7 @@ public class EntryTableModel extends AbstractTableModel {
 
     public Entry getEntry(int row) {
         if (row < entries.size()) {
-            return  entries.get(row);
+            return entries.get(row);
         }
 
         return null;
@@ -58,10 +62,14 @@ public class EntryTableModel extends AbstractTableModel {
 
             switch (column) {
 
-                case 0: return entry.getTitle();
-                case 1: return "********";
-                case 2: return "********";
-                default: return "???";
+                case 0:
+                    return entry.getTitle();
+                case 1:
+                    return "********";
+                case 2:
+                    return "********";
+                default:
+                    return "???";
             }
         }
 
@@ -76,8 +84,7 @@ public class EntryTableModel extends AbstractTableModel {
     public void setEntries(List<Entry> entries) {
         if (entries == null) {
             this.entries = new ArrayList<>();
-        }
-        else {
+        } else {
             this.entries = entries;
         }
     }

@@ -2,6 +2,7 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.gui.i18n.Messages;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class NewEntryDialog extends JDialog {
 
 
     public NewEntryDialog(JFrame parent, List<EntryCategory> categories) {
-        super(parent, "Neuen Eintrag erstellen", true);
+        super(parent, Messages.getMessage(Messages.NEWENTRYDIALOG_TITLE), true);
         this.categories = categories;
         this.onEntryAddedListeners = new ArrayList<>();
         initialize();
@@ -94,7 +95,7 @@ public class NewEntryDialog extends JDialog {
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
 
         passwordField = new JPasswordField(TEXT_COLUMNS);
-        panel.add(createLabel("Passwort:"));
+        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_PASSWORD)));
         panel.add(passwordField);
 
         return panel;
@@ -107,7 +108,7 @@ public class NewEntryDialog extends JDialog {
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
 
         usernameField = createTextField();
-        panel.add(createLabel("Benutzer:"));
+        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_USERNAME)));
         panel.add(usernameField);
 
         return panel;
@@ -120,7 +121,7 @@ public class NewEntryDialog extends JDialog {
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
 
         titleField = createTextField();
-        panel.add(createLabel("Titel:"));
+        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_TITLE)));
         panel.add(titleField);
 
         return panel;
@@ -128,13 +129,13 @@ public class NewEntryDialog extends JDialog {
 
 
     private Container createCategoryPanel() {
-        categoryBox = new JComboBox<EntryCategory>(categories.toArray(new EntryCategory[categories.size()]));
+        categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories.size()]));
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
 
-        panel.add(createLabel("Kategory:"));
+        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY)));
         panel.add(categoryBox);
 
         return panel;
@@ -146,7 +147,7 @@ public class NewEntryDialog extends JDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
 
-        panel.add(createButton("Speichern", new ActionListener() {
+        panel.add(createButton(Messages.getMessage(Messages.NEWENTRYDIALOG_BUTTON_SAVE), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'save new entry'");
@@ -158,7 +159,7 @@ public class NewEntryDialog extends JDialog {
             }
         }));
 
-        panel.add(createButton("Abbrechen", new ActionListener() {
+        panel.add(createButton(Messages.getMessage(Messages.NEWENTRYDIALOG_BUTTON_CANCEL), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'cancel new entry'");

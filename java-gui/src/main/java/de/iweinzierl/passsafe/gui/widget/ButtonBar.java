@@ -2,6 +2,7 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.i18n.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class ButtonBar extends JPanel {
 
 
     private JButton createAddEntryButton() {
-        return createButton("Neuer Eintrag", new ActionListener() {
+        return createButton(Messages.getMessage(Messages.BUTTONBAR_NEWENTRY), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'new entry'");
@@ -57,7 +58,7 @@ public class ButtonBar extends JPanel {
 
 
     private JButton createDeleteEntryButton() {
-        return createButton("Eintrag entfernen", new ActionListener() {
+        return createButton(Messages.getMessage(Messages.BUTTONBAR_REMOVEENTRY), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'delete entry'");
