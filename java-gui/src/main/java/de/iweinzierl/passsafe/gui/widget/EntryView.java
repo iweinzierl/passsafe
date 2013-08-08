@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -112,31 +112,58 @@ public class EntryView extends JPanel {
     }
 
     private void initialize() {
-        setPreferredSize(new Dimension(200, 100));
-        setLayout(new GridLayout(3, 3));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         titleField.setEditable(false);
         usernameField.setEditable(false);
         passwordField.setEditable(false);
 
-        add(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_TITLE)));
-        add(titleField);
-        add(createStandardButtons(titleField));
+        add(createTitleRow());
+        add(createUsernameRow());
+        add(createPasswordRow());
 
-        add(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_USERNAME)));
-        add(usernameField);
-        add(createSecretButtons(usernameField));
+        setMinimumSize(new Dimension(425, 125));
+        setPreferredSize(new Dimension(425, 125));
+        setMaximumSize(new Dimension(700, 200));
+    }
 
-        add(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_PASSWORD)));
-        add(passwordField);
-        add(createSecretButtons(passwordField));
+    private JPanel createRow(JLabel label, JComponent inputField, JPanel buttons) {
+        JPanel row = new JPanel();
+        row.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        setPreferredSize(new Dimension(300, 150));
-        setMinimumSize(new Dimension(300, 150));
+        label.setPreferredSize(new Dimension(75, 25));
+        inputField.setPreferredSize(new Dimension(150, 25));
+        buttons.setPreferredSize((new Dimension(200, 25)));
+
+        row.add(label);
+        row.add(inputField);
+        row.add(buttons);
+
+        return row;
+    }
+
+    private JPanel createTitleRow() {
 
         initializeClipboardFunctions(titleField);
+
+        return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_TITLE)), titleField,
+                createStandardButtons(titleField));
+    }
+
+    private JPanel createUsernameRow() {
+
         initializeClipboardFunctions(usernameField);
+
+        return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_USERNAME)), usernameField,
+                createSecretButtons(usernameField));
+    }
+
+    private JPanel createPasswordRow() {
+
         initializeClipboardFunctions(passwordField);
+
+        return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_PASSWORD)), passwordField,
+                createSecretButtons(passwordField));
     }
 
     private void initializeClipboardFunctions(JComponent textField) {

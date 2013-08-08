@@ -27,7 +27,7 @@ import java.sql.SQLException;
 
 public class Application extends JFrame {
 
-    public static final int DEFAULT_WIDTH = 600;
+    public static final int DEFAULT_WIDTH = 650;
     public static final int DEFAULT_HEIGHT = 400;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
