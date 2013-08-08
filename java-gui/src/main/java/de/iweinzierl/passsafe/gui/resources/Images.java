@@ -9,6 +9,8 @@ public class Images {
     public static final String ENTRYVIEW_BUTTON_SAVE = "/icons/accept.png";
     public static final String ENTRYVIEW_BUTTON_EDIT = "/icons/edit.png";
     public static final String ENTRYVIEW_BUTTON_CANCEL = "/icons/cancel.png";
+    public static final String ENTRYVIEW_BUTTON_VISIBLE = "/icons/show.png";
+    public static final String ENTRYVIEW_BUTTON_INVISIBLE = "/icons/hide.png";
 
     private static Images INSTANCE = new Images();
 

@@ -197,10 +197,13 @@ public class EntryView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 textField.setEditable(false);
-                textField.setText("Canceled"); // TODO set correct entry text
                 save.setEnabled(false);
                 cancel.setEnabled(false);
                 edit.setEnabled(true);
+
+                if (entry != null) {
+                    textField.setText(entry.getTitle()); // XXX specific to title property!
+                }
             }
         });
 
@@ -221,8 +224,8 @@ public class EntryView extends JPanel {
         final JButton edit = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
         final JButton save = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
         final JButton cancel = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
-        final JButton visible = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_VISIBLE));
-        final JButton invisible = new JButton(Messages.getMessage(Messages.ENTRYVIEW_BUTTON_INVISIBLE));
+        final JButton visible = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_VISIBLE);
+        final JButton invisible = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_INVISIBLE);
 
         edit.addActionListener(new ActionListener() {
             @Override
