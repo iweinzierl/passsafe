@@ -110,6 +110,7 @@ public class Application extends JFrame {
 
         contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_WIDTH));
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        setMinimumSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         UiUtils.center(this);
     }

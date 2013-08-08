@@ -112,7 +112,7 @@ public class EntryView extends JPanel {
     }
 
     private void initialize() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new FlowLayout(FlowLayout.CENTER));
 
         titleField.setEditable(false);
         usernameField.setEditable(false);
