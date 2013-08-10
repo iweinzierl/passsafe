@@ -9,8 +9,20 @@ import de.iweinzierl.passsafe.gui.util.UiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -28,8 +40,9 @@ public class NewEntryDialog extends JDialog {
     public static final int LABEL_HEIGHT = 15;
     public static final int TEXT_WIDTH = 100;
     public static final int TEXT_HEIGHT = 15;
-    public static final int DEFAULT_WIDTH = 200;
-    public static final int DEFAULT_HEIGHT = 125;
+
+    public static final int DEFAULT_WIDTH = 450;
+    public static final int DEFAULT_HEIGHT = 225;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryDialog.class);
 
@@ -56,7 +69,7 @@ public class NewEntryDialog extends JDialog {
 
     public void initialize() {
         JPanel contentPane = new JPanel();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
         contentPane.add(createCategoryPanel());
         contentPane.add(createTitlePanel());
@@ -64,9 +77,11 @@ public class NewEntryDialog extends JDialog {
         contentPane.add(createPasswordPanel());
         contentPane.add(createButtons());
 
+        contentPane.setMinimumSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         setContentPane(contentPane);
 
+        setMinimumSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         UiUtils.center(this);
     }
@@ -76,6 +91,19 @@ public class NewEntryDialog extends JDialog {
         if (onEntryAddedListener != null) {
             onEntryAddedListeners.add(onEntryAddedListener);
         }
+    }
+
+    private JPanel createRow(JLabel label, JComponent inputField) {
+        JPanel row = new JPanel();
+        row.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        label.setPreferredSize(new Dimension(75, 25));
+        inputField.setPreferredSize(new Dimension(150, 25));
+
+        row.add(label);
+        row.add(inputField);
+
+        return row;
     }
 
 
@@ -95,55 +123,26 @@ public class NewEntryDialog extends JDialog {
 
 
     private Component createPasswordPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
-
         passwordField = new JPasswordField(TEXT_COLUMNS);
-        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_PASSWORD)));
-        panel.add(passwordField);
-
-        return panel;
+        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_PASSWORD)), passwordField);
     }
 
 
     private Component createUsernamePanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
-
         usernameField = createTextField();
-        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_USERNAME)));
-        panel.add(usernameField);
-
-        return panel;
+        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_USERNAME)), usernameField);
     }
 
 
     private Component createTitlePanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
-
         titleField = createTextField();
-        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_TITLE)));
-        panel.add(titleField);
-
-        return panel;
+        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_TITLE)), titleField);
     }
 
 
     private Container createCategoryPanel() {
         categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories.size()]));
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
-
-        panel.add(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY)));
-        panel.add(categoryBox);
-
-        return panel;
+        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY)), categoryBox);
     }
 
 

@@ -27,6 +27,11 @@ public class EntryCategory {
 
 
     @Override
+    public String toString() {
+        return title;
+    }
+
+    @Override
     public int hashCode() {
         return new HashCodeBuilder().appendSuper(super.hashCode()).append(title).toHashCode();
     }
