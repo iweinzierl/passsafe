@@ -49,7 +49,8 @@ public class ButtonBar extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'new entry'");
 
-                NewEntryDialog dialog = new NewEntryDialog(parent, controller.getDataSource().getCategories());
+                NewEntryDialog dialog = new NewEntryDialog(parent, controller.getDataSource().getCategories(),
+                        controller.getPasswordHandler());
                 dialog.addOnEntryAddedListeners(controller);
                 dialog.show();
             }

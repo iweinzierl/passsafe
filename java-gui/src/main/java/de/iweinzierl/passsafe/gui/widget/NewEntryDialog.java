@@ -2,7 +2,9 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.gui.exception.PassSafeException;
 import de.iweinzierl.passsafe.gui.resources.Messages;
+import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +18,6 @@ import java.util.List;
 
 
 public class NewEntryDialog extends JDialog {
-
-    private final List<EntryCategory> categories;
 
     public interface OnEntryAddedListener {
         void onEntryAdded(EntryCategory category, Entry entry);
@@ -33,6 +33,10 @@ public class NewEntryDialog extends JDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryDialog.class);
 
+    private PasswordHandler passwordHandler;
+
+    private final List<EntryCategory> categories;
+
     private List<OnEntryAddedListener> onEntryAddedListeners;
 
     private JComboBox<EntryCategory> categoryBox;
@@ -41,9 +45,10 @@ public class NewEntryDialog extends JDialog {
     private JTextField passwordField;
 
 
-    public NewEntryDialog(JFrame parent, List<EntryCategory> categories) {
+    public NewEntryDialog(JFrame parent, List<EntryCategory> categories, PasswordHandler passwordHandler) {
         super(parent, Messages.getMessage(Messages.NEWENTRYDIALOG_TITLE), true);
         this.categories = categories;
+        this.passwordHandler = passwordHandler;
         this.onEntryAddedListeners = new ArrayList<>();
         initialize();
     }
@@ -152,8 +157,18 @@ public class NewEntryDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'save new entry'");
 
-                fireOnEntryAdded(new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
-                        usernameField.getText(), passwordField.getText()));
+                try {
+
+                    String encryptedUsername = passwordHandler.encrypt(usernameField.getText());
+                    String encryptedPassword = passwordHandler.encrypt(passwordField.getText());
+
+                    fireOnEntryAdded(new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
+                            encryptedUsername, encryptedPassword));
+                }
+                catch (PassSafeException ex) {
+                    LOGGER.error("Unable to encrypt password", ex);
+                    UiUtils.displayError("TODO");
+                }
 
                 dispose();
             }

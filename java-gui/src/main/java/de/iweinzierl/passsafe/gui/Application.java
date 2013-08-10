@@ -4,6 +4,7 @@ import de.iweinzierl.passsafe.gui.configuration.Configuration;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.resources.Messages;
+import de.iweinzierl.passsafe.gui.secure.AesPasswordHandler;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.Display;
@@ -44,7 +45,7 @@ public class Application extends JFrame {
 
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
-        ApplicationController controller = new ApplicationController(configuration);
+        ApplicationController controller = new ApplicationController(configuration, new AesPasswordHandler("TEST"));
         Application app = new Application(controller);
 
         EntryDataSource dataSource = new SqliteDataSource(configuration.getDatabase());

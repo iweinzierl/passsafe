@@ -6,6 +6,7 @@ import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
+import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
@@ -23,12 +24,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 
-public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener,
-        TreeSelectionListener, EntryTable.SelectionListener {
+public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener, TreeSelectionListener, EntryTable.SelectionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
-    private Configuration configuration;
+    private final Configuration configuration;
+
+    private final PasswordHandler passwordHandler;
 
     private EntryDataSource dataSource;
     private EntryList entryList;
@@ -37,8 +39,13 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private ButtonBar buttonBar;
 
 
-    public ApplicationController(Configuration configuration) {
+    public ApplicationController(Configuration configuration, PasswordHandler passwordHandler) {
         this.configuration = configuration;
+        this.passwordHandler = passwordHandler;
+    }
+
+    public PasswordHandler getPasswordHandler() {
+        return passwordHandler;
     }
 
     @Override
@@ -106,8 +113,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     public void onSelectionChanged(Entry entry) {
         if (entry != null) {
             entryView.apply(entry);
-        }
-        else {
+        } else {
             entryView.reset();
         }
     }

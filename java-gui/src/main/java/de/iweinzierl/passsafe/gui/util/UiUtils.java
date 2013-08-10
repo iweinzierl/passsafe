@@ -41,4 +41,8 @@ public class UiUtils {
             throw new RuntimeException("Unable to load icon '" + key + "'");
         }
     }
+
+    public static void displayError(String text) {
+        // TODO
+    }
 }

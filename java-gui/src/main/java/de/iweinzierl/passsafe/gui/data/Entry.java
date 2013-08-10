@@ -42,6 +42,11 @@ public class Entry {
     }
 
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
     @Override
     public String toString() {
         return new ToStringBuilder(this).appendSuper(super.toString()).append("category", category.getTitle()).

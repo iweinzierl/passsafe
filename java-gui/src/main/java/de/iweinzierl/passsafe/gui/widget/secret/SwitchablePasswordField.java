@@ -1,5 +1,8 @@
 package de.iweinzierl.passsafe.gui.widget.secret;
 
+import com.google.common.base.Strings;
+import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
+
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -8,12 +11,10 @@ import javax.swing.JTextField;
 
 public class SwitchablePasswordField extends JPanel {
 
-    private String password;
-
     private boolean visible;
 
-    private JTextField visibleField;
-    private JPasswordField invisibleField;
+    final private JTextField visibleField;
+    final private JPasswordField invisibleField;
 
     public SwitchablePasswordField() {
         super();
@@ -30,18 +31,19 @@ public class SwitchablePasswordField extends JPanel {
         add(invisibleField);
     }
 
-    public String getPassword() {
+    public String getPassword() throws PassSafeSecurityException {
         return visible ? visibleField.getText() : invisibleField.getText();
     }
 
-    public String getOrigPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-        this.visibleField.setText(password);
-        this.invisibleField.setText(password);
+    public void setPassword(String password) throws PassSafeSecurityException {
+        if (!Strings.isNullOrEmpty(password)) {
+            this.visibleField.setText(password);
+            this.invisibleField.setText(password);
+        }
+        else {
+            this.visibleField.setText("");
+            this.invisibleField.setText("");
+        }
     }
 
     public void hidePassword() {

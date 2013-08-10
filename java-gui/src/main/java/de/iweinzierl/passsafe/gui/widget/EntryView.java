@@ -2,10 +2,13 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.data.Entry;
+import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
 import de.iweinzierl.passsafe.gui.resources.Images;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.secret.SwitchablePasswordField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -26,6 +29,8 @@ import java.beans.PropertyChangeListener;
 
 // TODO make text fields smaller
 public class EntryView extends JPanel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryView.class);
 
     private class ClipboardMenu extends JMenuItem {
 
@@ -84,7 +89,13 @@ public class EntryView extends JPanel {
             if (component instanceof JTextField) {
                 text = ((JTextField) component).getText();
             } else if (component instanceof SwitchablePasswordField) {
-                text = ((SwitchablePasswordField) component).getPassword();
+                try {
+                    text = ((SwitchablePasswordField) component).getPassword();
+                    UiUtils.displayError("TODO");
+                } catch (PassSafeSecurityException e1) {
+                    LOGGER.error("Unable to retrieve password from password field", e);
+                    return;
+                }
             }
 
             StringSelection stringSelection = new StringSelection(text);
@@ -92,13 +103,13 @@ public class EntryView extends JPanel {
         }
     }
 
-    private ApplicationController controller;
+    final private ApplicationController controller;
+
+    final private JTextField titleField;
+    final private SwitchablePasswordField usernameField;
+    final private SwitchablePasswordField passwordField;
 
     private Entry entry;
-
-    private JTextField titleField;
-    private SwitchablePasswordField usernameField;
-    private SwitchablePasswordField passwordField;
 
     public EntryView(ApplicationController controller) {
         super();
@@ -180,15 +191,28 @@ public class EntryView extends JPanel {
         if (entry != null) {
             this.entry = entry;
             titleField.setText(entry.getTitle());
-            usernameField.setPassword(entry.getUsername());
-            passwordField.setPassword(entry.getPassword());
+            try {
+                usernameField.setPassword(controller.getPasswordHandler().decrypt(entry.getUsername()));
+                passwordField.setPassword(controller.getPasswordHandler().decrypt(entry.getPassword()));
+            }
+            catch (PassSafeSecurityException e) {
+                LOGGER.error("Unable to set password to password field", e);
+                UiUtils.displayError("TODO");
+            }
         }
     }
 
     public void reset() {
         titleField.setText("");
-        usernameField.setPassword("");
-        passwordField.setPassword("");
+
+        try {
+            usernameField.setPassword(null);
+            passwordField.setPassword(null);
+        }
+        catch (PassSafeSecurityException e) {
+            LOGGER.error("Unable to reset password fields", e);
+            UiUtils.displayError("TODO");
+        }
     }
 
     private JPanel createStandardButtons(final JTextField textField) {
@@ -279,7 +303,6 @@ public class EntryView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 secretField.setEditable(false);
-                secretField.setPassword(secretField.getOrigPassword());
                 save.setEnabled(false);
                 cancel.setEnabled(false);
                 edit.setEnabled(true);
