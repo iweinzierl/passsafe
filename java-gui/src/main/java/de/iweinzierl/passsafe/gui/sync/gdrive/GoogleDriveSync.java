@@ -8,28 +8,36 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.FileContent;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.IOUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
+import de.iweinzierl.passsafe.gui.sync.Sync;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class GoogleDriveSync {
+public class GoogleDriveSync implements Sync {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleDriveSync.class);
 
     private static final String APP_NAME = "de.iweinzierl.PassSafe";
+
+    private static final String DRIVE_STORE_DIR = "gdrive";
 
     private static final String CLIENT_ID = "641661793300.apps.googleusercontent.com";
     private static final String CLIENT_SECRET = "msRYKVpI1T1NKS436VPBATvy";
@@ -41,9 +49,9 @@ public class GoogleDriveSync {
     private final Drive client;
     private final Configuration configuration;
 
-    public GoogleDriveSync(Configuration configuration, String driveStoreDir) throws Exception {
+    public GoogleDriveSync(Configuration configuration) throws Exception {
         this.configuration = configuration;
-        this.dataStoreDir = new FileDataStoreFactory(getOrCreateStoreDir(driveStoreDir));
+        this.dataStoreDir = new FileDataStoreFactory(getOrCreateStoreDir(DRIVE_STORE_DIR));
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         this.jsonFactory = new JacksonFactory();
 
@@ -51,18 +59,15 @@ public class GoogleDriveSync {
     }
 
     public static void main(String[] args) throws Exception {
-        java.io.File home = new java.io.File(System.getProperty("user.home"));
-        java.io.File passsafe = new java.io.File(home, ".passsafe");
-        java.io.File gDriveStore = new java.io.File(passsafe, "gdrive");
-
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
-        GoogleDriveSync driveSync = new GoogleDriveSync(configuration, gDriveStore.getAbsolutePath());
-        driveSync.sync("sync-test.txt");
+        GoogleDriveSync driveSync = new GoogleDriveSync(configuration);
+        driveSync.sync("passsafe.sqlite");
     }
 
     private java.io.File getOrCreateStoreDir(String dirName) {
-        java.io.File driveStoreDir = new java.io.File(dirName);
+        String baseFolder = configuration.getBaseFolder();
+        java.io.File driveStoreDir = new java.io.File(baseFolder, dirName);
         if (!driveStoreDir.exists()) {
             driveStoreDir.mkdir();
         }
@@ -70,6 +75,7 @@ public class GoogleDriveSync {
         return driveStoreDir;
     }
 
+    @Override
     public void sync(String filename) throws IOException {
         DateTime onlineModificationDate = getOnlineModificationDate(filename);
 
@@ -79,20 +85,20 @@ public class GoogleDriveSync {
         if (onlineModificationTime > localModificationDate) {
             long diff = onlineModificationTime - localModificationDate;
             LOGGER.info("File '{}' needs to be downloaded from GoogleDrive: {} sec younger", filename, diff / 1000);
-            // TODO download
+            download(filename);
         } else {
             long diff = localModificationDate - onlineModificationTime;
             LOGGER.info("File '{}' needs to be uploaded to GoogleDrive: {} sec younger", filename, diff / 1000);
-            // TODO upload
+            upload(filename);
         }
     }
 
     private File find(String filename) throws IOException {
-        String q = String.format("title = '%s'", filename);
+        String q = String.format("title = '%s' and trashed = false", filename);
 
         final Drive.Files.List request = client.files().list();
 
-        FileList fileList = request.execute();
+        FileList fileList = request.setQ(q).execute();
 
         do {
 
@@ -127,12 +133,23 @@ public class GoogleDriveSync {
         return file.exists() ? file.lastModified() : 0;
     }
 
-    private void download(String filename) {
-        // TODO
-        throw new RuntimeException("GoogleDriveSync.download() is not implemented");
+    private void download(String filename) throws IOException {
+        java.io.File output = new java.io.File(configuration.getBaseFolder(), filename);
+
+        LOGGER.info("Download '{}' to '{}'", filename, output.getAbsoluteFile());
+
+        File file = find(filename);
+        HttpRequest request = client.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()));
+        HttpResponse response = request.execute();
+
+        IOUtils.copy(response.getContent(), new FileOutputStream(output));
     }
 
-    private void upload(java.io.File file) throws IOException {
+    private void upload(String filename) throws IOException {
+        java.io.File file = new java.io.File(configuration.getBaseFolder(), filename);
+
+        LOGGER.info("Upload '{}' to Google Drive", file.getAbsoluteFile());
+
         File fileMetadata = new File();
         fileMetadata.setTitle(file.getName());
 

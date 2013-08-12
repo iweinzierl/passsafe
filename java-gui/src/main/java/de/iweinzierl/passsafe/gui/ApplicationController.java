@@ -7,6 +7,7 @@ import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
+import de.iweinzierl.passsafe.gui.sync.Sync;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
@@ -31,6 +32,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private final Configuration configuration;
 
     private final PasswordHandler passwordHandler;
+    private Sync sync;
 
     private EntryDataSource dataSource;
     private EntryList entryList;
@@ -39,9 +41,10 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private ButtonBar buttonBar;
 
 
-    public ApplicationController(Configuration configuration, PasswordHandler passwordHandler) {
+    public ApplicationController(Configuration configuration, PasswordHandler passwordHandler, Sync sync) {
         this.configuration = configuration;
         this.passwordHandler = passwordHandler;
+        this.sync = sync;
     }
 
     public PasswordHandler getPasswordHandler() {
