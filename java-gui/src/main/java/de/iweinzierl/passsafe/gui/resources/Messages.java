@@ -10,6 +10,10 @@ public class Messages {
 
     public static final String APP_TITLE = "app.title";
 
+    public static final String START_DIALOG_TITLE = "startup.title";
+    public static final String START_DIALOG_LABEL = "startup.label";
+    public static final String START_DIALOG_PASSWORD_LABEL = "startup.password.label";
+
     public static final String ENTRYLIST_CATEGORIES = "entrylist.popup.categories";
     public static final String ENTRYLIST_ROOTNODE = "entrylist.rootnode";
     public static final String ENTRYLIST_MENU_REMOVEITEM = "entrylist.menu.removeitem";

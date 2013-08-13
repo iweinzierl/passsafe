@@ -11,6 +11,7 @@ import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.Display;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
+import de.iweinzierl.passsafe.gui.widget.StartupDialogBuilder;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTableModel;
 import org.apache.log4j.BasicConfigurator;
@@ -44,9 +45,29 @@ public class Application extends JFrame {
     public static void main(String[] args) throws Exception {
         initializeLogging();
 
+        new StartupDialogBuilder().setActionListener(new StartupDialogBuilder.ActionListener() {
+
+            @Override
+            public void submitted(String password) {
+                try {
+                    start(password);
+                } catch (Exception e) {
+                    LOGGER.error("Unable to start PassSafe application", e);
+                    System.exit(1);
+                }
+            }
+
+            @Override
+            public void canceled() {
+                System.exit(1);
+            }
+        }).build();
+    }
+
+    private static void start(String password) throws Exception {
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
-        ApplicationController controller = new ApplicationController(configuration, new AesPasswordHandler("TEST"),
+        ApplicationController controller = new ApplicationController(configuration, new AesPasswordHandler(password),
                 new GoogleDriveSync(configuration));
         Application app = new Application(controller);
 

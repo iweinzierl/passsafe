@@ -219,9 +219,9 @@ public class EntryView extends JPanel {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        final JButton edit = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
-        final JButton save = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
-        final JButton cancel = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
+        final JButton edit = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
+        final JButton save = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
+        final JButton cancel = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
 
         edit.addActionListener(new ActionListener() {
             @Override
@@ -272,11 +272,11 @@ public class EntryView extends JPanel {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        final JButton edit = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
-        final JButton save = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
-        final JButton cancel = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
-        final JButton visible = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_VISIBLE);
-        final JButton invisible = UiUtils.createImageButton(Images.ENTRYVIEW_BUTTON_INVISIBLE);
+        final JButton edit = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
+        final JButton save = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
+        final JButton cancel = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
+        final JButton visible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_VISIBLE);
+        final JButton invisible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_INVISIBLE);
 
         edit.addActionListener(new ActionListener() {
             @Override
