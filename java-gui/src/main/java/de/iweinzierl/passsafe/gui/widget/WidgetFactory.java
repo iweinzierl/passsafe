@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -36,11 +37,33 @@ public class WidgetFactory {
         }
     }
 
+    public static JComponent createComponent(Class<? extends JComponent> targetClass, int width, int height) {
+
+        try {
+            JComponent jComponent = targetClass.newInstance();
+            jComponent.setPreferredSize(new Dimension(width, height));
+
+            return jComponent;
+
+        } catch (InstantiationException | IllegalAccessException e) {
+            LOGGER.error("Cannot create instance of '{}'", targetClass.toString(), e);
+        }
+
+        return null;
+    }
+
     public static JLabel createLabel(String text, int width, int height) {
         JLabel label = new JLabel(text);
         label.setPreferredSize(new Dimension(width, height));
 
         return label;
+    }
+
+    public static JButton createButton(String text, int width, int height) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(width, height));
+
+        return button;
     }
 
     public static JPanel createInputPanel(JLabel label, JTextField textField) {
