@@ -13,6 +13,8 @@ public class Messages {
     public static final String START_DIALOG_TITLE = "startup.title";
     public static final String START_DIALOG_LABEL = "startup.label";
     public static final String START_DIALOG_PASSWORD_LABEL = "startup.password.label";
+    public static final String START_DIALOG_OK_BUTTON = "startup.button.ok";
+    public static final String START_DIALOG_CANCEL_BUTTON = "startup.button.cancel";
 
     public static final String ENTRYLIST_CATEGORIES = "entrylist.popup.categories";
     public static final String ENTRYLIST_ROOTNODE = "entrylist.rootnode";

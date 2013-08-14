@@ -39,8 +39,8 @@ public class StartupDialogBuilder {
         passwordField = new JPasswordField();
         passwordField.setPreferredSize(new Dimension(100, 20));
 
-        okButton = new JButton("OK");
-        cancelButton = new JButton("Cancel");
+        okButton = new JButton(Messages.getMessage(Messages.START_DIALOG_OK_BUTTON));
+        cancelButton = new JButton(Messages.getMessage(Messages.START_DIALOG_CANCEL_BUTTON));
 
         okButton.addActionListener(new java.awt.event.ActionListener() {
 
