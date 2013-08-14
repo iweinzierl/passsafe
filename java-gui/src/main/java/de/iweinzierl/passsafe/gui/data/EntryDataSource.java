@@ -19,6 +19,8 @@ public interface EntryDataSource {
 
     void removeEntry(Entry entry);
 
+    EntryCategory addCategory(EntryCategory category);
+
     void removeCategory(EntryCategory category);
 
     void close();

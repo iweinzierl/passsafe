@@ -78,6 +78,13 @@ public class EntryList extends JTree {
         return false;
     }
 
+    public void addCategory(EntryCategory category) {
+        DefaultTreeModel model = (DefaultTreeModel) getModel();
+        TreeNode root = (TreeNode) getModel().getRoot();
+
+        model.insertNodeInto(new CategoryNode(category), (MutableTreeNode) root, root.getChildCount());
+    }
+
     public void removeEntry(Entry entry) {
         MutableTreeNode root = (MutableTreeNode) getModel().getRoot();
         if (removeEntry(entry, root)) {

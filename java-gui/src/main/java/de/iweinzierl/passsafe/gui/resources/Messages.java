@@ -26,6 +26,7 @@ public class Messages {
 
     public static final String BUTTONBAR_NEWENTRY = "buttonbar.newentry";
     public static final String BUTTONBAR_REMOVEENTRY = "buttonbar.removeentry";
+    public static final String BUTTONBAR_NEWCATEGORY = "buttonbar.newcategory";
 
     public static final String NEWENTRYDIALOG_TITLE = "newentrydialog.title";
     public static final String NEWENTRYDIALOG_LABEL_PASSWORD = "newentrydialog.label.password";
@@ -34,6 +35,11 @@ public class Messages {
     public static final String NEWENTRYDIALOG_LABEL_CATEGORY = "newentrydialog.label.category";
     public static final String NEWENTRYDIALOG_BUTTON_SAVE = "newentrydialog.button.save";
     public static final String NEWENTRYDIALOG_BUTTON_CANCEL = "newentrydialog.button.cancel";
+
+    public static final String NEWCATEGORYDIALOG_TITLE = "newcategorydialog.title";
+    public static final String NEWCATEGORYDIALOG_LABEL_TITLE = "newcategorydialog.label.title";
+    public static final String NEWCATEGORYDIALOG_BUTTON_SAVE = "newcategorydialog.button.save";
+    public static final String NEWCATEGORYDIALOG_BUTTON_CANCEL = "newcategorydialog.button.cancel";
 
     public static final String ENTRYVIEW_MENU_COPYTOCLIPBOARD = "entryview.menu.copytoclipboard";
     public static final String ENTRYVIEW_LABEL_TITLE = "entryview.label.title";

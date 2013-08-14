@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class WidgetFactory {
@@ -59,11 +60,22 @@ public class WidgetFactory {
         return label;
     }
 
+    public static JButton createButton(String text, int width, int height, ActionListener listener) {
+        JButton button = createButton(text, width, height);
+        button.addActionListener(listener);
+
+        return button;
+    }
+
     public static JButton createButton(String text, int width, int height) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(width, height));
 
         return button;
+    }
+
+    public static JPanel createInputPanel(String label, JTextField textField) {
+        return createInputPanel(label, textField);
     }
 
     public static JPanel createInputPanel(JLabel label, JTextField textField) {

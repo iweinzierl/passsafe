@@ -2,6 +2,7 @@ package de.iweinzierl.passsafe.gui.data;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,8 @@ public class SqliteDataSource implements EntryDataSource {
             "" + "password) VALUES (?, ?, ?, ?)";
 
     public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE id = ?";
+
+    public static final String SQL_INSERT_CATEGORY = "INSERT INTO category (title) VALUES (?)";
 
     public static final String SQL_REMOVE_CATEGORY = "DELETE FROM category WHERE id = ?";
 
@@ -277,6 +280,32 @@ public class SqliteDataSource implements EntryDataSource {
     }
 
     @Override
+    public EntryCategory addCategory(EntryCategory category) {
+        LOGGER.debug("Go and insert category '{}'", category);
+
+        try {
+            PreparedStatement addCategory = conn.prepareStatement(SQL_INSERT_CATEGORY);
+            addCategory.setString(1, category.getTitle());
+            addCategory.executeUpdate();
+
+            ResultSet generatedKeys = addCategory.getGeneratedKeys();
+            int id = generatedKeys.getInt(1);
+
+            if (id > 0) {
+                EntryCategory newCategory = new SqliteEntryCategory(id, category.getTitle());
+                LOGGER.info("Successfully inserted category '{}'", newCategory);
+
+                return newCategory;
+            }
+        } catch (SQLException e) {
+            // do nothing
+        }
+
+        LOGGER.error("Unable to add category '{}'", category);
+        return null;
+    }
+
+    @Override
     public void removeCategory(EntryCategory category) {
         LOGGER.debug("Go an remove category '{}'", category);
 
@@ -340,6 +369,11 @@ public class SqliteDataSource implements EntryDataSource {
 
         public int getId() {
             return id;
+        }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this).append("id", id).append("title", getTitle()).toString();
         }
     }
 

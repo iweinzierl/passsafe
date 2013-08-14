@@ -11,6 +11,7 @@ import de.iweinzierl.passsafe.gui.sync.Sync;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
+import de.iweinzierl.passsafe.gui.widget.NewCategoryDialog;
 import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
@@ -25,14 +26,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 
-public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener, TreeSelectionListener, EntryTable.SelectionListener {
+public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener, TreeSelectionListener, EntryTable.SelectionListener, NewCategoryDialog.OnCategoryAddedListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
     private final Configuration configuration;
 
     private final PasswordHandler passwordHandler;
-    private Sync sync;
+    private final Sync sync;
 
     private EntryDataSource dataSource;
     private EntryList entryList;
@@ -62,6 +63,22 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
             entryTable.tableChanged();
         } else {
             LOGGER.error("Unable to add entry '{}'", entry);
+        }
+    }
+
+    @Override
+    public void onCategoryAdded(EntryCategory category) {
+        LOGGER.debug("Caught 'onCategoryAdded' event");
+
+        if (category == null) {
+            LOGGER.warn("Received category: null");
+            return;
+        }
+
+        EntryCategory newCategory = dataSource.addCategory(category);
+
+        if (newCategory != null) {
+            entryList.addCategory(category);
         }
     }
 

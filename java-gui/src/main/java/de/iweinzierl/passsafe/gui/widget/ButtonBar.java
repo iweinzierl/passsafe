@@ -13,6 +13,9 @@ import java.awt.event.ActionListener;
 
 public class ButtonBar extends JPanel {
 
+    public static final int BUTTON_WIDTH = 100;
+    public static final int BUTTON_HEIGHT = 25;
+
     private Logger LOGGER = LoggerFactory.getLogger(ButtonBar.class);
 
     private ApplicationController controller;
@@ -32,19 +35,12 @@ public class ButtonBar extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(createAddEntryButton());
         add(createDeleteEntryButton());
+        add(createAddCategoryButton());
     }
-
-
-    private JButton createButton(String label, ActionListener clickListener) {
-        JButton button = new JButton(label);
-        button.addActionListener(clickListener);
-
-        return button;
-    }
-
 
     private JButton createAddEntryButton() {
-        return createButton(Messages.getMessage(Messages.BUTTONBAR_NEWENTRY), new ActionListener() {
+        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_NEWENTRY), BUTTON_WIDTH,
+                BUTTON_HEIGHT, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'new entry'");
@@ -59,10 +55,21 @@ public class ButtonBar extends JPanel {
 
 
     private JButton createDeleteEntryButton() {
-        return createButton(Messages.getMessage(Messages.BUTTONBAR_REMOVEENTRY), new ActionListener() {
+        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_REMOVEENTRY),
+                BUTTON_WIDTH, BUTTON_HEIGHT, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'delete entry'");
+            }
+        });
+    }
+
+    private JButton createAddCategoryButton() {
+        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_NEWCATEGORY), BUTTON_WIDTH,
+                BUTTON_HEIGHT, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new NewCategoryDialog(parent, controller).show();
             }
         });
     }
