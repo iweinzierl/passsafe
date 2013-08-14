@@ -36,27 +36,28 @@ public class ButtonBar extends JPanel {
         add(createAddEntryButton());
         add(createDeleteEntryButton());
         add(createAddCategoryButton());
+        add(createSyncButton());
     }
 
     private JButton createAddEntryButton() {
-        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_NEWENTRY), BUTTON_WIDTH,
-                BUTTON_HEIGHT, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LOGGER.debug("Clicked 'new entry'");
+        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_NEWENTRY), BUTTON_WIDTH, BUTTON_HEIGHT,
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        LOGGER.debug("Clicked 'new entry'");
 
-                NewEntryDialog dialog = new NewEntryDialog(parent, controller.getDataSource().getCategories(),
-                        controller.getPasswordHandler());
-                dialog.addOnEntryAddedListeners(controller);
-                dialog.show();
-            }
-        });
+                        NewEntryDialog dialog = new NewEntryDialog(parent, controller.getDataSource().getCategories(),
+                                controller.getPasswordHandler());
+                        dialog.addOnEntryAddedListeners(controller);
+                        dialog.show();
+                    }
+                });
     }
 
 
     private JButton createDeleteEntryButton() {
-        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_REMOVEENTRY),
-                BUTTON_WIDTH, BUTTON_HEIGHT, new ActionListener() {
+        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_REMOVEENTRY), BUTTON_WIDTH,
+                BUTTON_HEIGHT, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LOGGER.debug("Clicked 'delete entry'");
@@ -72,5 +73,15 @@ public class ButtonBar extends JPanel {
                 new NewCategoryDialog(parent, controller).show();
             }
         });
+    }
+
+    private JButton createSyncButton() {
+        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_SYNC), BUTTON_WIDTH, BUTTON_HEIGHT,
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        controller.requestSync();
+                    }
+                });
     }
 }

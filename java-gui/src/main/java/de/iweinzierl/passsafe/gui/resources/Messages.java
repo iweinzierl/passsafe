@@ -10,6 +10,8 @@ public class Messages {
 
     public static final String APP_TITLE = "app.title";
 
+    public static final String ERROR_DIALOG_TITLE = "errordialog.title";
+
     public static final String START_DIALOG_TITLE = "startup.title";
     public static final String START_DIALOG_LABEL = "startup.label";
     public static final String START_DIALOG_PASSWORD_LABEL = "startup.password.label";
@@ -27,6 +29,7 @@ public class Messages {
     public static final String BUTTONBAR_NEWENTRY = "buttonbar.newentry";
     public static final String BUTTONBAR_REMOVEENTRY = "buttonbar.removeentry";
     public static final String BUTTONBAR_NEWCATEGORY = "buttonbar.newcategory";
+    public static final String BUTTONBAR_SYNC = "buttonbar.sync";
 
     public static final String NEWENTRYDIALOG_TITLE = "newentrydialog.title";
     public static final String NEWENTRYDIALOG_LABEL_PASSWORD = "newentrydialog.label.password";

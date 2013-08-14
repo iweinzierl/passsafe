@@ -166,7 +166,7 @@ public class NewEntryDialog extends JDialog {
                 }
                 catch (PassSafeException ex) {
                     LOGGER.error("Unable to encrypt password", ex);
-                    UiUtils.displayError("TODO");
+                    UiUtils.displayError(getOwner(), "TODO");
                 }
 
                 dispose();

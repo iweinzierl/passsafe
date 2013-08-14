@@ -81,6 +81,7 @@ public class Application extends JFrame {
 
         Display display = new Display(controller, entryTable, entryView);
 
+        controller.setApplication(app);
         controller.setEntryList(entryList);
         controller.setEntryTable(entryTable);
         controller.setEntryView(entryView);

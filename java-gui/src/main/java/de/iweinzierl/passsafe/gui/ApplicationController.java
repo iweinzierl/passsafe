@@ -6,8 +6,10 @@ import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
+import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.Sync;
+import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
@@ -24,6 +26,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
 
 
 public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener, TreeSelectionListener, EntryTable.SelectionListener, NewCategoryDialog.OnCategoryAddedListener {
@@ -35,6 +39,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private final PasswordHandler passwordHandler;
     private final Sync sync;
 
+    private Application application;
     private EntryDataSource dataSource;
     private EntryList entryList;
     private EntryTable entryTable;
@@ -142,11 +147,31 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         return dataSource;
     }
 
+    public void requestSync() {
+        if (sync == null) {
+            LOGGER.warn("No Sync handler configured");
+            return;
+        }
+
+        try {
+            File dataSource = new File(configuration.getDatabase());
+            sync.sync(dataSource.getName());
+
+            LOGGER.info("Successfully synchronized data source '{}'", dataSource);
+        } catch (IOException e) {
+            LOGGER.error("Error during sync process", e);
+            UiUtils.displayError(application, Errors.getError(Errors.SYNC_FAILED));
+        }
+    }
+
 
     public void setDataSource(EntryDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
+    public void setApplication(Application application) {
+        this.application = application;
+    }
 
     public void setEntryList(EntryList entryList) {
         this.entryList = entryList;

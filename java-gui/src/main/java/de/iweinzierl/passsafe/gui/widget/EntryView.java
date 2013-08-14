@@ -91,7 +91,7 @@ public class EntryView extends JPanel {
             } else if (component instanceof SwitchablePasswordField) {
                 try {
                     text = ((SwitchablePasswordField) component).getPassword();
-                    UiUtils.displayError("TODO");
+                    UiUtils.displayError(null, "TODO");
                 } catch (PassSafeSecurityException e1) {
                     LOGGER.error("Unable to retrieve password from password field", e);
                     return;
@@ -198,7 +198,7 @@ public class EntryView extends JPanel {
             }
             catch (PassSafeSecurityException e) {
                 LOGGER.error("Unable to set password to password field", e);
-                UiUtils.displayError("TODO");
+                UiUtils.displayError(null, "TODO");
             }
         }
     }
@@ -215,7 +215,7 @@ public class EntryView extends JPanel {
         }
         catch (PassSafeSecurityException e) {
             LOGGER.error("Unable to reset password fields", e);
-            UiUtils.displayError("TODO");
+            UiUtils.displayError(null, "TODO");
         }
     }
 
