@@ -19,6 +19,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.IOUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveRequest;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -77,19 +78,22 @@ public class GoogleDriveSync implements Sync {
 
     @Override
     public void sync(String filename) throws IOException {
-        DateTime onlineModificationDate = getOnlineModificationDate(filename);
+        File online = find(filename);
+        java.io.File local = getLocalFile(filename);
+
+        DateTime onlineModificationDate = getOnlineModificationDate(online);
 
         long onlineModificationTime = onlineModificationDate != null ? onlineModificationDate.getValue() : 0;
-        long localModificationDate = getLocalModificationDate(filename);
+        long localModificationDate = getLocalModificationDate(local);
 
         if (onlineModificationTime > localModificationDate) {
             long diff = onlineModificationTime - localModificationDate;
             LOGGER.info("File '{}' needs to be downloaded from GoogleDrive: {} sec younger", filename, diff / 1000);
-            download(filename);
+            download(online);
         } else {
             long diff = localModificationDate - onlineModificationTime;
             LOGGER.info("File '{}' needs to be uploaded to GoogleDrive: {} sec younger", filename, diff / 1000);
-            upload(filename);
+            upload(local, online);
         }
     }
 
@@ -105,10 +109,7 @@ public class GoogleDriveSync implements Sync {
             List<File> items = fileList.getItems();
 
             if (items != null && !items.isEmpty()) {
-                //return items.get(0);
-                for (File file : items) {
-                    LOGGER.debug("Title = {}", file.getTitle());
-                }
+                return items.get(0);
             }
 
             request.setPageToken(fileList.getNextPageToken());
@@ -117,8 +118,7 @@ public class GoogleDriveSync implements Sync {
         return null;
     }
 
-    private DateTime getOnlineModificationDate(String filename) throws IOException {
-        File online = find(filename);
+    private DateTime getOnlineModificationDate(File online) throws IOException {
         if (online == null) {
             return null;
         }
@@ -126,41 +126,50 @@ public class GoogleDriveSync implements Sync {
         return online.getModifiedDate();
     }
 
-    private long getLocalModificationDate(String filename) {
+    private java.io.File getLocalFile(String filename) {
         java.io.File passSafeDirectory = new java.io.File(configuration.getBaseFolder());
-        java.io.File file = new java.io.File(passSafeDirectory, filename);
+        return new java.io.File(passSafeDirectory, filename);
+    }
 
+    private long getLocalModificationDate(java.io.File file) {
         return file.exists() ? file.lastModified() : 0;
     }
 
-    private void download(String filename) throws IOException {
-        java.io.File output = new java.io.File(configuration.getBaseFolder(), filename);
+    private void download(File file) throws IOException {
+        java.io.File output = new java.io.File(configuration.getBaseFolder(), file.getTitle());
 
-        LOGGER.info("Download '{}' to '{}'", filename, output.getAbsoluteFile());
+        LOGGER.info("Download '{}' to '{}'", file.getTitle(), output.getAbsoluteFile());
 
-        File file = find(filename);
         HttpRequest request = client.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()));
         HttpResponse response = request.execute();
 
         IOUtils.copy(response.getContent(), new FileOutputStream(output));
     }
 
-    private void upload(String filename) throws IOException {
-        java.io.File file = new java.io.File(configuration.getBaseFolder(), filename);
-
-        LOGGER.info("Upload '{}' to Google Drive", file.getAbsoluteFile());
+    private void upload(java.io.File local, File online) throws IOException {
+        // TODO override existing file
+        LOGGER.info("Upload '{}' to Google Drive", local.getAbsoluteFile());
 
         File fileMetadata = new File();
-        fileMetadata.setTitle(file.getName());
+        fileMetadata.setTitle(local.getName());
 
-        FileContent mediaContent = new FileContent("application/octet-stream", file);
+        if (online != null) {
+            fileMetadata.setId(online.getId());
+        }
 
-        Drive.Files.Insert insert = client.files().insert(fileMetadata, mediaContent);
-        MediaHttpUploader uploader = insert.getMediaHttpUploader();
+        FileContent mediaContent = new FileContent("application/octet-stream", local);
+        DriveRequest<File> request;
+
+        if (online != null) {
+            request = client.files().update(online.getId(), online, mediaContent);
+        } else {
+            request = client.files().insert(fileMetadata, mediaContent);
+        }
+        MediaHttpUploader uploader = request.getMediaHttpUploader();
         uploader.setDirectUploadEnabled(true);
         //uploader.setProgressListener(new FileUploadProgressListener());
 
-        insert.execute();
+        request.execute();
     }
 
     private Credential authorize() throws Exception {
