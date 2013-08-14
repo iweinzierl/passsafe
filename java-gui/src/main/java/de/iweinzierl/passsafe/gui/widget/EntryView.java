@@ -189,6 +189,7 @@ public class EntryView extends JPanel {
 
     public void apply(Entry entry) {
         if (entry != null) {
+            reset();
             this.entry = entry;
             titleField.setText(entry.getTitle());
             try {
@@ -208,6 +209,9 @@ public class EntryView extends JPanel {
         try {
             usernameField.setPassword(null);
             passwordField.setPassword(null);
+
+            usernameField.hidePassword();
+            passwordField.hidePassword();
         }
         catch (PassSafeSecurityException e) {
             LOGGER.error("Unable to reset password fields", e);
