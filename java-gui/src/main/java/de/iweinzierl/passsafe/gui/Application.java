@@ -5,7 +5,7 @@ import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.secure.AesPasswordHandler;
-import de.iweinzierl.passsafe.gui.sync.gdrive.GoogleDriveSync;
+import de.iweinzierl.passsafe.gui.sync.SyncFactory;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.Display;
@@ -68,7 +68,7 @@ public class Application extends JFrame {
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
         ApplicationController controller = new ApplicationController(configuration, new AesPasswordHandler(password),
-                new GoogleDriveSync(configuration));
+                SyncFactory.createSync(configuration.getSyncType(), configuration));
         Application app = new Application(controller);
 
         EntryDataSource dataSource = new SqliteDataSource(configuration.getDatabase());

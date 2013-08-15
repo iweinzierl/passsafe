@@ -1,6 +1,8 @@
 package de.iweinzierl.passsafe.gui.configuration;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.gson.Gson;
+import de.iweinzierl.passsafe.gui.data.SyncType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,7 @@ public class Configuration {
     private String configurationFile;
     private String baseFolder;
     private String database;
+    private String syncName;
 
 
     public static Configuration parse(final String configuration) {
@@ -84,6 +87,15 @@ public class Configuration {
     }
 
 
+    public SyncType getSyncType() {
+        if (!Strings.isNullOrEmpty(syncName)) {
+            return SyncType.getBySyncName(syncName);
+        }
+
+        return null;
+    }
+
+
     public String getConfigurationFile() {
         return configurationFile;
     }
@@ -111,5 +123,13 @@ public class Configuration {
 
     public void setDatabase(String database) {
         this.database = database;
+    }
+
+    public String getSyncName() {
+        return syncName;
+    }
+
+    public void setSyncName(String syncName) {
+        this.syncName = syncName;
     }
 }
