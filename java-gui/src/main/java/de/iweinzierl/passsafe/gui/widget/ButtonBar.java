@@ -37,7 +37,6 @@ public class ButtonBar extends JPanel {
     private void initialize() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(createAddEntryButton());
-        add(createDeleteEntryButton());
         add(createAddCategoryButton());
         add(createSyncButton());
     }
@@ -57,17 +56,6 @@ public class ButtonBar extends JPanel {
                 });
     }
 
-
-    private JButton createDeleteEntryButton() {
-        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_REMOVEENTRY), BUTTON_WIDTH,
-                BUTTON_HEIGHT, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LOGGER.debug("Clicked 'delete entry'");
-            }
-        });
-    }
-
     private JButton createAddCategoryButton() {
         return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_NEWCATEGORY), BUTTON_WIDTH,
                 BUTTON_HEIGHT, new ActionListener() {
@@ -84,7 +72,7 @@ public class ButtonBar extends JPanel {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
-                        controller.requestSync();
+                            controller.requestSync();
                         } catch (IOException ex) {
                             LOGGER.error("Unable to sync", ex);
                             UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
