@@ -142,6 +142,7 @@ public class NewEntryDialog extends JDialog {
 
     private Container createCategoryPanel() {
         categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories.size()]));
+        categoryBox.setRenderer(new CategoryCellRenderer());
         return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY)), categoryBox);
     }
 
