@@ -147,21 +147,16 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         return dataSource;
     }
 
-    public void requestSync() {
+    public void requestSync() throws IOException {
         if (sync == null) {
             LOGGER.warn("No Sync handler configured");
             return;
         }
 
-        try {
-            File dataSource = new File(configuration.getDatabase());
-            sync.sync(dataSource.getName());
+        File dataSource = new File(configuration.getDatabase());
+        sync.sync(dataSource.getName());
 
-            LOGGER.info("Successfully synchronized data source '{}'", dataSource);
-        } catch (IOException e) {
-            LOGGER.error("Error during sync process", e);
-            UiUtils.displayError(application, Errors.getError(Errors.SYNC_FAILED));
-        }
+        LOGGER.info("Successfully synchronized data source '{}'", dataSource);
     }
 
 

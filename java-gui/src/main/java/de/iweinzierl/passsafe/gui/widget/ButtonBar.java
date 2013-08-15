@@ -2,13 +2,16 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;
+import de.iweinzierl.passsafe.gui.util.UiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 
 public class ButtonBar extends JPanel {
@@ -80,7 +83,12 @@ public class ButtonBar extends JPanel {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        try {
                         controller.requestSync();
+                        } catch (IOException ex) {
+                            LOGGER.error("Unable to sync", ex);
+                            UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
+                        }
                     }
                 });
     }

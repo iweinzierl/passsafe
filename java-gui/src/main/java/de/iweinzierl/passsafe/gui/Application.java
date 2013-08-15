@@ -3,6 +3,7 @@ package de.iweinzierl.passsafe.gui;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
+import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.secure.AesPasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.SyncFactory;
@@ -69,6 +70,16 @@ public class Application extends JFrame {
 
         ApplicationController controller = new ApplicationController(configuration, new AesPasswordHandler(password),
                 SyncFactory.createSync(configuration.getSyncType(), configuration));
+
+        try {
+            controller.requestSync();
+        }
+        catch (IOException e) {
+            LOGGER.error("Unable to sync PassSafe storage with sync type '{}'", configuration.getSyncType());
+            UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
+            return;
+        }
+
         Application app = new Application(controller);
 
         EntryDataSource dataSource = new SqliteDataSource(configuration.getDatabase());
