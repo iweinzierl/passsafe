@@ -105,9 +105,15 @@ public class EntryView extends JPanel {
 
     final private ApplicationController controller;
 
-    final private JTextField titleField;
-    final private SwitchablePasswordField usernameField;
-    final private SwitchablePasswordField passwordField;
+    private final JTextField titleField;
+
+    private final SwitchablePasswordField usernameField;
+    private final SwitchablePasswordField passwordField;
+
+    private final JButton userInvisible;
+    private final JButton userVisible;
+    private final JButton passInvisible;
+    private final JButton passVisible;
 
     private Entry entry;
 
@@ -118,6 +124,11 @@ public class EntryView extends JPanel {
         titleField = new JTextField();
         usernameField = new SwitchablePasswordField();
         passwordField = new SwitchablePasswordField();
+
+        userVisible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_VISIBLE);
+        userInvisible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_INVISIBLE);
+        passVisible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_VISIBLE);
+        passInvisible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_INVISIBLE);
 
         initialize();
     }
@@ -166,7 +177,7 @@ public class EntryView extends JPanel {
         initializeClipboardFunctions(usernameField);
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_USERNAME)), usernameField,
-                createSecretButtons(usernameField));
+                createSecretButtons(usernameField, userInvisible, userVisible));
     }
 
     private JPanel createPasswordRow() {
@@ -174,7 +185,7 @@ public class EntryView extends JPanel {
         initializeClipboardFunctions(passwordField);
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_PASSWORD)), passwordField,
-                createSecretButtons(passwordField));
+                createSecretButtons(passwordField, passInvisible, passVisible));
     }
 
     private void initializeClipboardFunctions(JComponent textField) {
@@ -195,8 +206,7 @@ public class EntryView extends JPanel {
             try {
                 usernameField.setPassword(controller.getPasswordHandler().decrypt(entry.getUsername()));
                 passwordField.setPassword(controller.getPasswordHandler().decrypt(entry.getPassword()));
-            }
-            catch (PassSafeSecurityException e) {
+            } catch (PassSafeSecurityException e) {
                 LOGGER.error("Unable to set password to password field", e);
                 UiUtils.displayError(null, "TODO");
             }
@@ -212,8 +222,12 @@ public class EntryView extends JPanel {
 
             usernameField.hidePassword();
             passwordField.hidePassword();
-        }
-        catch (PassSafeSecurityException e) {
+
+            passInvisible.setVisible(false);
+            passVisible.setVisible(true);
+            userInvisible.setVisible(false);
+            userVisible.setVisible(true);
+        } catch (PassSafeSecurityException e) {
             LOGGER.error("Unable to reset password fields", e);
             UiUtils.displayError(null, "TODO");
         }
@@ -272,15 +286,15 @@ public class EntryView extends JPanel {
         return panel;
     }
 
-    private JPanel createSecretButtons(final SwitchablePasswordField secretField) {
+    private JPanel createSecretButtons(final SwitchablePasswordField secretField, final JButton hide,
+            final JButton show) {
+
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         final JButton edit = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_EDIT);
         final JButton save = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_SAVE);
         final JButton cancel = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
-        final JButton visible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_VISIBLE);
-        final JButton invisible = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_INVISIBLE);
 
         edit.addActionListener(new ActionListener() {
             @Override
@@ -313,30 +327,30 @@ public class EntryView extends JPanel {
             }
         });
 
-        visible.addActionListener(new ActionListener() {
+        show.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 secretField.showPassword();
-                invisible.setVisible(true);
-                visible.setVisible(false);
+                hide.setVisible(true);
+                show.setVisible(false);
             }
         });
 
-        invisible.addActionListener(new ActionListener() {
+        hide.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 secretField.hidePassword();
-                invisible.setVisible(false);
-                visible.setVisible(true);
+                hide.setVisible(false);
+                show.setVisible(true);
             }
         });
 
         save.setEnabled(false);
         cancel.setEnabled(false);
-        invisible.setVisible(false);
+        hide.setVisible(false);
 
-        panel.add(visible);
-        panel.add(invisible);
+        panel.add(show);
+        panel.add(hide);
         panel.add(edit);
         panel.add(save);
         panel.add(cancel);
