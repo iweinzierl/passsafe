@@ -5,8 +5,11 @@ import de.iweinzierl.passsafe.gui.resources.Messages;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -44,5 +47,9 @@ public class UiUtils {
 
         center(dialog);
         dialog.show();
+    }
+
+    public static void markFieldAsInvalid(JTextField textField) {
+        textField.setBorder(new LineBorder(Color.RED));
     }
 }

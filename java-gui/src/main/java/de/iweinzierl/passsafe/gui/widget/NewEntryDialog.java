@@ -1,11 +1,13 @@
 package de.iweinzierl.passsafe.gui.widget;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.exception.PassSafeException;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -56,6 +59,9 @@ public class NewEntryDialog extends JDialog {
     private JTextField titleField;
     private JTextField usernameField;
     private JTextField passwordField;
+    private JTextField passwordVerifyField;
+
+    private Border origBorder;
 
 
     public NewEntryDialog(JFrame parent, List<EntryCategory> categories, PasswordHandler passwordHandler) {
@@ -75,6 +81,7 @@ public class NewEntryDialog extends JDialog {
         contentPane.add(createTitlePanel());
         contentPane.add(createUsernamePanel());
         contentPane.add(createPasswordPanel());
+        contentPane.add(createPasswordVerifyPanel());
         contentPane.add(createButtons());
 
         contentPane.setMinimumSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -84,6 +91,8 @@ public class NewEntryDialog extends JDialog {
         setMinimumSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         UiUtils.center(this);
+
+        this.origBorder = titleField.getBorder();
     }
 
 
@@ -128,6 +137,13 @@ public class NewEntryDialog extends JDialog {
     }
 
 
+    private Component createPasswordVerifyPanel() {
+        passwordVerifyField = new JPasswordField(TEXT_COLUMNS);
+        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_VERIFYPASSWORD)),
+                passwordVerifyField);
+    }
+
+
     private Component createUsernamePanel() {
         usernameField = createTextField();
         return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_USERNAME)), usernameField);
@@ -159,13 +175,16 @@ public class NewEntryDialog extends JDialog {
 
                 try {
 
+                    if (!verifyFields()) {
+                        return;
+                    }
+
                     String encryptedUsername = passwordHandler.encrypt(usernameField.getText());
                     String encryptedPassword = passwordHandler.encrypt(passwordField.getText());
 
                     fireOnEntryAdded(new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
                             encryptedUsername, encryptedPassword));
-                }
-                catch (PassSafeException ex) {
+                } catch (PassSafeException ex) {
                     LOGGER.error("Unable to encrypt password", ex);
                     UiUtils.displayError(getOwner(), "TODO");
                 }
@@ -183,6 +202,39 @@ public class NewEntryDialog extends JDialog {
         }));
 
         return panel;
+    }
+
+    private boolean verifyFields() {
+        titleField.setBorder(origBorder);
+        passwordField.setBorder(origBorder);
+        passwordVerifyField.setBorder(origBorder);
+
+        boolean isValid = true;
+
+        if (Strings.isNullOrEmpty(titleField.getText())) {
+            LOGGER.warn("No title entered!");
+            UiUtils.markFieldAsInvalid(titleField);
+
+            isValid = false;
+        }
+
+        if (!testPasswordsAreEqual()) {
+            LOGGER.warn("Passwords are not equal!");
+
+            UiUtils.markFieldAsInvalid(passwordField);
+            UiUtils.markFieldAsInvalid(passwordVerifyField);
+
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private boolean testPasswordsAreEqual() {
+        String password = passwordField.getText();
+        String verify = passwordVerifyField.getText();
+
+        return StringUtils.equals(password, verify);
     }
 
     private void fireOnEntryAdded(Entry entry) {

@@ -33,6 +33,7 @@ public class Messages {
 
     public static final String NEWENTRYDIALOG_TITLE = "newentrydialog.title";
     public static final String NEWENTRYDIALOG_LABEL_PASSWORD = "newentrydialog.label.password";
+    public static final String NEWENTRYDIALOG_LABEL_VERIFYPASSWORD = "newentrydialog.label.verifypassword";
     public static final String NEWENTRYDIALOG_LABEL_USERNAME = "newentrydialog.label.username";
     public static final String NEWENTRYDIALOG_LABEL_TITLE = "newentrydialog.label.title";
     public static final String NEWENTRYDIALOG_LABEL_CATEGORY = "newentrydialog.label.category";
