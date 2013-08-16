@@ -43,6 +43,8 @@ public class SqliteDataSource implements EntryDataSource {
 
     public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE id = ?";
 
+    public static final String SQL_FIND_ENTRY_ID = "SELECT id FROM entry WHERE title = ?";
+
     public static final String SQL_INSERT_CATEGORY = "INSERT INTO category (title) VALUES (?)";
 
     public static final String SQL_REMOVE_CATEGORY = "DELETE FROM category WHERE id = ?";
@@ -199,7 +201,7 @@ public class SqliteDataSource implements EntryDataSource {
 
 
     @Override
-    public void addEntry(EntryCategory category, Entry entry) {
+    public Entry addEntry(EntryCategory category, Entry entry) {
         SqliteEntryCategory sqliteCategory;
 
         if (!(category instanceof SqliteEntryCategory)) {
@@ -210,13 +212,13 @@ public class SqliteDataSource implements EntryDataSource {
 
         if (sqliteCategory == null) {
             LOGGER.error("Did not find sqlite category '{}'", category);
-            return;
+            return null;
         }
 
         try {
             if (conn.isReadOnly()) {
                 LOGGER.error("Database is read-only!");
-                return;
+                return null;
             }
 
             PreparedStatement statement = conn.prepareStatement(SQL_INSERT_ENTRY);
@@ -225,20 +227,45 @@ public class SqliteDataSource implements EntryDataSource {
             statement.setString(3, entry.getUsername());
             statement.setString(4, entry.getPassword());
 
-            int result = statement.executeUpdate();
-            if (result <= 0) {
+            statement.executeUpdate();
+            int id = findId(entry);
+
+            if (id <= 0) {
                 LOGGER.error("Storage of entry '{}' was not successful", entry.toString());
-                return;
+                return null;
             }
 
-            entryMap.put(category, entry);
+            SqliteEntry added = new SqliteEntry(entry, id);
+
+            entryMap.put(category, added);
 
             if (dataSourceChangedListener != null) {
-                dataSourceChangedListener.onEntryAdded(category, entry);
+                dataSourceChangedListener.onEntryAdded(category, added);
             }
+
+            return added;
         } catch (SQLException e) {
             LOGGER.error("Unable to create new entry", e);
         }
+
+        return null;
+    }
+
+
+    public Integer findId(Entry entry) {
+        try {
+            PreparedStatement find = conn.prepareStatement(SQL_FIND_ENTRY_ID);
+            find.setString(1, entry.getTitle());
+
+            ResultSet resultSet = find.executeQuery();
+            if (resultSet != null) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Cannot find id for entry '{}'", entry, e);
+        }
+
+        return null;
     }
 
 
@@ -275,7 +302,7 @@ public class SqliteDataSource implements EntryDataSource {
             LOGGER.info("Successfully deleted entry '{}'", entry);
 
         } catch (SQLException e) {
-            LOGGER.error("Unable to remove entry '{}'", entry);
+            LOGGER.error("Unable to remove entry '{}'", entry, e);
         }
     }
 
@@ -388,6 +415,10 @@ public class SqliteDataSource implements EntryDataSource {
 
         private int id;
 
+        public SqliteEntry(Entry entry, int id) {
+            this(entry.getCategory(), id, entry.getTitle(), entry.getUsername(), entry.getPassword());
+        }
+
 
         public SqliteEntry(EntryCategory category, String title, String username, String password) {
             super(category, title, username, password);
@@ -402,6 +433,11 @@ public class SqliteDataSource implements EntryDataSource {
 
         private int getId() {
             return id;
+        }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this).appendSuper(super.toString()).append("id", id).toString();
         }
     }
 }

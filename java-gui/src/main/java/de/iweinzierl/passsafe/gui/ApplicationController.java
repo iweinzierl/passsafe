@@ -6,10 +6,8 @@ import de.iweinzierl.passsafe.gui.data.Entry;
 import de.iweinzierl.passsafe.gui.data.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
-import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.Sync;
-import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
@@ -61,13 +59,13 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     public void onEntryAdded(EntryCategory category, Entry entry) {
         LOGGER.debug("Caught 'onEntryAdded' event");
 
-        dataSource.addEntry(category, entry);
+        Entry newEntry = dataSource.addEntry(category, entry);
 
-        if (entryList.addEntry(category, entry)) {
-            LOGGER.info("Successfully added entry '{}'", entry);
+        if (entryList.addEntry(category, newEntry)) {
+            LOGGER.info("Successfully added entry '{}'", newEntry);
             entryTable.tableChanged();
         } else {
-            LOGGER.error("Unable to add entry '{}'", entry);
+            LOGGER.error("Unable to add entry '{}'", newEntry);
         }
     }
 

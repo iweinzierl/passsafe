@@ -13,7 +13,7 @@ public interface EntryDataSource {
 
     Entry getEntry(EntryCategory category, int index);
 
-    void addEntry(EntryCategory category, Entry entry);
+    Entry addEntry(EntryCategory category, Entry entry);
 
     void setDataSourceChangedListener(DataSourceChangedListener listener);
 
