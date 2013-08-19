@@ -16,6 +16,8 @@ repositories {
 dependencies {
     compile 'com.android.support:support-v4:13.0.+'
     compile 'com.google.guava:guava:14.0.1'
+    compile 'commons-codec:commons-codec:1.7'
+
 }
 
 android {

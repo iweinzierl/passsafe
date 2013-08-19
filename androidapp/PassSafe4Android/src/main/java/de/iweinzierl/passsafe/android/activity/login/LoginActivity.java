@@ -1,9 +1,11 @@
 package de.iweinzierl.passsafe.android.activity.login;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 
+import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.logging.Logger;
 
@@ -28,6 +30,8 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
     @Override
     public void login(String password) {
         LOGGER.info("Received login() event");
-        // TODO
+        ((PassSafeApplication) getApplication()).setPassword(password);
+
+        // TODO start next activity
     }
 }
