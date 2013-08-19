@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.5.+'
+        classpath 'com.google.guava:guava:14.0.1'
     }
 }
 apply plugin: 'android'
@@ -14,6 +15,7 @@ repositories {
 
 dependencies {
     compile 'com.android.support:support-v4:13.0.+'
+    compile 'com.google.guava:guava:14.0.1'
 }
 
 android {
