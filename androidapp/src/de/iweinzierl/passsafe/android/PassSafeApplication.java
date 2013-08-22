@@ -20,7 +20,6 @@ public class PassSafeApplication extends Application {
 
     private void initializeSingletons() {
         LOGGER.info("initializeSingletons()");
-        LOGGER.debug(new Test("This is my personal test!").toString());
     }
 
     public void setPassword(String password) {
