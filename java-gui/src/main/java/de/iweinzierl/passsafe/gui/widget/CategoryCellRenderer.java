@@ -1,6 +1,6 @@
 package de.iweinzierl.passsafe.gui.widget;
 
-import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 import javax.swing.JLabel;
 import javax.swing.JList;

@@ -2,7 +2,7 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import org.slf4j.Logger;

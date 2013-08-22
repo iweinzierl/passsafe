@@ -1,5 +1,8 @@
 package de.iweinzierl.passsafe.gui.data;
 
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
+
 import java.util.List;
 
 

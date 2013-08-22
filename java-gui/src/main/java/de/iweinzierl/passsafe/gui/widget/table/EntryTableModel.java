@@ -1,6 +1,6 @@
 package de.iweinzierl.passsafe.gui.widget.table;
 
-import de.iweinzierl.passsafe.gui.data.Entry;
+import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 
 import javax.swing.table.AbstractTableModel;

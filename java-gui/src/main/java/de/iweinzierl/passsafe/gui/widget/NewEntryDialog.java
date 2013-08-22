@@ -1,8 +1,8 @@
 package de.iweinzierl.passsafe.gui.widget;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import de.iweinzierl.passsafe.gui.data.Entry;
-import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.gui.exception.PassSafeException;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;

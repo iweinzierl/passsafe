@@ -1,6 +1,6 @@
 package de.iweinzierl.passsafe.gui.widget.tree;
 
-import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;

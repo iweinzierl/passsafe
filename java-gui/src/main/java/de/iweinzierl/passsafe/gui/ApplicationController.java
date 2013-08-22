@@ -2,8 +2,8 @@ package de.iweinzierl.passsafe.gui;
 
 import com.google.common.collect.Lists;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
-import de.iweinzierl.passsafe.gui.data.Entry;
-import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;

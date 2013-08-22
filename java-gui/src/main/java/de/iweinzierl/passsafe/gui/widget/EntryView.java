@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.gui.data.Entry;
+import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
 import de.iweinzierl.passsafe.gui.resources.Images;
 import de.iweinzierl.passsafe.gui.resources.Messages;

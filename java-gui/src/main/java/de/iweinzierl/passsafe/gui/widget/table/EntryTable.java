@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui.widget.table;
 
 import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.gui.data.Entry;
+import de.iweinzierl.passsafe.shared.domain.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

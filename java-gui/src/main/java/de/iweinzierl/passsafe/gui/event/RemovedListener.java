@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui.event;
 
-import de.iweinzierl.passsafe.gui.data.Entry;
-import de.iweinzierl.passsafe.gui.data.EntryCategory;
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 public interface RemovedListener {
 

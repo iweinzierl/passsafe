@@ -1,4 +1,4 @@
-package de.iweinzierl.passsafe.gui.data;
+package de.iweinzierl.passsafe.shared.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
