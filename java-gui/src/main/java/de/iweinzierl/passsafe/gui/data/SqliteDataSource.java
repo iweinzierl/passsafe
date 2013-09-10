@@ -324,6 +324,8 @@ public class SqliteDataSource implements EntryDataSource {
                 EntryCategory newCategory = new SqliteEntryCategory(id, category.getTitle());
                 LOGGER.info("Successfully inserted category '{}'", newCategory);
 
+                categories.add(newCategory);
+
                 return newCategory;
             }
         } catch (SQLException e) {
