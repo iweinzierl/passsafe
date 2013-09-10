@@ -55,6 +55,10 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         return passwordHandler;
     }
 
+    public Application getApplication() {
+        return application;
+    }
+
     @Override
     public void onEntryAdded(EntryCategory category, Entry entry) {
         LOGGER.debug("Caught 'onEntryAdded' event");

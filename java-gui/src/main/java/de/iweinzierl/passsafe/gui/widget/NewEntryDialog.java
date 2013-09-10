@@ -1,6 +1,7 @@
 package de.iweinzierl.passsafe.gui.widget;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.gui.exception.PassSafeException;
@@ -49,6 +50,8 @@ public class NewEntryDialog extends JDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryDialog.class);
 
+    private static NewEntryDialog INSTANCE;
+
     private PasswordHandler passwordHandler;
 
     private final List<EntryCategory> categories;
@@ -64,12 +67,23 @@ public class NewEntryDialog extends JDialog {
     private Border origBorder;
 
 
-    public NewEntryDialog(JFrame parent, List<EntryCategory> categories, PasswordHandler passwordHandler) {
+    private NewEntryDialog(JFrame parent, List<EntryCategory> categories, PasswordHandler passwordHandler) {
         super(parent, Messages.getMessage(Messages.NEWENTRYDIALOG_TITLE), true);
         this.categories = categories;
         this.passwordHandler = passwordHandler;
         this.onEntryAddedListeners = new ArrayList<>();
         initialize();
+    }
+
+    public static NewEntryDialog show(ApplicationController controller, JFrame parent, PasswordHandler handler) {
+        if (INSTANCE != null) {
+            INSTANCE.dispose();
+        }
+
+        INSTANCE = new NewEntryDialog(parent, controller.getDataSource().getCategories(), handler);
+        INSTANCE.show();
+
+        return INSTANCE;
     }
 
 

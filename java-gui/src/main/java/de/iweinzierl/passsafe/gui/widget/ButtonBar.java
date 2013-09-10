@@ -2,6 +2,8 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.action.NewCategoryDialogAction;
+import de.iweinzierl.passsafe.gui.action.NewEntryDialogAction;
 import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
@@ -43,27 +45,12 @@ public class ButtonBar extends JPanel {
 
     private JButton createAddEntryButton() {
         return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_NEWENTRY), BUTTON_WIDTH, BUTTON_HEIGHT,
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        LOGGER.debug("Clicked 'new entry'");
-
-                        NewEntryDialog dialog = new NewEntryDialog(parent, controller.getDataSource().getCategories(),
-                                controller.getPasswordHandler());
-                        dialog.addOnEntryAddedListeners(controller);
-                        dialog.show();
-                    }
-                });
+                new NewEntryDialogAction(controller, parent));
     }
 
     private JButton createAddCategoryButton() {
         return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_NEWCATEGORY), BUTTON_WIDTH,
-                BUTTON_HEIGHT, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new NewCategoryDialog(parent, controller).show();
-            }
-        });
+                BUTTON_HEIGHT, new NewCategoryDialogAction(controller, parent));
     }
 
     private JButton createSyncButton() {

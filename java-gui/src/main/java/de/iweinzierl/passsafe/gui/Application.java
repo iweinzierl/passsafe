@@ -7,6 +7,7 @@ import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.secure.AesPasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.SyncFactory;
+import de.iweinzierl.passsafe.gui.util.KeyStrokeHandler;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
 import de.iweinzierl.passsafe.gui.widget.Display;
@@ -25,6 +26,9 @@ import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -122,6 +126,7 @@ public class Application extends JFrame {
 
     public void initialize() throws SQLException, ClassNotFoundException, IOException {
         initializeLayout();
+        initializeKeyStrokes();
 
         addWindowListener(controller);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -144,11 +149,21 @@ public class Application extends JFrame {
         contentPane.add(entryListPane, BorderLayout.WEST);
         contentPane.add(display, BorderLayout.CENTER);
 
-        contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_WIDTH));
+        contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         setMinimumSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         UiUtils.center(this);
+    }
+
+    private void initializeKeyStrokes() {
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                return KeyStrokeHandler.getKeyStrokeHandler(controller).handle(e);
+            }
+        });
     }
 
 

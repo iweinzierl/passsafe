@@ -37,17 +37,28 @@ public class NewCategoryDialog extends JDialog {
     public static final int BUTTON_WIDTH = 125;
     public static final int BUTTON_HEIGHT = 25;
 
+    private static NewCategoryDialog INSTANCE;
+
     private final ApplicationController controller;
 
     private final JTextField titleField;
 
-    public NewCategoryDialog(Frame owner, ApplicationController controller) {
+    private NewCategoryDialog(Frame owner, ApplicationController controller) {
         super(owner);
         this.controller = controller;
         this.titleField = (JTextField) WidgetFactory.createComponent(JTextField.class, TEXTFIELD_WIDTH,
                 TEXTFIELD_HEIGHT);
 
         initialize();
+    }
+
+    public static void show(Frame owner, ApplicationController controller) {
+        if (INSTANCE != null) {
+            INSTANCE.dispose();
+        }
+
+        INSTANCE = new NewCategoryDialog(owner, controller);
+        INSTANCE.show();
     }
 
     private void initialize() {
