@@ -77,8 +77,7 @@ public class Application extends JFrame {
 
         try {
             controller.requestSync();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Unable to sync PassSafe storage with sync type '{}'", configuration.getSyncType());
             UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
             return;
@@ -157,10 +156,16 @@ public class Application extends JFrame {
     }
 
     private void initializeKeyStrokes() {
+        LOGGER.info("Initialize key stroke event handling");
+
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.isConsumed()) {
+                    return false;
+                }
+
                 return KeyStrokeHandler.getKeyStrokeHandler(controller).handle(e);
             }
         });

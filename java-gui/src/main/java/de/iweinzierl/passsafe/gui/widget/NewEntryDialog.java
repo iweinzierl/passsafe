@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -52,9 +53,9 @@ public class NewEntryDialog extends JDialog {
 
     private static NewEntryDialog INSTANCE;
 
-    private PasswordHandler passwordHandler;
+    private final ApplicationController controller;
 
-    private final List<EntryCategory> categories;
+    private final PasswordHandler passwordHandler;
 
     private List<OnEntryAddedListener> onEntryAddedListeners;
 
@@ -67,21 +68,24 @@ public class NewEntryDialog extends JDialog {
     private Border origBorder;
 
 
-    private NewEntryDialog(JFrame parent, List<EntryCategory> categories, PasswordHandler passwordHandler) {
+    private NewEntryDialog(JFrame parent, ApplicationController controller, PasswordHandler passwordHandler) {
         super(parent, Messages.getMessage(Messages.NEWENTRYDIALOG_TITLE), true);
-        this.categories = categories;
+        this.controller = controller;
         this.passwordHandler = passwordHandler;
         this.onEntryAddedListeners = new ArrayList<>();
         initialize();
     }
 
     public static NewEntryDialog show(ApplicationController controller, JFrame parent, PasswordHandler handler) {
-        if (INSTANCE != null) {
-            INSTANCE.dispose();
+        if (INSTANCE == null) {
+            INSTANCE = new NewEntryDialog(parent, controller, handler);
         }
 
-        INSTANCE = new NewEntryDialog(parent, controller.getDataSource().getCategories(), handler);
-        INSTANCE.show();
+        if (!INSTANCE.isShowing()) {
+            INSTANCE.reset();
+        }
+
+        INSTANCE.setVisible(true);
 
         return INSTANCE;
     }
@@ -171,7 +175,11 @@ public class NewEntryDialog extends JDialog {
 
 
     private Container createCategoryPanel() {
-        categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories.size()]));
+        final List<EntryCategory> categories = controller.getDataSource().getCategories();
+
+        categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories
+                .size
+                ()]));
         categoryBox.setRenderer(new CategoryCellRenderer());
         return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY)), categoryBox);
     }
@@ -263,5 +271,17 @@ public class NewEntryDialog extends JDialog {
         button.addActionListener(listener);
 
         return button;
+    }
+
+
+    private void reset() {
+        List<EntryCategory> tmp = controller.getDataSource().getCategories();
+        EntryCategory[] categories = tmp.toArray(new EntryCategory[tmp.size()]);
+
+        categoryBox.setModel(new DefaultComboBoxModel<>(categories));
+        titleField.setText(null);
+        usernameField.setText(null);
+        passwordField.setText(null);
+        passwordVerifyField.setText(null);
     }
 }

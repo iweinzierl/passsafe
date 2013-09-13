@@ -2,9 +2,9 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +52,17 @@ public class NewCategoryDialog extends JDialog {
         initialize();
     }
 
-    public static void show(Frame owner, ApplicationController controller) {
-        if (INSTANCE != null) {
-            INSTANCE.dispose();
+    public static NewCategoryDialog show(Frame owner, ApplicationController controller) {
+        if (INSTANCE == null) {
+            INSTANCE = new NewCategoryDialog(owner, controller);
         }
 
-        INSTANCE = new NewCategoryDialog(owner, controller);
-        INSTANCE.show();
+        if (!INSTANCE.isShowing()) {
+            INSTANCE.reset();
+        }
+
+        INSTANCE.setVisible(true);
+        return INSTANCE;
     }
 
     private void initialize() {
@@ -119,5 +123,9 @@ public class NewCategoryDialog extends JDialog {
                         BUTTON_HEIGHT, okListener),
                 WidgetFactory.createButton(Messages.getMessage(Messages.NEWCATEGORYDIALOG_BUTTON_CANCEL), BUTTON_WIDTH,
                         BUTTON_HEIGHT, cancelListener));
+    }
+
+    private void reset() {
+        titleField.setText(null);
     }
 }
