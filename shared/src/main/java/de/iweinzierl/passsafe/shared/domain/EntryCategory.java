@@ -3,8 +3,10 @@ package de.iweinzierl.passsafe.shared.domain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
 
-public class EntryCategory {
+
+public class EntryCategory implements Serializable {
 
     public static final EntryCategory DEFAULT_CATEGORY = new EntryCategory("default");
 

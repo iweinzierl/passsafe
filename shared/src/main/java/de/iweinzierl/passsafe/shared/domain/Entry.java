@@ -2,8 +2,10 @@ package de.iweinzierl.passsafe.shared.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
 
-public class Entry {
+
+public class Entry implements Serializable {
 
     private EntryCategory category;
 

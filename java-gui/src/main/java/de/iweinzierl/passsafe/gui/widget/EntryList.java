@@ -2,15 +2,18 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.shared.domain.Entry;
-import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.gui.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryListNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.RemoveItemMenu;
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.swing.DropMode;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -27,6 +30,8 @@ import java.util.List;
 
 public class EntryList extends JTree {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(EntryList.class);
+
     private final ApplicationController controller;
     private final Application application;
 
@@ -41,6 +46,9 @@ public class EntryList extends JTree {
         setMinimumSize(new Dimension(150, 300));
 
         initialize();
+        setDragEnabled(true);
+        setDropMode(DropMode.INSERT);
+        setTransferHandler(new EntryListTransferHandler());
         addTreeSelectionListener(controller);
     }
 
