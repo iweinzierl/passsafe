@@ -53,6 +53,8 @@ public class SqliteDataSource implements EntryDataSource {
 
     public static final String SQL_REMOVE_CATEGORY_ENTRIES = "DELETE FROM entry WHERE category_id = ?";
 
+    public static final String SQL_UPDATE_CATEGORY_OF_ENTRY = "UPDATE entry SET category_id = ? WHERE id = ?";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SqliteDataSource.class);
 
     private String dbfile;
@@ -368,6 +370,41 @@ public class SqliteDataSource implements EntryDataSource {
     }
 
     @Override
+    public void updateEntryCategory(Entry entry, EntryCategory category) {
+        LOGGER.debug("Go and update category to '{}' of entry {}", category.getTitle(), entry.getTitle());
+        final EntryCategory oldCategory = entry.getCategory();
+
+        if (!(category instanceof SqliteEntryCategory)) {
+            LOGGER.warn("Cannot update entry with category from type '{}'", category.getClass());
+            return;
+        }
+
+        if (!(entry instanceof SqliteEntry)) {
+            LOGGER.warn("Cannot update entry of type '{}'", entry.getClass());
+            return;
+        }
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_CATEGORY_OF_ENTRY);
+            stmt.setInt(1, ((SqliteEntryCategory) category).getId());
+            stmt.setInt(2, ((SqliteEntry) entry).getId());
+
+            int affected = stmt.executeUpdate();
+            if (affected <= 0) {
+                LOGGER.warn("No entry updated!");
+            } else {
+                LOGGER.info("Successfully updated entry '{}' with category '{}'", entry.getTitle(),
+                        category.getTitle());
+
+                entryMap.remove(oldCategory, entry);
+                entryMap.put(category, entry);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Unable to update category '{}' of entry '{}'", category.getTitle(), entry.getTitle());
+        }
+    }
+
+    @Override
     public void close() {
         if (conn != null) {
 
@@ -435,7 +472,7 @@ public class SqliteDataSource implements EntryDataSource {
         }
 
 
-        private int getId() {
+        protected int getId() {
             return id;
         }
 

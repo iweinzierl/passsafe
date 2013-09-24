@@ -26,5 +26,7 @@ public interface EntryDataSource {
 
     void removeCategory(EntryCategory category);
 
+    void updateEntryCategory(Entry entry, EntryCategory category);
+
     void close();
 }

@@ -1,16 +1,17 @@
 package de.iweinzierl.passsafe.gui.widget;
 
+import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryListNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryListTransferable;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
 import de.iweinzierl.passsafe.shared.domain.Entry;
-import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -22,6 +23,12 @@ import java.util.List;
 public class EntryListTransferHandler extends TransferHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryListTransferHandler.class);
+
+    private ApplicationController controller;
+
+    public EntryListTransferHandler(ApplicationController controller) {
+        this.controller = controller;
+    }
 
     @Override
     public int getSourceActions(JComponent c) {
@@ -69,10 +76,10 @@ public class EntryListTransferHandler extends TransferHandler {
             final EntryList entryList = (EntryList) comp;
             final List<EntryListNode> selection = transferData.getSelection();
 
-            doImport(entryList.getDropLocation().getPath(), selection);
-
-        } catch (UnsupportedFlavorException e) {
-            e.printStackTrace();
+            doImport(entryList, entryList.getDropLocation().getPath(), selection);
+            entryList.updateUI();
+    } catch (UnsupportedFlavorException e) {
+        e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -80,26 +87,31 @@ public class EntryListTransferHandler extends TransferHandler {
         return false;
     }
 
-    private void doImport(TreePath path, List<EntryListNode> selection) {
+    private void doImport(EntryList entryList, TreePath path, List<EntryListNode> selection) {
         EntryListNode lastPathComponent = (EntryListNode) path.getLastPathComponent();
         if (lastPathComponent instanceof CategoryNode) {
-            EntryCategory category = ((CategoryNode) lastPathComponent).getCategory();
+            CategoryNode category = ((CategoryNode) lastPathComponent);
 
             for (EntryListNode entry : selection) {
-                importEntry(category, entry);
+                importEntry(entryList, category, entry);
             }
         }
     }
 
-    private void importEntry(EntryCategory category, EntryListNode entryListNode) {
+    private void importEntry(EntryList entryList, CategoryNode category, EntryListNode entryListNode) {
         if (!(entryListNode instanceof EntryNode)) {
             LOGGER.warn("Unsupported import of {}", entryListNode.getClass());
             return;
         }
 
-        Entry entry = ((EntryNode) entryListNode).getEntry();
+        EntryNode entryNode = (EntryNode) entryListNode;
+        Entry entry = entryNode.getEntry();
 
-        LOGGER.info("Import {} to {}", entry.getTitle(), category.getTitle());
-        // TODO update entry with new category (datasource) and update tree
+        LOGGER.info("Import {} to {}", entry.getTitle(), category.getCategory().getTitle());
+        controller.getDataSource().updateEntryCategory(entry, category.getCategory());
+
+        ((DefaultTreeModel) entryList.getModel()).removeNodeFromParent(entryNode);
+        ((DefaultTreeModel) entryList.getModel()).insertNodeInto(entryNode, category, 0);
+        ((DefaultTreeModel) entryList.getModel()).reload(entryNode.getRoot());
     }
 }

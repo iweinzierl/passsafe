@@ -48,7 +48,7 @@ public class EntryList extends JTree {
         initialize();
         setDragEnabled(true);
         setDropMode(DropMode.INSERT);
-        setTransferHandler(new EntryListTransferHandler());
+        setTransferHandler(new EntryListTransferHandler(controller));
         addTreeSelectionListener(controller);
     }
 
