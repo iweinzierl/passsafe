@@ -1,12 +1,11 @@
 package de.iweinzierl.passsafe.android.activity.login;
 
-import android.app.Application;
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
-
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.activity.list.ListActivityIntent;
 import de.iweinzierl.passsafe.android.logging.Logger;
 
 public class LoginActivity extends Activity implements LoginFragment.ActionHandler {
@@ -32,6 +31,6 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
         LOGGER.info("Received login() event");
         ((PassSafeApplication) getApplication()).setPassword(password);
 
-        // TODO start next activity
+        startActivity(new ListActivityIntent(this));
     }
 }
