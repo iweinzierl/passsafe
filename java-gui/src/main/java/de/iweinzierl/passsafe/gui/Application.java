@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui;
 
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
-import de.iweinzierl.passsafe.shared.data.EntryDataSource;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;
@@ -85,7 +85,7 @@ public class Application extends JFrame {
 
         Application app = new Application(controller);
 
-        EntryDataSource dataSource = new SqliteDataSource(configuration.getDatabase());
+        PassSafeDataSource dataSource = new SqliteDataSource(configuration.getDatabase());
         controller.setDataSource(dataSource);
 
         ButtonBar buttonBar = new ButtonBar(controller, app);

@@ -2,9 +2,9 @@ package de.iweinzierl.passsafe.gui;
 
 import com.google.common.collect.Lists;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
-import de.iweinzierl.passsafe.shared.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.Sync;
@@ -38,7 +38,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private final Sync sync;
 
     private Application application;
-    private EntryDataSource dataSource;
+    private PassSafeDataSource dataSource;
     private EntryList entryList;
     private EntryTable entryTable;
     private EntryView entryView;
@@ -145,7 +145,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         }
     }
 
-    public EntryDataSource getDataSource() {
+    public PassSafeDataSource getDataSource() {
         return dataSource;
     }
 
@@ -162,7 +162,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     }
 
 
-    public void setDataSource(EntryDataSource dataSource) {
+    public void setDataSource(PassSafeDataSource dataSource) {
         this.dataSource = dataSource;
     }
 

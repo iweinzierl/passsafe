@@ -3,7 +3,7 @@ package de.iweinzierl.passsafe.gui.data;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import de.iweinzierl.passsafe.shared.data.DataSourceChangedListener;
-import de.iweinzierl.passsafe.shared.data.EntryDataSource;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.shared.data.SQLiteDatabaseCreator;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class SqliteDataSource implements EntryDataSource {
+public class SqliteDataSource implements PassSafeDataSource {
 
     public static final String SQL_LOAD_CATEGORIES = "SELECT id, title FROM category ORDER BY title";
 

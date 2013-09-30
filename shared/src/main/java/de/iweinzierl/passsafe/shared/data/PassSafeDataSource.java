@@ -6,7 +6,7 @@ import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import java.util.List;
 
 
-public interface EntryDataSource {
+public interface PassSafeDataSource {
 
     int getItemCount(EntryCategory category);
 

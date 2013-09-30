@@ -2,7 +2,7 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.shared.data.EntryDataSource;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryListNode;
@@ -171,7 +171,7 @@ public class EntryList extends JTree {
         return selection;
     }
 
-    public static EntryList create(ApplicationController controller, Application parent, EntryDataSource dataSource) {
+    public static EntryList create(ApplicationController controller, Application parent, PassSafeDataSource dataSource) {
         DefaultTreeModel model = new DefaultTreeModel(createRootNode(dataSource));
         EntryList tree = new EntryList(controller, parent, model);
         expandCategories(tree);
@@ -179,7 +179,7 @@ public class EntryList extends JTree {
         return tree;
     }
 
-    public static TreeNode createRootNode(EntryDataSource dataSource) {
+    public static TreeNode createRootNode(PassSafeDataSource dataSource) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(Messages.getMessage(Messages.ENTRYLIST_ROOTNODE));
 
         for (EntryCategory category : dataSource.getCategories()) {
