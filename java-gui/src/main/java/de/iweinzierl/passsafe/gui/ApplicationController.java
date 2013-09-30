@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
-import de.iweinzierl.passsafe.gui.data.EntryDataSource;
+import de.iweinzierl.passsafe.shared.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.Sync;

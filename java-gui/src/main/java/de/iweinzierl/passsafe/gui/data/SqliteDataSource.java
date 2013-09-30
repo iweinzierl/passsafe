@@ -2,6 +2,8 @@ package de.iweinzierl.passsafe.gui.data;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import de.iweinzierl.passsafe.shared.data.DataSourceChangedListener;
+import de.iweinzierl.passsafe.shared.data.EntryDataSource;
 import de.iweinzierl.passsafe.shared.data.SQLiteDatabaseCreator;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;

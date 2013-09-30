@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui;
 
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
-import de.iweinzierl.passsafe.gui.data.EntryDataSource;
+import de.iweinzierl.passsafe.shared.data.EntryDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;

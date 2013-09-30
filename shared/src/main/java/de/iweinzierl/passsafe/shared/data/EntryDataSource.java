@@ -1,4 +1,4 @@
-package de.iweinzierl.passsafe.gui.data;
+package de.iweinzierl.passsafe.shared.data;
 
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
