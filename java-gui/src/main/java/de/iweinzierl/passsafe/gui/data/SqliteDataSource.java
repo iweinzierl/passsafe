@@ -2,8 +2,10 @@ package de.iweinzierl.passsafe.gui.data;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import de.iweinzierl.passsafe.shared.data.SQLiteDatabaseCreator;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
+import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,20 +23,6 @@ import java.util.List;
 
 
 public class SqliteDataSource implements EntryDataSource {
-
-    public static final String SQL_CREATE_CATEGORY = "CREATE TABLE category (" +
-            "  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "  title TEXT NOT NULL" +
-            ");";
-
-    public static final String SQL_CREATE_ENTRY = "CREATE TABLE entry ( " +
-            "  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "  category_id INTEGER NOT NULL, " +
-            "  title TEXT NOT NULL, " +
-            "  username TEXT, " +
-            "  password TEXT NOT NULL, " +
-            "  FOREIGN KEY (category_id) REFERENCES category(id)" +
-            ");";
 
     public static final String SQL_LOAD_CATEGORIES = "SELECT id, title FROM category ORDER BY title";
 
@@ -65,7 +53,8 @@ public class SqliteDataSource implements EntryDataSource {
     private Multimap<EntryCategory, Entry> entryMap;
 
 
-    public SqliteDataSource(String dbfile) throws SQLException, ClassNotFoundException, IOException {
+    public SqliteDataSource(
+            String dbfile) throws SQLException, ClassNotFoundException, IOException, PassSafeSqlException {
         Class.forName("org.sqlite.JDBC");
 
         this.dbfile = dbfile;
@@ -77,7 +66,8 @@ public class SqliteDataSource implements EntryDataSource {
     }
 
 
-    private void initialize(String dbfile) throws SQLException, ClassNotFoundException, IOException {
+    private void initialize(
+            String dbfile) throws PassSafeSqlException, SQLException, ClassNotFoundException, IOException {
 
         File db = new File(dbfile);
         boolean isNew = !db.exists();
@@ -89,23 +79,25 @@ public class SqliteDataSource implements EntryDataSource {
             LOGGER.info("SQLite database is new. Initialize now...");
 
             try {
-                initializeDBLayout();
-            } catch (SQLException e) {
+                new SQLiteDatabaseCreator(new SQLiteDatabaseCreator.SQLiteCommandExecutor() {
+                    @Override
+                    public boolean execute(String sql) throws PassSafeSqlException {
+                        try {
+                            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                            preparedStatement.execute();
+
+                            return true;
+
+                        } catch (SQLException e) {
+                            throw new PassSafeSqlException(e.getMessage(), e.getCause());
+                        }
+                    }
+                }).setup();
+            } catch (PassSafeSqlException e) {
                 db.delete();
                 throw e;
             }
         }
-    }
-
-
-    private void initializeDBLayout() throws SQLException {
-        PreparedStatement prepareCategory = conn.prepareStatement(SQL_CREATE_CATEGORY);
-        prepareCategory.execute();
-        LOGGER.info("Successfully created table 'category'");
-
-        PreparedStatement prepareEntry = conn.prepareStatement(SQL_CREATE_ENTRY);
-        prepareEntry.execute();
-        LOGGER.info("Successfully created table 'entry'");
     }
 
 
