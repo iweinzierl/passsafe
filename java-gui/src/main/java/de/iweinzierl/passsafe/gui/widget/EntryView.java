@@ -1,14 +1,13 @@
 package de.iweinzierl.passsafe.gui.widget;
 
-import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.shared.domain.Entry;
-import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
-import de.iweinzierl.passsafe.gui.resources.Images;
-import de.iweinzierl.passsafe.gui.resources.Messages;
-import de.iweinzierl.passsafe.gui.util.UiUtils;
-import de.iweinzierl.passsafe.gui.widget.secret.SwitchablePasswordField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -19,13 +18,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
+import de.iweinzierl.passsafe.gui.resources.Images;
+import de.iweinzierl.passsafe.gui.resources.Messages;
+import de.iweinzierl.passsafe.gui.util.UiUtils;
+import de.iweinzierl.passsafe.gui.widget.secret.SwitchablePasswordField;
+import de.iweinzierl.passsafe.shared.domain.Entry;
 
 // TODO make text fields smaller
 public class EntryView extends JPanel {
@@ -34,7 +37,7 @@ public class EntryView extends JPanel {
 
     private class ClipboardMenu extends JMenuItem {
 
-        private ClipboardMenu(JComponent component) {
+        private ClipboardMenu(final JComponent component) {
             super(new ClipboardMenuAction(component));
         }
     }
@@ -43,14 +46,15 @@ public class EntryView extends JPanel {
 
         private JComponent component;
 
-        private ClipboardMenuAction(JComponent component) {
+        private ClipboardMenuAction(final JComponent component) {
             this.component = component;
         }
 
         @Override
-        public Object getValue(String key) {
+        public Object getValue(final String key) {
             switch (key) {
-                case "Name":
+
+                case "Name" :
                     return Messages.getMessage(Messages.ENTRYVIEW_MENU_COPYTOCLIPBOARD);
             }
 
@@ -58,12 +62,12 @@ public class EntryView extends JPanel {
         }
 
         @Override
-        public void putValue(String key, Object value) {
+        public void putValue(final String key, final Object value) {
             // nothing to do here
         }
 
         @Override
-        public void setEnabled(boolean b) {
+        public void setEnabled(final boolean b) {
             // nothing to do here
         }
 
@@ -73,17 +77,17 @@ public class EntryView extends JPanel {
         }
 
         @Override
-        public void addPropertyChangeListener(PropertyChangeListener listener) {
+        public void addPropertyChangeListener(final PropertyChangeListener listener) {
             // nothing to do here
         }
 
         @Override
-        public void removePropertyChangeListener(PropertyChangeListener listener) {
+        public void removePropertyChangeListener(final PropertyChangeListener listener) {
             // nothing to do here
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(final ActionEvent e) {
             Clipboard clipboard = getToolkit().getSystemClipboard();
             String text = null;
             if (component instanceof JTextField) {
@@ -91,7 +95,6 @@ public class EntryView extends JPanel {
             } else if (component instanceof SwitchablePasswordField) {
                 try {
                     text = ((SwitchablePasswordField) component).getPassword();
-                    UiUtils.displayError(null, "TODO");
                 } catch (PassSafeSecurityException e1) {
                     LOGGER.error("Unable to retrieve password from password field", e);
                     return;
@@ -103,7 +106,7 @@ public class EntryView extends JPanel {
         }
     }
 
-    final private ApplicationController controller;
+    private final ApplicationController controller;
 
     private final JTextField titleField;
 
@@ -117,7 +120,7 @@ public class EntryView extends JPanel {
 
     private Entry entry;
 
-    public EntryView(ApplicationController controller) {
+    public EntryView(final ApplicationController controller) {
         super();
         this.controller = controller;
 
@@ -149,7 +152,7 @@ public class EntryView extends JPanel {
         setMaximumSize(new Dimension(700, 200));
     }
 
-    private JPanel createRow(JLabel label, JComponent inputField, JPanel buttons) {
+    private JPanel createRow(final JLabel label, final JComponent inputField, final JPanel buttons) {
         JPanel row = new JPanel();
         row.setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -188,7 +191,7 @@ public class EntryView extends JPanel {
                 createSecretButtons(passwordField, passInvisible, passVisible));
     }
 
-    private void initializeClipboardFunctions(JComponent textField) {
+    private void initializeClipboardFunctions(final JComponent textField) {
         JPopupMenu componentPopupMenu = textField.getComponentPopupMenu();
         if (componentPopupMenu == null) {
             componentPopupMenu = new JPopupMenu(Messages.getMessage(Messages.ENTRYVIEW_MENU_TITLE));
@@ -198,7 +201,7 @@ public class EntryView extends JPanel {
         componentPopupMenu.add(new ClipboardMenu(textField));
     }
 
-    public void apply(Entry entry) {
+    public void apply(final Entry entry) {
         if (entry != null) {
             reset();
             this.entry = entry;
@@ -242,39 +245,40 @@ public class EntryView extends JPanel {
         final JButton cancel = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
 
         edit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                textField.setEditable(true);
-                edit.setEnabled(false);
-                save.setEnabled(true);
-                cancel.setEnabled(true);
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    textField.setEditable(true);
+                    edit.setEnabled(false);
+                    save.setEnabled(true);
+                    cancel.setEnabled(true);
+                }
+            });
 
         save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO save entry
-                textField.setEditable(false);
-                save.setEnabled(false);
-                cancel.setEnabled(false);
-                edit.setEnabled(true);
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+
+                    // TODO save entry
+                    textField.setEditable(false);
+                    save.setEnabled(false);
+                    cancel.setEnabled(false);
+                    edit.setEnabled(true);
+                }
+            });
 
         cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                textField.setEditable(false);
-                save.setEnabled(false);
-                cancel.setEnabled(false);
-                edit.setEnabled(true);
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    textField.setEditable(false);
+                    save.setEnabled(false);
+                    cancel.setEnabled(false);
+                    edit.setEnabled(true);
 
-                if (entry != null) {
-                    textField.setText(entry.getTitle()); // XXX specific to title property!
+                    if (entry != null) {
+                        textField.setText(entry.getTitle()); // XXX specific to title property!
+                    }
                 }
-            }
-        });
+            });
 
         save.setEnabled(false);
         cancel.setEnabled(false);
@@ -297,53 +301,54 @@ public class EntryView extends JPanel {
         final JButton cancel = WidgetFactory.createImageButton(Images.ENTRYVIEW_BUTTON_CANCEL);
 
         edit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                secretField.setEditable(true);
-                edit.setEnabled(false);
-                save.setEnabled(true);
-                cancel.setEnabled(true);
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    secretField.setEditable(true);
+                    edit.setEnabled(false);
+                    save.setEnabled(true);
+                    cancel.setEnabled(true);
+                }
+            });
 
         save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO save entry
-                secretField.setEditable(false);
-                save.setEnabled(false);
-                cancel.setEnabled(false);
-                edit.setEnabled(true);
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+
+                    // TODO save entry
+                    secretField.setEditable(false);
+                    save.setEnabled(false);
+                    cancel.setEnabled(false);
+                    edit.setEnabled(true);
+                }
+            });
 
         cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                secretField.setEditable(false);
-                save.setEnabled(false);
-                cancel.setEnabled(false);
-                edit.setEnabled(true);
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    secretField.setEditable(false);
+                    save.setEnabled(false);
+                    cancel.setEnabled(false);
+                    edit.setEnabled(true);
+                }
+            });
 
         show.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                secretField.showPassword();
-                hide.setVisible(true);
-                show.setVisible(false);
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    secretField.showPassword();
+                    hide.setVisible(true);
+                    show.setVisible(false);
+                }
+            });
 
         hide.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                secretField.hidePassword();
-                hide.setVisible(false);
-                show.setVisible(true);
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    secretField.hidePassword();
+                    hide.setVisible(false);
+                    show.setVisible(true);
+                }
+            });
 
         save.setEnabled(false);
         cancel.setEnabled(false);
