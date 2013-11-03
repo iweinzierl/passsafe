@@ -1,16 +1,13 @@
 package de.iweinzierl.passsafe.gui.widget;
 
-import com.google.api.client.repackaged.com.google.common.base.Strings;
-import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.shared.domain.Entry;
-import de.iweinzierl.passsafe.shared.domain.EntryCategory;
-import de.iweinzierl.passsafe.gui.exception.PassSafeException;
-import de.iweinzierl.passsafe.gui.resources.Messages;
-import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
-import de.iweinzierl.passsafe.gui.util.UiUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -24,15 +21,21 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.api.client.repackaged.com.google.common.base.Strings;
+
+import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.exception.PassSafeException;
+import de.iweinzierl.passsafe.gui.resources.Messages;
+import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
+import de.iweinzierl.passsafe.gui.util.UiUtils;
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 public class NewEntryDialog extends JDialog {
 
@@ -67,18 +70,19 @@ public class NewEntryDialog extends JDialog {
 
     private Border origBorder;
 
-
-    private NewEntryDialog(JFrame parent, ApplicationController controller, PasswordHandler passwordHandler) {
+    private NewEntryDialog(final JFrame parent, final ApplicationController controller,
+            final PasswordHandler passwordHandler, final List<OnEntryAddedListener> onEntryAddedListeners) {
         super(parent, Messages.getMessage(Messages.NEWENTRYDIALOG_TITLE), true);
         this.controller = controller;
         this.passwordHandler = passwordHandler;
-        this.onEntryAddedListeners = new ArrayList<>();
+        this.onEntryAddedListeners = onEntryAddedListeners;
         initialize();
     }
 
-    public static NewEntryDialog show(ApplicationController controller, JFrame parent, PasswordHandler handler) {
+    public static NewEntryDialog show(final ApplicationController controller, final JFrame parent,
+            final PasswordHandler handler, final List<OnEntryAddedListener> onEntryAddedListeners) {
         if (INSTANCE == null) {
-            INSTANCE = new NewEntryDialog(parent, controller, handler);
+            INSTANCE = new NewEntryDialog(parent, controller, handler, onEntryAddedListeners);
         }
 
         if (!INSTANCE.isShowing()) {
@@ -89,7 +93,6 @@ public class NewEntryDialog extends JDialog {
 
         return INSTANCE;
     }
-
 
     public void initialize() {
         JPanel contentPane = new JPanel();
@@ -113,14 +116,13 @@ public class NewEntryDialog extends JDialog {
         this.origBorder = titleField.getBorder();
     }
 
-
-    public void addOnEntryAddedListeners(OnEntryAddedListener onEntryAddedListener) {
-        if (onEntryAddedListener != null) {
+    public void addOnEntryAddedListeners(final OnEntryAddedListener onEntryAddedListener) {
+        if (onEntryAddedListener != null && !onEntryAddedListeners.contains(onEntryAddedListener)) {
             onEntryAddedListeners.add(onEntryAddedListener);
         }
     }
 
-    private JPanel createRow(JLabel label, JComponent inputField) {
+    private JPanel createRow(final JLabel label, final JComponent inputField) {
         JPanel row = new JPanel();
         row.setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -133,14 +135,12 @@ public class NewEntryDialog extends JDialog {
         return row;
     }
 
-
-    private JLabel createLabel(String text) {
+    private JLabel createLabel(final String text) {
         JLabel label = new JLabel(text);
         label.setSize(new Dimension(100, 10));
 
         return label;
     }
-
 
     private JTextField createTextField() {
         JTextField textField = new JTextField(TEXT_COLUMNS);
@@ -148,12 +148,10 @@ public class NewEntryDialog extends JDialog {
         return textField;
     }
 
-
     private Component createPasswordPanel() {
         passwordField = new JPasswordField(TEXT_COLUMNS);
         return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_PASSWORD)), passwordField);
     }
-
 
     private Component createPasswordVerifyPanel() {
         passwordVerifyField = new JPasswordField(TEXT_COLUMNS);
@@ -161,29 +159,23 @@ public class NewEntryDialog extends JDialog {
                 passwordVerifyField);
     }
 
-
     private Component createUsernamePanel() {
         usernameField = createTextField();
         return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_USERNAME)), usernameField);
     }
-
 
     private Component createTitlePanel() {
         titleField = createTextField();
         return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_TITLE)), titleField);
     }
 
-
     private Container createCategoryPanel() {
         final List<EntryCategory> categories = controller.getDataSource().getCategories();
 
-        categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories
-                .size
-                ()]));
+        categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories.size()]));
         categoryBox.setRenderer(new CategoryCellRenderer());
         return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY)), categoryBox);
     }
-
 
     private Container createButtons() {
         JPanel panel = new JPanel();
@@ -191,37 +183,38 @@ public class NewEntryDialog extends JDialog {
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
 
         panel.add(createButton(Messages.getMessage(Messages.NEWENTRYDIALOG_BUTTON_SAVE), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LOGGER.debug("Clicked 'save new entry'");
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        LOGGER.debug("Clicked 'save new entry'");
 
-                try {
+                        try {
 
-                    if (!verifyFields()) {
-                        return;
+                            if (!verifyFields()) {
+                                return;
+                            }
+
+                            String encryptedUsername = passwordHandler.encrypt(usernameField.getText());
+                            String encryptedPassword = passwordHandler.encrypt(passwordField.getText());
+
+                            fireOnEntryAdded(
+                                new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
+                                    encryptedUsername, encryptedPassword));
+                        } catch (PassSafeException ex) {
+                            LOGGER.error("Unable to encrypt password", ex);
+                            UiUtils.displayError(getOwner(), "TODO");
+                        }
+
+                        dispose();
                     }
-
-                    String encryptedUsername = passwordHandler.encrypt(usernameField.getText());
-                    String encryptedPassword = passwordHandler.encrypt(passwordField.getText());
-
-                    fireOnEntryAdded(new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
-                            encryptedUsername, encryptedPassword));
-                } catch (PassSafeException ex) {
-                    LOGGER.error("Unable to encrypt password", ex);
-                    UiUtils.displayError(getOwner(), "TODO");
-                }
-
-                dispose();
-            }
-        }));
+                }));
 
         panel.add(createButton(Messages.getMessage(Messages.NEWENTRYDIALOG_BUTTON_CANCEL), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LOGGER.debug("Clicked 'cancel new entry'");
-                dispose();
-            }
-        }));
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        LOGGER.debug("Clicked 'cancel new entry'");
+                        dispose();
+                    }
+                }));
 
         return panel;
     }
@@ -259,20 +252,18 @@ public class NewEntryDialog extends JDialog {
         return StringUtils.equals(password, verify);
     }
 
-    private void fireOnEntryAdded(Entry entry) {
+    private void fireOnEntryAdded(final Entry entry) {
         for (OnEntryAddedListener listener : onEntryAddedListeners) {
             listener.onEntryAdded((EntryCategory) categoryBox.getSelectedItem(), entry);
         }
     }
 
-
-    private JButton createButton(String label, ActionListener listener) {
+    private JButton createButton(final String label, final ActionListener listener) {
         JButton button = new JButton(label);
         button.addActionListener(listener);
 
         return button;
     }
-
 
     private void reset() {
         List<EntryCategory> tmp = controller.getDataSource().getCategories();

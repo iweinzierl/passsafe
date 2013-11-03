@@ -1,13 +1,17 @@
 package de.iweinzierl.passsafe.gui.action;
 
-import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import java.awt.event.ActionEvent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+
+import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
 
 public class NewEntryDialogAction extends AbstractAction {
 
@@ -16,16 +20,16 @@ public class NewEntryDialogAction extends AbstractAction {
     private final ApplicationController controller;
     private final JFrame parent;
 
-    public NewEntryDialogAction(ApplicationController controller, JFrame parent) {
+    public NewEntryDialogAction(final ApplicationController controller, final JFrame parent) {
         this.controller = controller;
         this.parent = parent;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         LOGGER.debug("Clicked 'new entry'");
 
-        NewEntryDialog dialog = NewEntryDialog.show(controller, parent, controller.getPasswordHandler());
-        dialog.addOnEntryAddedListeners(controller);
+        NewEntryDialog.show(controller, parent, controller.getPasswordHandler(),
+            Lists.<NewEntryDialog.OnEntryAddedListener>newArrayList(controller));
     }
 }
