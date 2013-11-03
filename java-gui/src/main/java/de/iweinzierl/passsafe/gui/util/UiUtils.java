@@ -1,6 +1,13 @@
 package de.iweinzierl.passsafe.gui.util;
 
-import de.iweinzierl.passsafe.gui.resources.Messages;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.Window;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -8,13 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.Window;
 
+import de.iweinzierl.passsafe.gui.resources.Messages;
 
 public class UiUtils {
 
@@ -23,14 +25,23 @@ public class UiUtils {
 
     private static final String ERROR_TEMPLATE = "<html><body style='width: %spx'>%s</body></html>";
 
-    public static void center(Component component) {
+    public static void center(final Component component) {
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (int) ((dimension.getWidth() - component.getWidth()) / 2);
         int y = (int) ((dimension.getHeight() - component.getHeight()) / 2);
         component.setLocation(x, y);
     }
 
-    public static void displayError(Window owner, String text) {
+    public static Frame getOwner(final Component component) {
+        Container parent = component.getParent();
+        if (parent instanceof Frame) {
+            return (Frame) parent;
+        } else {
+            return getOwner(parent);
+        }
+    }
+
+    public static void displayError(final Window owner, final String text) {
         JLabel label = new JLabel(String.format(ERROR_TEMPLATE, 250, text));
         label.setPreferredSize(new Dimension(250, 100));
 
@@ -49,7 +60,7 @@ public class UiUtils {
         dialog.show();
     }
 
-    public static void markFieldAsInvalid(JTextField textField) {
+    public static void markFieldAsInvalid(final JTextField textField) {
         textField.setBorder(new LineBorder(Color.RED));
     }
 }
