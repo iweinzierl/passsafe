@@ -1,20 +1,19 @@
 package de.iweinzierl.passsafe.gui.widget.secret;
 
-import com.google.common.base.Strings;
-import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
-
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
+import com.google.common.base.Strings;
+
 public class SwitchablePasswordField extends JPanel {
 
     private boolean visible;
 
-    final private JTextField visibleField;
-    final private JPasswordField invisibleField;
+    private final JTextField visibleField;
+    private final JPasswordField invisibleField;
 
     public SwitchablePasswordField() {
         super();
@@ -31,16 +30,15 @@ public class SwitchablePasswordField extends JPanel {
         add(invisibleField);
     }
 
-    public String getPassword() throws PassSafeSecurityException {
+    public String getPassword() {
         return visible ? visibleField.getText() : invisibleField.getText();
     }
 
-    public void setPassword(String password) throws PassSafeSecurityException {
+    public void setPassword(final String password) {
         if (!Strings.isNullOrEmpty(password)) {
             this.visibleField.setText(password);
             this.invisibleField.setText(password);
-        }
-        else {
+        } else {
             this.visibleField.setText("");
             this.invisibleField.setText("");
         }
@@ -51,6 +49,7 @@ public class SwitchablePasswordField extends JPanel {
         remove(visibleField);
         add(invisibleField);
         visible = false;
+        updateUI();
     }
 
     public void showPassword() {
@@ -58,15 +57,16 @@ public class SwitchablePasswordField extends JPanel {
         remove(invisibleField);
         add(visibleField);
         visible = true;
+        updateUI();
     }
 
-    public void setEditable(boolean editable) {
+    public void setEditable(final boolean editable) {
         visibleField.setEditable(editable);
         invisibleField.setEditable(editable);
     }
 
     @Override
-    public void setComponentPopupMenu(JPopupMenu popup) {
+    public void setComponentPopupMenu(final JPopupMenu popup) {
         visibleField.setComponentPopupMenu(popup);
         invisibleField.setComponentPopupMenu(popup);
     }

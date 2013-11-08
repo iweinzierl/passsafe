@@ -9,10 +9,10 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.Window;
 
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
@@ -60,7 +60,7 @@ public class UiUtils {
         dialog.show();
     }
 
-    public static void markFieldAsInvalid(final JTextField textField) {
-        textField.setBorder(new LineBorder(Color.RED));
+    public static void markFieldAsInvalid(final JComponent component) {
+        component.setBorder(new LineBorder(Color.RED));
     }
 }

@@ -93,12 +93,7 @@ public class EntryView extends JPanel {
             if (component instanceof JTextField) {
                 text = ((JTextField) component).getText();
             } else if (component instanceof SwitchablePasswordField) {
-                try {
-                    text = ((SwitchablePasswordField) component).getPassword();
-                } catch (PassSafeSecurityException e1) {
-                    LOGGER.error("Unable to retrieve password from password field", e);
-                    return;
-                }
+                text = ((SwitchablePasswordField) component).getPassword();
             }
 
             StringSelection stringSelection = new StringSelection(text);
@@ -219,21 +214,16 @@ public class EntryView extends JPanel {
     public void reset() {
         titleField.setText("");
 
-        try {
-            usernameField.setPassword(null);
-            passwordField.setPassword(null);
+        usernameField.setPassword(null);
+        passwordField.setPassword(null);
 
-            usernameField.hidePassword();
-            passwordField.hidePassword();
+        usernameField.hidePassword();
+        passwordField.hidePassword();
 
-            passInvisible.setVisible(false);
-            passVisible.setVisible(true);
-            userInvisible.setVisible(false);
-            userVisible.setVisible(true);
-        } catch (PassSafeSecurityException e) {
-            LOGGER.error("Unable to reset password fields", e);
-            UiUtils.displayError(null, "TODO");
-        }
+        passInvisible.setVisible(false);
+        passVisible.setVisible(true);
+        userInvisible.setVisible(false);
+        userVisible.setVisible(true);
     }
 
     private JPanel createStandardButtons(final JTextField textField) {

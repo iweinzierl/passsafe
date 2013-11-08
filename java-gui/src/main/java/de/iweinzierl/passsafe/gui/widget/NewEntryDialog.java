@@ -1,9 +1,8 @@
 package de.iweinzierl.passsafe.gui.widget;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,16 +12,12 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
-
-import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +29,7 @@ import de.iweinzierl.passsafe.gui.exception.PassSafeException;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
+import de.iweinzierl.passsafe.gui.widget.secret.PasswordInputPanel;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
@@ -45,11 +41,11 @@ public class NewEntryDialog extends JDialog {
 
     public static final int TEXT_COLUMNS = 30;
     public static final int LABEL_WIDTH = 100;
-    public static final int LABEL_HEIGHT = 15;
+    public static final int LABEL_HEIGHT = 25;
     public static final int TEXT_WIDTH = 100;
-    public static final int TEXT_HEIGHT = 15;
+    public static final int TEXT_HEIGHT = 25;
 
-    public static final int DEFAULT_WIDTH = 450;
+    public static final int DEFAULT_WIDTH = 550;
     public static final int DEFAULT_HEIGHT = 225;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryDialog.class);
@@ -65,8 +61,8 @@ public class NewEntryDialog extends JDialog {
     private JComboBox<EntryCategory> categoryBox;
     private JTextField titleField;
     private JTextField usernameField;
-    private JTextField passwordField;
-    private JTextField passwordVerifyField;
+
+    private PasswordInputPanel passwordInputPanel;
 
     private Border origBorder;
 
@@ -96,14 +92,21 @@ public class NewEntryDialog extends JDialog {
 
     public void initialize() {
         JPanel contentPane = new JPanel();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-        contentPane.add(createCategoryPanel());
-        contentPane.add(createTitlePanel());
-        contentPane.add(createUsernamePanel());
-        contentPane.add(createPasswordPanel());
-        contentPane.add(createPasswordVerifyPanel());
-        contentPane.add(createButtons());
+        GridBagLayout layout = new GridBagLayout();
+        contentPane.setLayout(layout);
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 1d;
+        constraints.weighty = 1d;
+
+        createCategoryPanel(contentPane, layout, constraints);
+        createTitlePanel(contentPane, layout, constraints);
+        createUsernamePanel(contentPane, layout, constraints);
+        createPasswordPanel(contentPane, layout, constraints);
+        createButtons(contentPane, layout, constraints);
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
 
         contentPane.setMinimumSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         contentPane.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -114,25 +117,6 @@ public class NewEntryDialog extends JDialog {
         UiUtils.center(this);
 
         this.origBorder = titleField.getBorder();
-    }
-
-    public void addOnEntryAddedListeners(final OnEntryAddedListener onEntryAddedListener) {
-        if (onEntryAddedListener != null && !onEntryAddedListeners.contains(onEntryAddedListener)) {
-            onEntryAddedListeners.add(onEntryAddedListener);
-        }
-    }
-
-    private JPanel createRow(final JLabel label, final JComponent inputField) {
-        JPanel row = new JPanel();
-        row.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-        label.setPreferredSize(new Dimension(75, 25));
-        inputField.setPreferredSize(new Dimension(150, 25));
-
-        row.add(label);
-        row.add(inputField);
-
-        return row;
     }
 
     private JLabel createLabel(final String text) {
@@ -148,36 +132,69 @@ public class NewEntryDialog extends JDialog {
         return textField;
     }
 
-    private Component createPasswordPanel() {
-        passwordField = new JPasswordField(TEXT_COLUMNS);
-        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_PASSWORD)), passwordField);
+    private void createPasswordPanel(final JPanel contentPane, final GridBagLayout layout,
+            final GridBagConstraints constraints) {
+
+        JLabel label = createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_PASSWORD));
+        constraints.gridwidth = 1;
+        constraints.weightx = 1d;
+        layout.setConstraints(label, constraints);
+        contentPane.add(label);
+
+        passwordInputPanel = new PasswordInputPanel.Builder().build();
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 5d;
+        layout.setConstraints(passwordInputPanel, constraints);
+        contentPane.add(passwordInputPanel);
     }
 
-    private Component createPasswordVerifyPanel() {
-        passwordVerifyField = new JPasswordField(TEXT_COLUMNS);
-        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_VERIFYPASSWORD)),
-                passwordVerifyField);
-    }
+    private void createUsernamePanel(final JPanel contentPane, final GridBagLayout layout,
+            final GridBagConstraints constraints) {
 
-    private Component createUsernamePanel() {
+        JLabel label = createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_USERNAME));
+        constraints.gridwidth = 1;
+        layout.setConstraints(label, constraints);
+        contentPane.add(label);
+
         usernameField = createTextField();
-        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_USERNAME)), usernameField);
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        layout.setConstraints(usernameField, constraints);
+        contentPane.add(usernameField);
     }
 
-    private Component createTitlePanel() {
+    private void createTitlePanel(final JPanel contentPane, final GridBagLayout layout,
+            final GridBagConstraints constraints) {
+
+        JLabel label = createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_TITLE));
+        constraints.gridwidth = 1;
+        layout.setConstraints(label, constraints);
+        contentPane.add(label);
+
         titleField = createTextField();
-        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_TITLE)), titleField);
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        layout.setConstraints(titleField, constraints);
+        contentPane.add(titleField);
     }
 
-    private Container createCategoryPanel() {
-        final List<EntryCategory> categories = controller.getDataSource().getCategories();
+    private void createCategoryPanel(final JPanel contentPane, final GridBagLayout layout,
+            final GridBagConstraints constraints) {
 
+        JLabel label = createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY));
+        constraints.gridwidth = 1;
+        layout.setConstraints(label, constraints);
+        contentPane.add(label);
+
+        final List<EntryCategory> categories = controller.getDataSource().getCategories();
         categoryBox = new JComboBox<>(categories.toArray(new EntryCategory[categories.size()]));
         categoryBox.setRenderer(new CategoryCellRenderer());
-        return createRow(createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_CATEGORY)), categoryBox);
+
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        layout.setConstraints(categoryBox, constraints);
+        contentPane.add(categoryBox);
     }
 
-    private Container createButtons() {
+    private void createButtons(final JPanel contentPane, final GridBagLayout layout,
+            final GridBagConstraints constraints) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setSize(new Dimension(TEXT_WIDTH + LABEL_WIDTH, TEXT_HEIGHT + LABEL_HEIGHT));
@@ -194,7 +211,7 @@ public class NewEntryDialog extends JDialog {
                             }
 
                             String encryptedUsername = passwordHandler.encrypt(usernameField.getText());
-                            String encryptedPassword = passwordHandler.encrypt(passwordField.getText());
+                            String encryptedPassword = passwordHandler.encrypt(passwordInputPanel.getPassword());
 
                             fireOnEntryAdded(
                                 new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
@@ -216,13 +233,15 @@ public class NewEntryDialog extends JDialog {
                     }
                 }));
 
-        return panel;
+        constraints.weightx = 1d;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        layout.setConstraints(panel, constraints);
+        contentPane.add(panel);
     }
 
     private boolean verifyFields() {
         titleField.setBorder(origBorder);
-        passwordField.setBorder(origBorder);
-        passwordVerifyField.setBorder(origBorder);
+        passwordInputPanel.clearBorder();
 
         boolean isValid = true;
 
@@ -233,23 +252,12 @@ public class NewEntryDialog extends JDialog {
             isValid = false;
         }
 
-        if (!testPasswordsAreEqual()) {
+        if (!passwordInputPanel.verifyFields()) {
             LOGGER.warn("Passwords are not equal!");
-
-            UiUtils.markFieldAsInvalid(passwordField);
-            UiUtils.markFieldAsInvalid(passwordVerifyField);
-
             isValid = false;
         }
 
         return isValid;
-    }
-
-    private boolean testPasswordsAreEqual() {
-        String password = passwordField.getText();
-        String verify = passwordVerifyField.getText();
-
-        return StringUtils.equals(password, verify);
     }
 
     private void fireOnEntryAdded(final Entry entry) {
@@ -272,7 +280,6 @@ public class NewEntryDialog extends JDialog {
         categoryBox.setModel(new DefaultComboBoxModel<>(categories));
         titleField.setText(null);
         usernameField.setText(null);
-        passwordField.setText(null);
-        passwordVerifyField.setText(null);
+        passwordInputPanel.reset();
     }
 }
