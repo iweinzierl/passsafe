@@ -1,37 +1,42 @@
 package de.iweinzierl.passsafe.gui.data;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+
 import de.iweinzierl.passsafe.shared.data.DataSourceChangedListener;
 import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.shared.data.SQLiteDatabaseCreator;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 
 public class SqliteDataSource implements PassSafeDataSource {
 
     public static final String SQL_LOAD_CATEGORIES = "SELECT id, title FROM category ORDER BY title";
 
-    public static final String SQL_LOAD_ENTRIES = "SELECT id, category_id, title, username, password FROM entry";
+    public static final String SQL_LOAD_ENTRIES =
+        "SELECT id, category_id, title, url, username, password, comment FROM entry";
 
-    public static final String SQL_INSERT_ENTRY = "INSERT INTO entry (category_id, title, username, " +
-            "" + "password) VALUES (?, ?, ?, ?)";
+    public static final String SQL_INSERT_ENTRY =
+        "INSERT INTO entry (category_id, title, url, username, password, comment) VALUES (?, ?, ?, ?, ?, ?)";
 
     public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE id = ?";
 
@@ -54,9 +59,8 @@ public class SqliteDataSource implements PassSafeDataSource {
     private List<EntryCategory> categories;
     private Multimap<EntryCategory, Entry> entryMap;
 
-
-    public SqliteDataSource(
-            String dbfile) throws SQLException, ClassNotFoundException, IOException, PassSafeSqlException {
+    public SqliteDataSource(final String dbfile) throws SQLException, ClassNotFoundException, IOException,
+        PassSafeSqlException {
         Class.forName("org.sqlite.JDBC");
 
         this.dbfile = dbfile;
@@ -67,9 +71,8 @@ public class SqliteDataSource implements PassSafeDataSource {
         preLoad();
     }
 
-
-    private void initialize(
-            String dbfile) throws PassSafeSqlException, SQLException, ClassNotFoundException, IOException {
+    private void initialize(final String dbfile) throws PassSafeSqlException, SQLException, ClassNotFoundException,
+        IOException {
 
         File db = new File(dbfile);
         boolean isNew = !db.exists();
@@ -82,19 +85,19 @@ public class SqliteDataSource implements PassSafeDataSource {
 
             try {
                 new SQLiteDatabaseCreator(new SQLiteDatabaseCreator.SQLiteCommandExecutor() {
-                    @Override
-                    public boolean execute(String sql) throws PassSafeSqlException {
-                        try {
-                            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-                            preparedStatement.execute();
+                        @Override
+                        public boolean execute(final String sql) throws PassSafeSqlException {
+                            try {
+                                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                                preparedStatement.execute();
 
-                            return true;
+                                return true;
 
-                        } catch (SQLException e) {
-                            throw new PassSafeSqlException(e.getMessage(), e.getCause());
+                            } catch (SQLException e) {
+                                throw new PassSafeSqlException(e.getMessage(), e.getCause());
+                            }
                         }
-                    }
-                }).setup();
+                    }).setup();
             } catch (PassSafeSqlException e) {
                 db.delete();
                 throw e;
@@ -102,12 +105,10 @@ public class SqliteDataSource implements PassSafeDataSource {
         }
     }
 
-
     private void preLoad() throws SQLException {
         preLoadCategories();
         preLoadEntries();
     }
-
 
     private void preLoadCategories() throws SQLException {
         PreparedStatement loadCategories = conn.prepareStatement(SQL_LOAD_CATEGORIES);
@@ -123,7 +124,6 @@ public class SqliteDataSource implements PassSafeDataSource {
         LOGGER.debug("PreLoaded {} categories", categories.size());
     }
 
-
     private void preLoadEntries() throws SQLException {
         PreparedStatement loadEntries = conn.prepareStatement(SQL_LOAD_ENTRIES);
         ResultSet resultSet = loadEntries.executeQuery();
@@ -134,8 +134,10 @@ public class SqliteDataSource implements PassSafeDataSource {
             int id = resultSet.getInt(1);
             int categoryId = resultSet.getInt(2);
             String title = resultSet.getString(3);
-            String username = resultSet.getString(4);
-            String password = resultSet.getString(5);
+            String url = resultSet.getString(4);
+            String username = resultSet.getString(5);
+            String password = resultSet.getString(6);
+            String comment = resultSet.getString(7);
 
             EntryCategory category = getCategoryById(categoryId);
 
@@ -147,7 +149,7 @@ public class SqliteDataSource implements PassSafeDataSource {
                     entryMap.put(category, (Entry) entries);
                 }
 
-                entries.add(new SqliteEntry(category, id, title, username, password));
+                entries.add(new SqliteEntry(category, id, title, url, username, password, comment));
                 loaded++;
             }
         }
@@ -155,8 +157,7 @@ public class SqliteDataSource implements PassSafeDataSource {
         LOGGER.debug("PreLoaded {} entries", loaded);
     }
 
-
-    private EntryCategory getCategoryById(int id) {
+    private EntryCategory getCategoryById(final int id) {
         for (EntryCategory category : categories) {
             if (((SqliteEntryCategory) category).getId() == id) {
                 return category;
@@ -166,29 +167,25 @@ public class SqliteDataSource implements PassSafeDataSource {
         return null;
     }
 
-
     @Override
-    public int getItemCount(EntryCategory category) {
+    public int getItemCount(final EntryCategory category) {
         Collection<Entry> entries = entryMap.get(category);
 
         return entries == null || entries.isEmpty() ? 0 : entries.size();
     }
-
 
     @Override
     public List<EntryCategory> getCategories() {
         return categories;
     }
 
-
     @Override
-    public List<Entry> getAllEntries(EntryCategory category) {
+    public List<Entry> getAllEntries(final EntryCategory category) {
         return (List<Entry>) entryMap.get(category);
     }
 
-
     @Override
-    public Entry getEntry(EntryCategory category, int index) {
+    public Entry getEntry(final EntryCategory category, final int index) {
         List<Entry> entries = (List<Entry>) entryMap.get(category);
         if (entries != null && !entries.isEmpty() && entries.size() > index) {
             return entries.get(index);
@@ -197,9 +194,8 @@ public class SqliteDataSource implements PassSafeDataSource {
         return null;
     }
 
-
     @Override
-    public Entry addEntry(EntryCategory category, Entry entry) {
+    public Entry addEntry(final EntryCategory category, final Entry entry) {
         SqliteEntryCategory sqliteCategory;
 
         if (!(category instanceof SqliteEntryCategory)) {
@@ -222,10 +218,13 @@ public class SqliteDataSource implements PassSafeDataSource {
             PreparedStatement statement = conn.prepareStatement(SQL_INSERT_ENTRY);
             statement.setInt(1, sqliteCategory.getId());
             statement.setString(2, entry.getTitle());
-            statement.setString(3, entry.getUsername());
-            statement.setString(4, entry.getPassword());
+            statement.setString(3, entry.getUrl());
+            statement.setString(4, entry.getUsername());
+            statement.setString(5, entry.getPassword());
+            statement.setString(6, entry.getComment());
 
             statement.executeUpdate();
+
             int id = findId(entry);
 
             if (id <= 0) {
@@ -249,8 +248,7 @@ public class SqliteDataSource implements PassSafeDataSource {
         return null;
     }
 
-
-    public Integer findId(Entry entry) {
+    public Integer findId(final Entry entry) {
         try {
             PreparedStatement find = conn.prepareStatement(SQL_FIND_ENTRY_ID);
             find.setString(1, entry.getTitle());
@@ -266,8 +264,7 @@ public class SqliteDataSource implements PassSafeDataSource {
         return null;
     }
 
-
-    public SqliteEntryCategory findCategory(EntryCategory category) {
+    public SqliteEntryCategory findCategory(final EntryCategory category) {
         for (EntryCategory tmp : categories) {
             if (tmp.getTitle().equals(category.getTitle())) {
                 return (SqliteEntryCategory) category;
@@ -278,7 +275,7 @@ public class SqliteDataSource implements PassSafeDataSource {
     }
 
     @Override
-    public void removeEntry(Entry entry) {
+    public void removeEntry(final Entry entry) {
         LOGGER.debug("Go an remove entry '{}'", entry);
 
         if (!(entry instanceof SqliteEntry)) {
@@ -289,6 +286,7 @@ public class SqliteDataSource implements PassSafeDataSource {
         try {
             PreparedStatement remove = conn.prepareStatement(SQL_REMOVE_ENTRY);
             remove.setInt(1, ((SqliteEntry) entry).getId());
+
             int affected = remove.executeUpdate();
 
             if (affected <= 0) {
@@ -305,7 +303,7 @@ public class SqliteDataSource implements PassSafeDataSource {
     }
 
     @Override
-    public EntryCategory addCategory(EntryCategory category) {
+    public EntryCategory addCategory(final EntryCategory category) {
         LOGGER.debug("Go and insert category '{}'", category);
 
         try {
@@ -333,7 +331,7 @@ public class SqliteDataSource implements PassSafeDataSource {
     }
 
     @Override
-    public void removeCategory(EntryCategory category) {
+    public void removeCategory(final EntryCategory category) {
         LOGGER.debug("Go an remove category '{}'", category);
 
         if (!(category instanceof SqliteEntryCategory)) {
@@ -348,6 +346,7 @@ public class SqliteDataSource implements PassSafeDataSource {
 
             PreparedStatement remove = conn.prepareStatement(SQL_REMOVE_CATEGORY);
             remove.setInt(1, ((SqliteEntryCategory) category).getId());
+
             int affected = remove.executeUpdate();
 
             if (affected <= 0) {
@@ -364,8 +363,9 @@ public class SqliteDataSource implements PassSafeDataSource {
     }
 
     @Override
-    public void updateEntryCategory(Entry entry, EntryCategory category) {
+    public void updateEntryCategory(final Entry entry, final EntryCategory category) {
         LOGGER.debug("Go and update category to '{}' of entry {}", category.getTitle(), entry.getTitle());
+
         final EntryCategory oldCategory = entry.getCategory();
 
         if (!(category instanceof SqliteEntryCategory)) {
@@ -388,7 +388,7 @@ public class SqliteDataSource implements PassSafeDataSource {
                 LOGGER.warn("No entry updated!");
             } else {
                 LOGGER.info("Successfully updated entry '{}' with category '{}'", entry.getTitle(),
-                        category.getTitle());
+                    category.getTitle());
 
                 entryMap.remove(oldCategory, entry);
                 entryMap.put(category, entry);
@@ -417,17 +417,14 @@ public class SqliteDataSource implements PassSafeDataSource {
 
         private int id;
 
-
-        public SqliteEntryCategory(String title) {
+        public SqliteEntryCategory(final String title) {
             super(title);
         }
 
-
-        public SqliteEntryCategory(int id, String title) {
+        public SqliteEntryCategory(final int id, final String title) {
             this(title);
             this.id = id;
         }
-
 
         public int getId() {
             return id;
@@ -439,32 +436,25 @@ public class SqliteDataSource implements PassSafeDataSource {
         }
     }
 
-
     @Override
-    public void setDataSourceChangedListener(DataSourceChangedListener listener) {
+    public void setDataSourceChangedListener(final DataSourceChangedListener listener) {
         this.dataSourceChangedListener = listener;
     }
-
 
     private static class SqliteEntry extends Entry {
 
         private int id;
 
-        public SqliteEntry(Entry entry, int id) {
-            this(entry.getCategory(), id, entry.getTitle(), entry.getUsername(), entry.getPassword());
+        public SqliteEntry(final Entry entry, final int id) {
+            this(entry.getCategory(), id, entry.getTitle(), null, entry.getUsername(), entry.getPassword(), null);
         }
 
+        public SqliteEntry(final EntryCategory category, final int id, final String title, final String url,
+                final String username, final String password, final String comment) {
 
-        public SqliteEntry(EntryCategory category, String title, String username, String password) {
-            super(category, title, username, password);
-        }
-
-
-        public SqliteEntry(EntryCategory category, int id, String title, String username, String password) {
-            this(category, title, username, password);
+            super(category, title, url, username, password, comment);
             this.id = id;
         }
-
 
         protected int getId() {
             return id;
