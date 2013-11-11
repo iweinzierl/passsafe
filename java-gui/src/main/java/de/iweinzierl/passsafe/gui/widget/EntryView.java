@@ -103,6 +103,10 @@ public class EntryView extends JPanel {
         }
     }
 
+    private interface ValueProvider {
+        String getValue();
+    }
+
     private final ApplicationController controller;
 
     private final JTextField titleField;
@@ -177,19 +181,34 @@ public class EntryView extends JPanel {
         initializeClipboardFunctions(titleField);
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_TITLE)), titleField,
-                createStandardButtons(titleField));
+                createStandardButtons(titleField, new ValueProvider() {
+                        @Override
+                        public String getValue() {
+                            return entry.getTitle();
+                        }
+                    }));
     }
 
     private JPanel createUrlRow() {
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_URL)), urlField,
-                createStandardButtons(urlField));
+                createStandardButtons(urlField, new ValueProvider() {
+                        @Override
+                        public String getValue() {
+                            return entry.getUrl();
+                        }
+                    }));
     }
 
     private JPanel createCommentRow() {
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_COMMENT)), commentsField,
-                createStandardButtons(commentsField));
+                createStandardButtons(commentsField, new ValueProvider() {
+                        @Override
+                        public String getValue() {
+                            return entry.getComment();
+                        }
+                    }));
     }
 
     private JPanel createUsernameRow() {
@@ -223,6 +242,9 @@ public class EntryView extends JPanel {
             reset();
             this.entry = entry;
             titleField.setText(entry.getTitle());
+            urlField.setText(entry.getUrl());
+            commentsField.setText(entry.getComment());
+
             try {
                 usernameField.setPassword(controller.getPasswordHandler().decrypt(entry.getUsername()));
                 passwordField.setPassword(controller.getPasswordHandler().decrypt(entry.getPassword()));
@@ -235,6 +257,8 @@ public class EntryView extends JPanel {
 
     public void reset() {
         titleField.setText("");
+        urlField.setText("");
+        commentsField.setText("");
 
         usernameField.setPassword(null);
         passwordField.setPassword(null);
@@ -248,7 +272,7 @@ public class EntryView extends JPanel {
         userVisible.setVisible(true);
     }
 
-    private JPanel createStandardButtons(final JTextComponent textComponent) {
+    private JPanel createStandardButtons(final JTextComponent textComponent, final ValueProvider valueProvider) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
@@ -287,7 +311,7 @@ public class EntryView extends JPanel {
                     edit.setEnabled(true);
 
                     if (entry != null) {
-                        textComponent.setText(entry.getTitle()); // XXX specific to title property!
+                        textComponent.setText(valueProvider.getValue());
                     }
                 }
             });
