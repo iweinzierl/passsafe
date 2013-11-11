@@ -40,6 +40,9 @@ public class SqliteDataSource implements PassSafeDataSource {
 
     public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE id = ?";
 
+    public static final String SQL_UPDATE_ENTRY =
+        "UPDATE entry SET title = ?, url = ?, username = ?, password = ?, comment = ? WHERE id = ?";
+
     public static final String SQL_FIND_ENTRY_ID = "SELECT id FROM entry WHERE title = ?";
 
     public static final String SQL_INSERT_CATEGORY = "INSERT INTO category (title) VALUES (?)";
@@ -299,6 +302,39 @@ public class SqliteDataSource implements PassSafeDataSource {
 
         } catch (SQLException e) {
             LOGGER.error("Unable to remove entry '{}'", entry, e);
+        }
+    }
+
+    @Override
+    public void updateEntry(final Entry entry) {
+        LOGGER.debug("Go and update entry '{}'", entry);
+
+        if (!(entry instanceof SqliteEntry)) {
+            LOGGER.warn("Cannot remove entry from type '{}'", entry.getClass());
+            return;
+        }
+
+        SqliteEntry sqliteEntry = (SqliteEntry) entry;
+
+        try {
+            PreparedStatement updateEntry = conn.prepareStatement(SQL_UPDATE_ENTRY);
+            updateEntry.setString(1, entry.getTitle());
+            updateEntry.setString(2, entry.getUrl());
+            updateEntry.setString(3, entry.getUsername());
+            updateEntry.setString(4, entry.getPassword());
+            updateEntry.setString(5, entry.getComment());
+            updateEntry.setInt(6, sqliteEntry.getId());
+
+            int affected = updateEntry.executeUpdate();
+            if (affected <= 0) {
+                LOGGER.error("Update of entry was not successful.");
+                return;
+            }
+
+            LOGGER.info("Successfully updated entry '{}'", entry);
+
+        } catch (SQLException e) {
+            LOGGER.error("Unable to update entry '{}'", entry, e);
         }
     }
 

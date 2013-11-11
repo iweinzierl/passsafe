@@ -1,10 +1,25 @@
 package de.iweinzierl.passsafe.gui;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
+
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
-import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
-import de.iweinzierl.passsafe.shared.domain.Entry;
-import de.iweinzierl.passsafe.shared.domain.EntryCategory;
+import de.iweinzierl.passsafe.gui.event.Event;
+import de.iweinzierl.passsafe.gui.event.EventBus;
+import de.iweinzierl.passsafe.gui.event.EventListener;
+import de.iweinzierl.passsafe.gui.event.EventType;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.Sync;
@@ -16,19 +31,12 @@ import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.IOException;
-
-
-public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener, TreeSelectionListener, EntryTable.SelectionListener, NewCategoryDialog.OnCategoryAddedListener {
+public class ApplicationController implements NewEntryDialog.OnEntryAddedListener, WindowListener, RemovedListener,
+    TreeSelectionListener, EntryTable.SelectionListener, NewCategoryDialog.OnCategoryAddedListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
@@ -44,11 +52,12 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private EntryView entryView;
     private ButtonBar buttonBar;
 
-
-    public ApplicationController(Configuration configuration, PasswordHandler passwordHandler, Sync sync) {
+    public ApplicationController(final Configuration configuration, final PasswordHandler passwordHandler,
+            final Sync sync) {
         this.configuration = configuration;
         this.passwordHandler = passwordHandler;
         this.sync = sync;
+        setupEventListeners();
     }
 
     public PasswordHandler getPasswordHandler() {
@@ -60,7 +69,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     }
 
     @Override
-    public void onEntryAdded(EntryCategory category, Entry entry) {
+    public void onEntryAdded(final EntryCategory category, final Entry entry) {
         LOGGER.debug("Caught 'onEntryAdded' event");
 
         Entry newEntry = dataSource.addEntry(category, entry);
@@ -74,7 +83,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     }
 
     @Override
-    public void onCategoryAdded(EntryCategory category) {
+    public void onCategoryAdded(final EntryCategory category) {
         LOGGER.debug("Caught 'onCategoryAdded' event");
 
         if (category == null) {
@@ -90,13 +99,13 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     }
 
     @Override
-    public void onEntryRemoved(Entry entry) {
+    public void onEntryRemoved(final Entry entry) {
         dataSource.removeEntry(entry);
         entryList.removeEntry(entry);
     }
 
     @Override
-    public void onCategoryRemoved(EntryCategory category) {
+    public void onCategoryRemoved(final EntryCategory category) {
         dataSource.removeCategory(category);
         entryList.removeCategory(category);
     }
@@ -104,10 +113,10 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     /**
      * Used to keep track on EntryList changes. The selected entries are published to the EntryTable.
      *
-     * @param treeSelectionEvent Event that keeps an instance of the selected tree item.
+     * @param  treeSelectionEvent  Event that keeps an instance of the selected tree item.
      */
     @Override
-    public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
+    public void valueChanged(final TreeSelectionEvent treeSelectionEvent) {
         TreePath newLeadSelectionPath = treeSelectionEvent.getNewLeadSelectionPath();
         TreePath oldLeadSelectionPath = treeSelectionEvent.getOldLeadSelectionPath();
 
@@ -116,6 +125,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
                 entryTable.getEntryTableModel().setEntries(null);
                 entryTable.tableChanged();
             }
+
             return;
         }
 
@@ -137,7 +147,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     }
 
     @Override
-    public void onSelectionChanged(Entry entry) {
+    public void onSelectionChanged(final Entry entry) {
         if (entry != null) {
             entryView.apply(entry);
         } else {
@@ -161,28 +171,27 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         LOGGER.info("Successfully synchronized data source '{}'", dataSource);
     }
 
-
-    public void setDataSource(PassSafeDataSource dataSource) {
+    public void setDataSource(final PassSafeDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public void setApplication(Application application) {
+    public void setApplication(final Application application) {
         this.application = application;
     }
 
-    public void setEntryList(EntryList entryList) {
+    public void setEntryList(final EntryList entryList) {
         this.entryList = entryList;
     }
 
-    public void setEntryTable(EntryTable table) {
+    public void setEntryTable(final EntryTable table) {
         this.entryTable = table;
     }
 
-    public void setEntryView(EntryView entryView) {
+    public void setEntryView(final EntryView entryView) {
         this.entryView = entryView;
     }
 
-    public void setButtonBar(ButtonBar buttonBar) {
+    public void setButtonBar(final ButtonBar buttonBar) {
         this.buttonBar = buttonBar;
     }
 
@@ -191,37 +200,48 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     }
 
     @Override
-    public void windowOpened(WindowEvent windowEvent) {
+    public void windowOpened(final WindowEvent windowEvent) {
         // nothing to do
     }
 
     @Override
-    public void windowClosing(WindowEvent windowEvent) {
+    public void windowClosing(final WindowEvent windowEvent) {
         shutdown();
     }
 
     @Override
-    public void windowClosed(WindowEvent windowEvent) {
+    public void windowClosed(final WindowEvent windowEvent) {
         // nothing to do
     }
 
     @Override
-    public void windowIconified(WindowEvent windowEvent) {
+    public void windowIconified(final WindowEvent windowEvent) {
         // nothing to do
     }
 
     @Override
-    public void windowDeiconified(WindowEvent windowEvent) {
+    public void windowDeiconified(final WindowEvent windowEvent) {
         // nothing to do
     }
 
     @Override
-    public void windowActivated(WindowEvent windowEvent) {
+    public void windowActivated(final WindowEvent windowEvent) {
         // nothing to do
     }
 
     @Override
-    public void windowDeactivated(WindowEvent windowEvent) {
+    public void windowDeactivated(final WindowEvent windowEvent) {
         // nothing to do
+    }
+
+    private void setupEventListeners() {
+        EventBus eventBus = EventBus.getInstance();
+
+        eventBus.register(EventType.MODIFY_ENTRY, new EventListener() {
+                @Override
+                public void notify(final Event event) {
+                    getDataSource().updateEntry((Entry) event.getData());
+                }
+            });
     }
 }

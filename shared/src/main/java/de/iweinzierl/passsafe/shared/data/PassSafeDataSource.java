@@ -1,10 +1,9 @@
 package de.iweinzierl.passsafe.shared.data;
 
-import de.iweinzierl.passsafe.shared.domain.Entry;
-import de.iweinzierl.passsafe.shared.domain.EntryCategory;
-
 import java.util.List;
 
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 public interface PassSafeDataSource {
 
@@ -21,6 +20,8 @@ public interface PassSafeDataSource {
     void setDataSourceChangedListener(DataSourceChangedListener listener);
 
     void removeEntry(Entry entry);
+
+    void updateEntry(Entry entry);
 
     EntryCategory addCategory(EntryCategory category);
 

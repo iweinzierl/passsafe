@@ -25,6 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.event.Event;
+import de.iweinzierl.passsafe.gui.event.EventBus;
+import de.iweinzierl.passsafe.gui.event.EventType;
 import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
 import de.iweinzierl.passsafe.gui.resources.Images;
 import de.iweinzierl.passsafe.gui.resources.Messages;
@@ -105,6 +108,8 @@ public class EntryView extends JPanel {
 
     private interface ValueProvider {
         String getValue();
+
+        void setValue(Entry entry, String value);
     }
 
     private final ApplicationController controller;
@@ -186,6 +191,11 @@ public class EntryView extends JPanel {
                         public String getValue() {
                             return entry.getTitle();
                         }
+
+                        @Override
+                        public void setValue(final Entry entry, final String value) {
+                            entry.setTitle(value);
+                        }
                     }));
     }
 
@@ -197,6 +207,11 @@ public class EntryView extends JPanel {
                         public String getValue() {
                             return entry.getUrl();
                         }
+
+                        @Override
+                        public void setValue(final Entry entry, final String value) {
+                            entry.setUrl(value);
+                        }
                     }));
     }
 
@@ -207,6 +222,11 @@ public class EntryView extends JPanel {
                         @Override
                         public String getValue() {
                             return entry.getComment();
+                        }
+
+                        @Override
+                        public void setValue(final Entry entry, final String value) {
+                            entry.setComment(value);
                         }
                     }));
     }
@@ -293,8 +313,20 @@ public class EntryView extends JPanel {
         save.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
+                    valueProvider.setValue(entry, textComponent.getText());
 
-                    // TODO save entry
+                    EventBus.getInstance().fire(new Event() {
+                            @Override
+                            public EventType getType() {
+                                return EventType.MODIFY_ENTRY;
+                            }
+
+                            @Override
+                            public Object getData() {
+                                return entry;
+                            }
+                        });
+
                     textComponent.setEditable(false);
                     save.setEnabled(false);
                     cancel.setEnabled(false);
@@ -350,7 +382,18 @@ public class EntryView extends JPanel {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
 
-                    // TODO save entry
+                    EventBus.getInstance().fire(new Event() {
+                            @Override
+                            public EventType getType() {
+                                return EventType.MODIFY_ENTRY;
+                            }
+
+                            @Override
+                            public Object getData() {
+                                return entry;
+                            }
+                        });
+
                     secretField.setEditable(false);
                     save.setEnabled(false);
                     cancel.setEnabled(false);

@@ -46,12 +46,24 @@ public class Entry implements Serializable {
         return title;
     }
 
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
     public String getUrl() {
         return url;
     }
 
+    public void setUrl(final String url) {
+        this.url = url;
+    }
+
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(final String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -64,6 +76,10 @@ public class Entry implements Serializable {
 
     public String getComment() {
         return comment;
+    }
+
+    public void setComment(final String comment) {
+        this.comment = comment;
     }
 
     @Override
