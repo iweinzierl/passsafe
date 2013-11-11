@@ -49,6 +49,8 @@ public class Messages {
 
     public static final String ENTRYVIEW_MENU_COPYTOCLIPBOARD = "entryview.menu.copytoclipboard";
     public static final String ENTRYVIEW_LABEL_TITLE = "entryview.label.title";
+    public static final String ENTRYVIEW_LABEL_URL = "entryview.label.url";
+    public static final String ENTRYVIEW_LABEL_COMMENT = "entryview.label.comment";
     public static final String ENTRYVIEW_LABEL_USERNAME = "entryview.label.username";
     public static final String ENTRYVIEW_LABEL_PASSWORD = "entryview.label.password";
     public static final String ENTRYVIEW_BUTTON_EDIT = "entryview.button.edit";

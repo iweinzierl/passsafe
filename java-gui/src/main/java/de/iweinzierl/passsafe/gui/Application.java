@@ -1,7 +1,26 @@
 package de.iweinzierl.passsafe.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
+
+import java.io.IOException;
+
+import java.sql.SQLException;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
+
+import org.apache.log4j.BasicConfigurator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
-import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;
@@ -16,27 +35,12 @@ import de.iweinzierl.passsafe.gui.widget.EntryView;
 import de.iweinzierl.passsafe.gui.widget.StartupDialogBuilder;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTableModel;
-import org.apache.log4j.BasicConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.sql.SQLException;
-
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 
 public class Application extends JFrame {
 
-    public static final int DEFAULT_WIDTH = 650;
-    public static final int DEFAULT_HEIGHT = 400;
+    public static final int DEFAULT_WIDTH = 750;
+    public static final int DEFAULT_HEIGHT = 425;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
@@ -46,30 +50,29 @@ public class Application extends JFrame {
 
     private ApplicationController controller;
 
-
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         initializeLogging();
 
         new StartupDialogBuilder().setActionListener(new StartupDialogBuilder.ActionListener() {
 
-            @Override
-            public void submitted(String password) {
-                try {
-                    start(password);
-                } catch (Exception e) {
-                    LOGGER.error("Unable to start PassSafe application", e);
-                    System.exit(1);
-                }
-            }
+                                          @Override
+                                          public void submitted(final String password) {
+                                              try {
+                                                  start(password);
+                                              } catch (Exception e) {
+                                                  LOGGER.error("Unable to start PassSafe application", e);
+                                                  System.exit(1);
+                                              }
+                                          }
 
-            @Override
-            public void canceled() {
-                System.exit(1);
-            }
-        }).build();
+                                          @Override
+                                          public void canceled() {
+                                              System.exit(1);
+                                          }
+                                      }).build();
     }
 
-    private static void start(String password) throws Exception {
+    private static void start(final String password) throws Exception {
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
         ApplicationController controller = new ApplicationController(configuration, new AesPasswordHandler(password),
@@ -117,11 +120,9 @@ public class Application extends JFrame {
         LOGGER.info("Started PassSafe Java User Interface");
     }
 
-
-    public Application(ApplicationController controller) {
+    public Application(final ApplicationController controller) {
         this.controller = controller;
     }
-
 
     public void initialize() throws SQLException, ClassNotFoundException, IOException {
         initializeLayout();
@@ -132,15 +133,13 @@ public class Application extends JFrame {
         setTitle(Messages.getMessage(Messages.APP_TITLE));
     }
 
-
     private static void initializeLogging() {
         BasicConfigurator.configure();
     }
 
-
     private void initializeLayout() {
         JScrollPane entryListPane = new JScrollPane(entryList);
-        entryListPane.setPreferredSize(new Dimension(200, 450));
+        entryListPane.setPreferredSize(new Dimension(250, 450));
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -160,28 +159,26 @@ public class Application extends JFrame {
 
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyEventDispatcher() {
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                if (e.isConsumed()) {
-                    return false;
-                }
+                @Override
+                public boolean dispatchKeyEvent(final KeyEvent e) {
+                    if (e.isConsumed()) {
+                        return false;
+                    }
 
-                return KeyStrokeHandler.getKeyStrokeHandler(controller).handle(e);
-            }
-        });
+                    return KeyStrokeHandler.getKeyStrokeHandler(controller).handle(e);
+                }
+            });
     }
 
-
-    public void setButtonBar(ButtonBar buttonBar) {
+    public void setButtonBar(final ButtonBar buttonBar) {
         this.buttonBar = buttonBar;
     }
 
-
-    public void setEntryList(EntryList entryList) {
+    public void setEntryList(final EntryList entryList) {
         this.entryList = entryList;
     }
 
-    public void setDisplay(Display display) {
+    public void setDisplay(final Display display) {
         this.display = display;
     }
 }

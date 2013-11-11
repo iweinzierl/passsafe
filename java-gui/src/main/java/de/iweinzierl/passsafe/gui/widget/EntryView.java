@@ -17,7 +17,9 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +106,8 @@ public class EntryView extends JPanel {
     private final ApplicationController controller;
 
     private final JTextField titleField;
+    private final JTextField urlField;
+    private final JTextArea commentsField;
 
     private final SwitchablePasswordField usernameField;
     private final SwitchablePasswordField passwordField;
@@ -120,6 +124,8 @@ public class EntryView extends JPanel {
         this.controller = controller;
 
         titleField = new JTextField();
+        urlField = new JTextField();
+        commentsField = new JTextArea();
         usernameField = new SwitchablePasswordField();
         passwordField = new SwitchablePasswordField();
 
@@ -137,21 +143,25 @@ public class EntryView extends JPanel {
         titleField.setEditable(false);
         usernameField.setEditable(false);
         passwordField.setEditable(false);
+        urlField.setEditable(false);
+        commentsField.setEditable(false);
 
         add(createTitleRow());
+        add(createUrlRow());
         add(createUsernameRow());
         add(createPasswordRow());
+        add(createCommentRow());
 
-        setMinimumSize(new Dimension(425, 125));
-        setPreferredSize(new Dimension(425, 125));
-        setMaximumSize(new Dimension(700, 200));
+        setMinimumSize(new Dimension(450, 225));
+        setPreferredSize(new Dimension(450, 225));
+        setMaximumSize(new Dimension(700, 400));
     }
 
     private JPanel createRow(final JLabel label, final JComponent inputField, final JPanel buttons) {
         JPanel row = new JPanel();
         row.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        label.setPreferredSize(new Dimension(75, 25));
+        label.setPreferredSize(new Dimension(100, 25));
         inputField.setPreferredSize(new Dimension(150, 25));
         buttons.setPreferredSize((new Dimension(200, 25)));
 
@@ -168,6 +178,18 @@ public class EntryView extends JPanel {
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_TITLE)), titleField,
                 createStandardButtons(titleField));
+    }
+
+    private JPanel createUrlRow() {
+
+        return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_URL)), urlField,
+                createStandardButtons(urlField));
+    }
+
+    private JPanel createCommentRow() {
+
+        return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_COMMENT)), commentsField,
+                createStandardButtons(commentsField));
     }
 
     private JPanel createUsernameRow() {
@@ -226,7 +248,7 @@ public class EntryView extends JPanel {
         userVisible.setVisible(true);
     }
 
-    private JPanel createStandardButtons(final JTextField textField) {
+    private JPanel createStandardButtons(final JTextComponent textComponent) {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
@@ -237,7 +259,7 @@ public class EntryView extends JPanel {
         edit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    textField.setEditable(true);
+                    textComponent.setEditable(true);
                     edit.setEnabled(false);
                     save.setEnabled(true);
                     cancel.setEnabled(true);
@@ -249,7 +271,7 @@ public class EntryView extends JPanel {
                 public void actionPerformed(final ActionEvent e) {
 
                     // TODO save entry
-                    textField.setEditable(false);
+                    textComponent.setEditable(false);
                     save.setEnabled(false);
                     cancel.setEnabled(false);
                     edit.setEnabled(true);
@@ -259,13 +281,13 @@ public class EntryView extends JPanel {
         cancel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    textField.setEditable(false);
+                    textComponent.setEditable(false);
                     save.setEnabled(false);
                     cancel.setEnabled(false);
                     edit.setEnabled(true);
 
                     if (entry != null) {
-                        textField.setText(entry.getTitle()); // XXX specific to title property!
+                        textComponent.setText(entry.getTitle()); // XXX specific to title property!
                     }
                 }
             });
