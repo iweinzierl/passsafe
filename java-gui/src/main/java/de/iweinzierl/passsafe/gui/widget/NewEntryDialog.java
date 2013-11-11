@@ -1,5 +1,6 @@
 package de.iweinzierl.passsafe.gui.widget;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,6 +9,7 @@ import java.awt.event.ActionListener;
 
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -16,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
@@ -46,7 +49,7 @@ public class NewEntryDialog extends JDialog {
     public static final int TEXT_HEIGHT = 25;
 
     public static final int DEFAULT_WIDTH = 550;
-    public static final int DEFAULT_HEIGHT = 225;
+    public static final int DEFAULT_HEIGHT = 325;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryDialog.class);
 
@@ -61,6 +64,8 @@ public class NewEntryDialog extends JDialog {
     private JComboBox<EntryCategory> categoryBox;
     private JTextField titleField;
     private JTextField usernameField;
+    private JTextField urlField;
+    private JTextArea commentsField;
 
     private PasswordInputPanel passwordInputPanel;
 
@@ -103,8 +108,10 @@ public class NewEntryDialog extends JDialog {
 
         createCategoryPanel(contentPane, layout, constraints);
         createTitlePanel(contentPane, layout, constraints);
+        createUrlPanel(contentPane, layout, constraints);
         createUsernamePanel(contentPane, layout, constraints);
         createPasswordPanel(contentPane, layout, constraints);
+        createCommentsPanel(contentPane, layout, constraints);
         createButtons(contentPane, layout, constraints);
         constraints.gridwidth = GridBagConstraints.REMAINDER;
 
@@ -130,6 +137,23 @@ public class NewEntryDialog extends JDialog {
         JTextField textField = new JTextField(TEXT_COLUMNS);
         textField.setSize(new Dimension(TEXT_WIDTH, TEXT_HEIGHT));
         return textField;
+    }
+
+    private void createCommentsPanel(final JPanel contentPane, final GridBagLayout layout,
+            final GridBagConstraints constraints) {
+
+        JLabel label = createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_COMMENTS));
+        constraints.gridwidth = 1;
+        constraints.weightx = 1d;
+        layout.setConstraints(label, constraints);
+        contentPane.add(label);
+
+        commentsField = new JTextArea(4, 50);
+        commentsField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 5d;
+        layout.setConstraints(commentsField, constraints);
+        contentPane.add(commentsField);
     }
 
     private void createPasswordPanel(final JPanel contentPane, final GridBagLayout layout,
@@ -176,6 +200,20 @@ public class NewEntryDialog extends JDialog {
         contentPane.add(titleField);
     }
 
+    private void createUrlPanel(final JPanel contentPane, final GridBagLayout layout,
+            final GridBagConstraints constraints) {
+
+        JLabel label = createLabel(Messages.getMessage(Messages.NEWENTRYDIALOG_LABEL_URL));
+        constraints.gridwidth = 1;
+        layout.setConstraints(label, constraints);
+        contentPane.add(label);
+
+        urlField = createTextField();
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        layout.setConstraints(urlField, constraints);
+        contentPane.add(urlField);
+    }
+
     private void createCategoryPanel(final JPanel contentPane, final GridBagLayout layout,
             final GridBagConstraints constraints) {
 
@@ -215,7 +253,7 @@ public class NewEntryDialog extends JDialog {
 
                             fireOnEntryAdded(
                                 new Entry((EntryCategory) categoryBox.getSelectedItem(), titleField.getText(),
-                                    encryptedUsername, encryptedPassword));
+                                    urlField.getText(), encryptedUsername, encryptedPassword, commentsField.getText()));
                         } catch (PassSafeException ex) {
                             LOGGER.error("Unable to encrypt password", ex);
                             UiUtils.displayError(getOwner(), "TODO");
@@ -279,7 +317,9 @@ public class NewEntryDialog extends JDialog {
 
         categoryBox.setModel(new DefaultComboBoxModel<>(categories));
         titleField.setText(null);
+        urlField.setText(null);
         usernameField.setText(null);
         passwordInputPanel.reset();
+        commentsField.setText(null);
     }
 }

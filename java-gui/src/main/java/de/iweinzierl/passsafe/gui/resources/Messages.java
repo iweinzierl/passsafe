@@ -36,6 +36,8 @@ public class Messages {
     public static final String NEWENTRYDIALOG_LABEL_VERIFYPASSWORD = "newentrydialog.label.verifypassword";
     public static final String NEWENTRYDIALOG_LABEL_USERNAME = "newentrydialog.label.username";
     public static final String NEWENTRYDIALOG_LABEL_TITLE = "newentrydialog.label.title";
+    public static final String NEWENTRYDIALOG_LABEL_URL = "newentrydialog.label.url";
+    public static final String NEWENTRYDIALOG_LABEL_COMMENTS = "newentrydialog.label.comments";
     public static final String NEWENTRYDIALOG_LABEL_CATEGORY = "newentrydialog.label.category";
     public static final String NEWENTRYDIALOG_BUTTON_SAVE = "newentrydialog.button.save";
     public static final String NEWENTRYDIALOG_BUTTON_CANCEL = "newentrydialog.button.cancel";
@@ -56,10 +58,9 @@ public class Messages {
     public static final String ENTRYVIEW_BUTTON_INVISIBLE = "entryview.button.invisible";
     public static final String ENTRYVIEW_MENU_TITLE = "entryview.menu.title";
 
-    private Messages() {
-    }
+    private Messages() { }
 
-    public static String getMessage(String key) {
+    public static String getMessage(final String key) {
         return MESSAGE_BUNDLE.getString(key);
     }
 }
