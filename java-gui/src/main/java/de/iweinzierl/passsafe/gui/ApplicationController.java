@@ -6,6 +6,9 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -21,6 +24,8 @@ import de.iweinzierl.passsafe.gui.event.EventBus;
 import de.iweinzierl.passsafe.gui.event.EventListener;
 import de.iweinzierl.passsafe.gui.event.EventType;
 import de.iweinzierl.passsafe.gui.event.RemovedListener;
+import de.iweinzierl.passsafe.gui.exception.PassSafeSecurityException;
+import de.iweinzierl.passsafe.gui.secure.AesPasswordHandler;
 import de.iweinzierl.passsafe.gui.secure.PasswordHandler;
 import de.iweinzierl.passsafe.gui.sync.Sync;
 import de.iweinzierl.passsafe.gui.widget.ButtonBar;
@@ -28,6 +33,7 @@ import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
 import de.iweinzierl.passsafe.gui.widget.NewCategoryDialog;
 import de.iweinzierl.passsafe.gui.widget.NewEntryDialog;
+import de.iweinzierl.passsafe.gui.widget.secret.PasswordInputDialog;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
 import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
@@ -41,12 +47,12 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationController.class);
 
     private final Configuration configuration;
-
-    private final PasswordHandler passwordHandler;
     private final Sync sync;
 
     private Application application;
     private PassSafeDataSource dataSource;
+    private PasswordHandler passwordHandler;
+
     private EntryList entryList;
     private EntryTable entryTable;
     private EntryView entryView;
@@ -169,6 +175,76 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         sync.sync(dataSource.getName());
 
         LOGGER.info("Successfully synchronized data source '{}'", dataSource);
+    }
+
+    public void requestChangePassword() throws IOException {
+
+        //J-
+        new PasswordInputDialog.Builder()
+                .withListener(new PasswordInputDialog.Listener() {
+                    @Override
+                    public void onSubmit(final String password) {
+                        LOGGER.info("Start re-encryption with new password");
+                        updateEncryption(password);
+                    }
+                }).build().setVisible(true);
+        //J+
+    }
+
+    protected void updateEncryption(final String newPassword) {
+        PasswordHandler newHandler = new AesPasswordHandler(newPassword);
+
+        List<Entry> entriesToUpdate = new ArrayList<>();
+
+        for (EntryCategory category : dataSource.getCategories()) {
+            for (Entry entry : dataSource.getAllEntries(category)) {
+                if (updateEncryption(entry, passwordHandler, newHandler)) {
+                    entriesToUpdate.add(entry);
+                } else {
+
+                    // TODO bring up dialog displaying an error message while re-encrypting entry
+                    return;
+                }
+            }
+        }
+
+        for (Entry entry : entriesToUpdate) {
+            dataSource.updateEntry(entry);
+        }
+
+        passwordHandler = newHandler;
+    }
+
+    protected boolean updateEncryption(final Entry entry, final PasswordHandler oldHandler,
+            final PasswordHandler newHandler) {
+
+        String password;
+        String username;
+
+        try {
+            password = oldHandler.decrypt(entry.getPassword());
+            username = oldHandler.decrypt(entry.getUsername());
+        } catch (PassSafeSecurityException e) {
+            LOGGER.error("Unable to decrypt password of entry: {}", entry.getPassword(), e);
+            return false;
+        }
+
+        if (password != null) {
+            try {
+                String reEncryptedPassword = newHandler.encrypt(password);
+                entry.setPassword(reEncryptedPassword);
+
+                String reEncryptedUsername = newHandler.encrypt(username);
+                entry.setUsername(reEncryptedUsername);
+
+                return true;
+            } catch (PassSafeSecurityException e) {
+                LOGGER.error("Unable to re-encrypt password of entry: {}", entry.getPassword(), e);
+                return false;
+            }
+        }
+
+        return false;
     }
 
     public void setDataSource(final PassSafeDataSource dataSource) {

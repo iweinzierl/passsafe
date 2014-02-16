@@ -1,5 +1,17 @@
 package de.iweinzierl.passsafe.gui.widget;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.io.IOException;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.action.NewCategoryDialogAction;
@@ -7,14 +19,6 @@ import de.iweinzierl.passsafe.gui.action.NewEntryDialogAction;
 import de.iweinzierl.passsafe.gui.resources.Errors;
 import de.iweinzierl.passsafe.gui.resources.Messages;
 import de.iweinzierl.passsafe.gui.util.UiUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-
 
 public class ButtonBar extends JPanel {
 
@@ -26,8 +30,7 @@ public class ButtonBar extends JPanel {
     private ApplicationController controller;
     private Application parent;
 
-
-    public ButtonBar(ApplicationController controller, Application parent) {
+    public ButtonBar(final ApplicationController controller, final Application parent) {
         super();
         this.controller = controller;
         this.parent = parent;
@@ -35,12 +38,12 @@ public class ButtonBar extends JPanel {
         initialize();
     }
 
-
     private void initialize() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(createAddEntryButton());
         add(createAddCategoryButton());
         add(createSyncButton());
+        add(createChangePasswordButton());
     }
 
     private JButton createAddEntryButton() {
@@ -57,9 +60,24 @@ public class ButtonBar extends JPanel {
         return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_SYNC), BUTTON_WIDTH, BUTTON_HEIGHT,
                 new ActionListener() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {
+                    public void actionPerformed(final ActionEvent e) {
                         try {
                             controller.requestSync();
+                        } catch (IOException ex) {
+                            LOGGER.error("Unable to sync", ex);
+                            UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
+                        }
+                    }
+                });
+    }
+
+    private JButton createChangePasswordButton() {
+        return WidgetFactory.createButton(Messages.getMessage(Messages.BUTTONBAR_CHANGEPASSWORD), BUTTON_WIDTH,
+                BUTTON_HEIGHT, new ActionListener() {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        try {
+                            controller.requestChangePassword();
                         } catch (IOException ex) {
                             LOGGER.error("Unable to sync", ex);
                             UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));

@@ -30,6 +30,10 @@ public class Messages {
     public static final String BUTTONBAR_REMOVEENTRY = "buttonbar.removeentry";
     public static final String BUTTONBAR_NEWCATEGORY = "buttonbar.newcategory";
     public static final String BUTTONBAR_SYNC = "buttonbar.sync";
+    public static final String BUTTONBAR_CHANGEPASSWORD = "buttonbar.changepassword";
+
+    public static final String CHANGEPASSWORD_PANEL_TITLE = "changepassword.panel.title";
+    public static final String CHANGEPASSWORD_PANEL_LABEL = "changepassword.panel.label";
 
     public static final String NEWENTRYDIALOG_TITLE = "newentrydialog.title";
     public static final String NEWENTRYDIALOG_LABEL_PASSWORD = "newentrydialog.label.password";
