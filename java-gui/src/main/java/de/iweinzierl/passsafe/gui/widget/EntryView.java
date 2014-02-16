@@ -1,7 +1,7 @@
 package de.iweinzierl.passsafe.gui.widget;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -147,7 +147,7 @@ public class EntryView extends JPanel {
     }
 
     private void initialize() {
-        setLayout(new FlowLayout(FlowLayout.CENTER));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         titleField.setEditable(false);
         usernameField.setEditable(false);
@@ -168,15 +168,16 @@ public class EntryView extends JPanel {
 
     private JPanel createRow(final JLabel label, final JComponent inputField, final JPanel buttons) {
         JPanel row = new JPanel();
-        row.setLayout(new FlowLayout(FlowLayout.LEFT));
+        row.setLayout(new BorderLayout(5, 5));
 
+        label.setMinimumSize(new Dimension(100, 25));
         label.setPreferredSize(new Dimension(100, 25));
-        inputField.setPreferredSize(new Dimension(150, 25));
+        buttons.setMinimumSize((new Dimension(200, 25)));
         buttons.setPreferredSize((new Dimension(200, 25)));
 
-        row.add(label);
-        row.add(inputField);
-        row.add(buttons);
+        row.add(label, BorderLayout.LINE_START);
+        row.add(inputField, BorderLayout.CENTER);
+        row.add(buttons, BorderLayout.LINE_END);
 
         return row;
     }
