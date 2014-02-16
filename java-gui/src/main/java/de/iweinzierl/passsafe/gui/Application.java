@@ -13,6 +13,7 @@ import java.sql.SQLException;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import org.apache.log4j.BasicConfigurator;
@@ -52,6 +53,7 @@ public class Application extends JFrame {
 
     public static void main(final String[] args) throws Exception {
         initializeLogging();
+        initializeLookAndFeel();
 
         new StartupDialogBuilder().setActionListener(new StartupDialogBuilder.ActionListener() {
 
@@ -135,6 +137,17 @@ public class Application extends JFrame {
 
     private static void initializeLogging() {
         BasicConfigurator.configure();
+    }
+
+    private static void initializeLookAndFeel() {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) { }
     }
 
     private void initializeLayout() {
