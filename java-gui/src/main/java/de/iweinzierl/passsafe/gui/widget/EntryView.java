@@ -202,6 +202,8 @@ public class EntryView extends JPanel {
 
     private JPanel createUrlRow() {
 
+        initializeClipboardFunctions(urlField);
+
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_URL)), urlField,
                 createStandardButtons(urlField, new ValueProvider() {
                         @Override
