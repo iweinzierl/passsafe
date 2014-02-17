@@ -16,7 +16,7 @@
             <!-- android 4x from the central repository -->
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>4.0.1.2</version>
+            <version>4.1.1.4</version>
             <scope>provided</scope>
         </dependency>
 
@@ -24,14 +24,14 @@
             <!-- Support library (aka compatibility library) from the central repository as well note that this uses default scope
                 (NOT provided) since the library will need to be added to your apk -->
             <groupId>com.google.android</groupId>
-            <artifactId>support-v13</artifactId>
+            <artifactId>support-v4</artifactId>
             <version>r13</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>14.0.1</version>
+            <version>14.0-rc1</version>
         </dependency>
 
         <dependency>
