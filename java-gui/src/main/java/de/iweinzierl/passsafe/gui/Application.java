@@ -85,7 +85,6 @@ public class Application extends JFrame {
         } catch (IOException e) {
             LOGGER.error("Unable to sync PassSafe storage with sync type '{}'", configuration.getSyncType());
             UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
-            return;
         }
 
         Application app = new Application(controller);
