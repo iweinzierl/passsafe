@@ -1,15 +1,18 @@
 package de.iweinzierl.passsafe.android.activity.login;
 
+import com.google.common.base.Preconditions;
+
 import android.app.Activity;
 import android.app.Fragment;
+
 import android.os.Bundle;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.Button;
 import android.widget.EditText;
-
-import com.google.common.base.Preconditions;
 
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.logging.Logger;
@@ -24,14 +27,14 @@ public class LoginFragment extends Fragment {
 
     private ActionHandler actionHandler;
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
         Preconditions.checkArgument(getActivity() instanceof ActionHandler);
 
@@ -39,14 +42,14 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
         Button loginButton = findLoginButton(view);
         loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fireLoginEvent();
-            }
-        });
+                @Override
+                public void onClick(final View view) {
+                    fireLoginEvent();
+                }
+            });
     }
 
     public void fireLoginEvent() {
@@ -58,7 +61,7 @@ public class LoginFragment extends Fragment {
         actionHandler.login(passwordField.getText().toString());
     }
 
-    private Button findLoginButton(View container) {
+    private Button findLoginButton(final View container) {
         View view = container.findViewById(R.id.login_button);
         if (view != null) {
             return (Button) view;
@@ -68,7 +71,7 @@ public class LoginFragment extends Fragment {
         return null;
     }
 
-    private EditText findPasswordField(View container) {
+    private EditText findPasswordField(final View container) {
         View view = container.findViewById(R.id.password);
         if (view != null) {
             return (EditText) view;
