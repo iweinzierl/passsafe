@@ -55,6 +55,7 @@ public class UiUtils {
         dialog.setPreferredSize(new Dimension(ERRORDIALOG_WIDTH, ERRORDIALOG_HEIGHT));
         dialog.setMinimumSize(new Dimension(ERRORDIALOG_WIDTH, ERRORDIALOG_HEIGHT));
         dialog.setTitle(Messages.getMessage(Messages.ERROR_DIALOG_TITLE));
+        dialog.setModal(true);
 
         center(dialog);
         dialog.show();
