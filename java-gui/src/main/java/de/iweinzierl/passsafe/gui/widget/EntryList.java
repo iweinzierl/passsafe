@@ -1,17 +1,9 @@
 package de.iweinzierl.passsafe.gui.widget;
 
-import de.iweinzierl.passsafe.gui.Application;
-import de.iweinzierl.passsafe.gui.ApplicationController;
-import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
-import de.iweinzierl.passsafe.gui.resources.Messages;
-import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
-import de.iweinzierl.passsafe.gui.widget.tree.EntryListNode;
-import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
-import de.iweinzierl.passsafe.gui.widget.tree.RemoveItemMenu;
-import de.iweinzierl.passsafe.shared.domain.Entry;
-import de.iweinzierl.passsafe.shared.domain.EntryCategory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.Dimension;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JPopupMenu;
@@ -23,10 +15,20 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.iweinzierl.passsafe.gui.Application;
+import de.iweinzierl.passsafe.gui.ApplicationController;
+import de.iweinzierl.passsafe.gui.resources.Messages;
+import de.iweinzierl.passsafe.gui.widget.tree.CategoryNode;
+import de.iweinzierl.passsafe.gui.widget.tree.EntryListNode;
+import de.iweinzierl.passsafe.gui.widget.tree.EntryNode;
+import de.iweinzierl.passsafe.gui.widget.tree.RemoveItemMenu;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
+import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 public class EntryList extends JTree {
 
@@ -35,8 +37,7 @@ public class EntryList extends JTree {
     private final ApplicationController controller;
     private final Application application;
 
-
-    public EntryList(ApplicationController controller, Application application, TreeModel model) {
+    public EntryList(final ApplicationController controller, final Application application, final TreeModel model) {
         super(model);
 
         this.controller = controller;
@@ -62,15 +63,14 @@ public class EntryList extends JTree {
         menu.add(new RemoveItemMenu(this, controller));
     }
 
-
-    public boolean addEntry(EntryCategory category, Entry entry) {
+    public boolean addEntry(final EntryCategory category, final Entry entry) {
         TreeNode root = (TreeNode) getModel().getRoot();
 
         for (int i = 0; i < root.getChildCount(); i++) {
             Object child = root.getChildAt(i);
 
-            if (child instanceof CategoryNode && ((CategoryNode) child).getCategory().getTitle().equals(
-                    category.getTitle())) {
+            if (child instanceof CategoryNode
+                    && ((CategoryNode) child).getCategory().getTitle().equals(category.getTitle())) {
 
                 CategoryNode parent = (CategoryNode) child;
                 EntryNode newChild = new EntryNode(entry);
@@ -86,14 +86,14 @@ public class EntryList extends JTree {
         return false;
     }
 
-    public void addCategory(EntryCategory category) {
+    public void addCategory(final EntryCategory category) {
         DefaultTreeModel model = (DefaultTreeModel) getModel();
         TreeNode root = (TreeNode) getModel().getRoot();
 
         model.insertNodeInto(new CategoryNode(category), (MutableTreeNode) root, root.getChildCount());
     }
 
-    public void removeEntry(Entry entry) {
+    public void removeEntry(final Entry entry) {
         MutableTreeNode root = (MutableTreeNode) getModel().getRoot();
         if (removeEntry(entry, root)) {
             ((DefaultTreeModel) getModel()).reload(root);
@@ -101,7 +101,7 @@ public class EntryList extends JTree {
         }
     }
 
-    private boolean removeEntry(Entry entry, MutableTreeNode node) {
+    private boolean removeEntry(final Entry entry, final MutableTreeNode node) {
 
         for (int i = node.getChildCount() - 1; i >= 0; i--) {
 
@@ -113,8 +113,7 @@ public class EntryList extends JTree {
                     node.remove(child);
                     return true;
                 }
-            }
-            else if (child instanceof CategoryNode) {
+            } else if (child instanceof CategoryNode) {
                 if (removeEntry(entry, child)) {
                     return true;
                 }
@@ -124,7 +123,7 @@ public class EntryList extends JTree {
         return false;
     }
 
-    public void removeCategory(EntryCategory category) {
+    public void removeCategory(final EntryCategory category) {
         MutableTreeNode root = (MutableTreeNode) getModel().getRoot();
         if (removeCategory(category, root)) {
             ((DefaultTreeModel) getModel()).reload(root);
@@ -132,7 +131,7 @@ public class EntryList extends JTree {
         }
     }
 
-    private boolean removeCategory(EntryCategory category, MutableTreeNode node) {
+    private boolean removeCategory(final EntryCategory category, final MutableTreeNode node) {
 
         for (int i = node.getChildCount() - 1; i >= 0; i--) {
 
@@ -144,8 +143,7 @@ public class EntryList extends JTree {
                     node.remove(child);
                     return true;
                 }
-            }
-            else if (child instanceof CategoryNode) {
+            } else if (child instanceof CategoryNode) {
                 if (removeCategory(category, child)) {
                     return true;
                 }
@@ -171,7 +169,8 @@ public class EntryList extends JTree {
         return selection;
     }
 
-    public static EntryList create(ApplicationController controller, Application parent, PassSafeDataSource dataSource) {
+    public static EntryList create(final ApplicationController controller, final Application parent,
+            final PassSafeDataSource dataSource) {
         DefaultTreeModel model = new DefaultTreeModel(createRootNode(dataSource));
         EntryList tree = new EntryList(controller, parent, model);
         expandCategories(tree);
@@ -179,7 +178,7 @@ public class EntryList extends JTree {
         return tree;
     }
 
-    public static TreeNode createRootNode(PassSafeDataSource dataSource) {
+    public static TreeNode createRootNode(final PassSafeDataSource dataSource) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(Messages.getMessage(Messages.ENTRYLIST_ROOTNODE));
 
         for (EntryCategory category : dataSource.getCategories()) {
@@ -200,13 +199,17 @@ public class EntryList extends JTree {
         return root;
     }
 
-    public static void expandCategories(JTree tree) {
+    public static void expandCategories(final JTree tree) {
         TreeNode root = (TreeNode) tree.getModel().getRoot();
 
         tree.expandPath(new TreePath(root));
 
-        for (int i = 0; i < root.getChildCount(); i++) {
-            tree.expandPath(new TreePath(new Object[]{root, root.getChildAt(i)}));
-        }
+        /* XXX do not expand all categories as there might be a lot of entries in it; prefer category selection
+         * and all entries are displayed at the entry box
+         *
+         * for (int i = 0; i < root.getChildCount(); i++) {
+         *  tree.expandPath(new TreePath(new Object[]{root, root.getChildAt(i)}));
+         * }
+         */
     }
 }
