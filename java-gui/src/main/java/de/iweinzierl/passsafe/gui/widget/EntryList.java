@@ -19,6 +19,8 @@ import javax.swing.tree.TreeSelectionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
+
 import de.iweinzierl.passsafe.gui.Application;
 import de.iweinzierl.passsafe.gui.ApplicationController;
 import de.iweinzierl.passsafe.gui.resources.Messages;
@@ -51,16 +53,6 @@ public class EntryList extends JTree {
         setDropMode(DropMode.INSERT);
         setTransferHandler(new EntryListTransferHandler(controller));
         addTreeSelectionListener(controller);
-    }
-
-    private void initialize() {
-        JPopupMenu menu = getComponentPopupMenu();
-        if (menu == null) {
-            menu = new JPopupMenu(Messages.getMessage(Messages.ENTRYLIST_CATEGORIES));
-            setComponentPopupMenu(menu);
-        }
-
-        menu.add(new RemoveItemMenu(this, controller));
     }
 
     public boolean addEntry(final EntryCategory category, final Entry entry) {
@@ -101,56 +93,12 @@ public class EntryList extends JTree {
         }
     }
 
-    private boolean removeEntry(final Entry entry, final MutableTreeNode node) {
-
-        for (int i = node.getChildCount() - 1; i >= 0; i--) {
-
-            MutableTreeNode child = (MutableTreeNode) node.getChildAt(i);
-            if (child instanceof EntryNode) {
-
-                Entry current = ((EntryNode) child).getEntry();
-                if (current.getTitle().equals(entry.getTitle())) {
-                    node.remove(child);
-                    return true;
-                }
-            } else if (child instanceof CategoryNode) {
-                if (removeEntry(entry, child)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     public void removeCategory(final EntryCategory category) {
         MutableTreeNode root = (MutableTreeNode) getModel().getRoot();
         if (removeCategory(category, root)) {
             ((DefaultTreeModel) getModel()).reload(root);
             expandCategories(this);
         }
-    }
-
-    private boolean removeCategory(final EntryCategory category, final MutableTreeNode node) {
-
-        for (int i = node.getChildCount() - 1; i >= 0; i--) {
-
-            MutableTreeNode child = (MutableTreeNode) node.getChildAt(i);
-            if (child instanceof CategoryNode) {
-
-                EntryCategory current = ((CategoryNode) child).getCategory();
-                if (current.getTitle().equals(category.getTitle())) {
-                    node.remove(child);
-                    return true;
-                }
-            } else if (child instanceof CategoryNode) {
-                if (removeCategory(category, child)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     public List<EntryListNode> getSelection() {
@@ -178,25 +126,15 @@ public class EntryList extends JTree {
         return tree;
     }
 
-    public static TreeNode createRootNode(final PassSafeDataSource dataSource) {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(Messages.getMessage(Messages.ENTRYLIST_ROOTNODE));
+    public static void expandTree(final JTree tree) {
+        TreeNode root = (TreeNode) tree.getModel().getRoot();
 
-        for (EntryCategory category : dataSource.getCategories()) {
-            CategoryNode categoryNode = new CategoryNode(category);
-            root.add(categoryNode);
+        tree.expandPath(new TreePath(root));
 
-            List<Entry> entries = dataSource.getAllEntries(category);
-
-            if (entries == null || entries.isEmpty()) {
-                continue;
-            }
-
-            for (Entry entry : entries) {
-                categoryNode.add(new EntryNode(entry));
-            }
+        for (int i = 0; i < root.getChildCount(); i++) {
+            tree.expandPath(new TreePath(new Object[] {root, root.getChildAt(i)}));
         }
 
-        return root;
     }
 
     public static void expandCategories(final JTree tree) {
@@ -211,5 +149,118 @@ public class EntryList extends JTree {
          *  tree.expandPath(new TreePath(new Object[]{root, root.getChildAt(i)}));
          * }
          */
+    }
+
+    public void filter(final PassSafeDataSource dataSource, String searchText) {
+        if (searchText == null) {
+            searchText = "";
+        }
+
+        LOGGER.debug("Filter entry tree with: {}", searchText);
+
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+        root.removeAllChildren();
+        ((DefaultTreeModel) getModel()).reload(root);
+
+        addTreeContent(dataSource, searchText, root);
+        ((DefaultTreeModel) getModel()).reload(root);
+
+        expandTree(this);
+    }
+
+    private void initialize() {
+        JPopupMenu menu = getComponentPopupMenu();
+        if (menu == null) {
+            menu = new JPopupMenu(Messages.getMessage(Messages.ENTRYLIST_CATEGORIES));
+            setComponentPopupMenu(menu);
+        }
+
+        menu.add(new RemoveItemMenu(this, controller));
+    }
+
+    private boolean removeEntry(final Entry entry, final MutableTreeNode node) {
+
+        for (int i = node.getChildCount() - 1; i >= 0; i--) {
+
+            MutableTreeNode child = (MutableTreeNode) node.getChildAt(i);
+            if (child instanceof EntryNode) {
+
+                Entry current = ((EntryNode) child).getEntry();
+                if (current.getTitle().equals(entry.getTitle())) {
+                    node.remove(child);
+                    return true;
+                }
+            } else if (child instanceof CategoryNode) {
+                if (removeEntry(entry, child)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean removeCategory(final EntryCategory category, final MutableTreeNode node) {
+
+        for (int i = node.getChildCount() - 1; i >= 0; i--) {
+
+            MutableTreeNode child = (MutableTreeNode) node.getChildAt(i);
+            if (child instanceof CategoryNode) {
+
+                EntryCategory current = ((CategoryNode) child).getCategory();
+                if (current.getTitle().equals(category.getTitle())) {
+                    node.remove(child);
+                    return true;
+                }
+            } else if (child instanceof CategoryNode) {
+                if (removeCategory(category, child)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static TreeNode createRootNode(final PassSafeDataSource dataSource) {
+        return createRootNode(dataSource, null);
+    }
+
+    public static TreeNode createRootNode(final PassSafeDataSource dataSource, final String filterText) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(Messages.getMessage(Messages.ENTRYLIST_ROOTNODE));
+        addTreeContent(dataSource, filterText, root);
+
+        return root;
+    }
+
+    private static void addTreeContent(final PassSafeDataSource dataSource, final String filterText,
+            final DefaultMutableTreeNode root) {
+
+        LOGGER.debug("addTreeContent filtered with: {}", filterText);
+
+        for (EntryCategory category : dataSource.getCategories()) {
+            CategoryNode categoryNode = new CategoryNode(category);
+            root.add(categoryNode);
+
+            List<Entry> entries = dataSource.getAllEntries(category);
+
+            if (entries == null || entries.isEmpty()) {
+                continue;
+            }
+
+            for (Entry entry : entries) {
+                if (!Strings.isNullOrEmpty(filterText)
+                        && entry.getTitle().toLowerCase().contains(filterText.toLowerCase())) {
+
+                    categoryNode.add(new EntryNode(entry));
+                } else if (Strings.isNullOrEmpty(filterText)) {
+                    categoryNode.add(new EntryNode(entry));
+                }
+            }
+
+            if (!Strings.isNullOrEmpty(filterText) && categoryNode.getChildCount() == 0) {
+                categoryNode.removeFromParent();
+            }
+        }
     }
 }

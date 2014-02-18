@@ -177,6 +177,10 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         LOGGER.info("Successfully synchronized data source '{}'", dataSource);
     }
 
+    public void requestEntrySearch(final String searchText) {
+        entryList.filter(dataSource, searchText);
+    }
+
     public void requestChangePassword() throws IOException {
 
         //J-

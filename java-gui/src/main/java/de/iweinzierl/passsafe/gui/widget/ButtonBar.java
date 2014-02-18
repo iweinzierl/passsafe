@@ -2,12 +2,15 @@ package de.iweinzierl.passsafe.gui.widget;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +47,7 @@ public class ButtonBar extends JPanel {
         add(createAddCategoryButton());
         add(createSyncButton());
         add(createChangePasswordButton());
+        add(createSearchField());
     }
 
     private JButton createAddEntryButton() {
@@ -84,5 +88,26 @@ public class ButtonBar extends JPanel {
                         }
                     }
                 });
+    }
+
+    private JTextField createSearchField() {
+        final JTextField search = new JTextField(30);
+        search.addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(final KeyEvent e) { }
+
+                @Override
+                public void keyPressed(final KeyEvent e) { }
+
+                @Override
+                public void keyReleased(final KeyEvent e) {
+                    String searchText = search.getText();
+                    LOGGER.debug("Search for: {}", searchText);
+
+                    controller.requestEntrySearch(searchText);
+                }
+            });
+
+        return search;
     }
 }
