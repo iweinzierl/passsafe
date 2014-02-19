@@ -30,28 +30,28 @@ import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 
 public class SqliteDataSource implements PassSafeDataSource {
 
-    public static final String SQL_LOAD_CATEGORIES = "SELECT id, title FROM category ORDER BY title";
+    public static final String SQL_LOAD_CATEGORIES = "SELECT \"_id\", title FROM category ORDER BY title";
 
     public static final String SQL_LOAD_ENTRIES =
-        "SELECT id, category_id, title, url, username, password, comment FROM entry";
+        "SELECT \"_id\", category_id, title, url, username, password, comment FROM entry";
 
     public static final String SQL_INSERT_ENTRY =
         "INSERT INTO entry (category_id, title, url, username, password, comment) VALUES (?, ?, ?, ?, ?, ?)";
 
-    public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE id = ?";
+    public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE \"_id\" = ?";
 
     public static final String SQL_UPDATE_ENTRY =
-        "UPDATE entry SET title = ?, url = ?, username = ?, password = ?, comment = ? WHERE id = ?";
+        "UPDATE entry SET title = ?, url = ?, username = ?, password = ?, comment = ? WHERE \"_id\" = ?";
 
-    public static final String SQL_FIND_ENTRY_ID = "SELECT id FROM entry WHERE title = ?";
+    public static final String SQL_FIND_ENTRY_ID = "SELECT \"_id\" FROM entry WHERE title = ?";
 
     public static final String SQL_INSERT_CATEGORY = "INSERT INTO category (title) VALUES (?)";
 
-    public static final String SQL_REMOVE_CATEGORY = "DELETE FROM category WHERE id = ?";
+    public static final String SQL_REMOVE_CATEGORY = "DELETE FROM category WHERE \"_id\" = ?";
 
     public static final String SQL_REMOVE_CATEGORY_ENTRIES = "DELETE FROM entry WHERE category_id = ?";
 
-    public static final String SQL_UPDATE_CATEGORY_OF_ENTRY = "UPDATE entry SET category_id = ? WHERE id = ?";
+    public static final String SQL_UPDATE_CATEGORY_OF_ENTRY = "UPDATE entry SET category_id = ? WHERE \"_id\" = ?";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SqliteDataSource.class);
 
