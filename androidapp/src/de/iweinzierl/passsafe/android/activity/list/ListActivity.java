@@ -42,8 +42,9 @@ public class ListActivity extends Activity {
             }
 
             LOGGER.debug("Clicked category: " + category.getTitle());
+            showCategory(category);
+
             categoryDrawer.closeDrawers();
-            showAllEntries();
         }
     }
 

@@ -21,10 +21,10 @@ public class SQLiteRepository {
     private static final Logger LOGGER = new Logger("SQLiteRepository");
 
     private static final String TABLE_ENTRY = "entry";
-    private static final String TABLE_CATEGORY = "entry";
+    private static final String TABLE_CATEGORY = "category";
 
     private static final String[] TABLE_ENTRY_COLUMNS = new String[] {
-        "_id", "category_id", "title", "url", "username", "password", "comment"
+        "\"_id\"", "category_id", "title", "url", "username", "password", "comment"
     };
 
     private static final String[] TABLE_CATEGORY_COLUMNS = new String[] {"_id", "title"};
@@ -59,28 +59,28 @@ public class SQLiteRepository {
     public List<EntryCategory> listCategories() {
         openDatabaseIfNecessary();
 
-        List<EntryCategory> entries = new ArrayList<EntryCategory>();
+        List<EntryCategory> categories = new ArrayList<EntryCategory>();
 
         Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, null, null, null, null, "title");
         if (!cursor.moveToFirst()) {
-            return entries;
+            return categories;
         }
 
         do {
-            EntryCategory entry = newEntryCategoryFromCursor(cursor);
-            if (entry != null) {
-                entries.add(entry);
+            EntryCategory category = newEntryCategoryFromCursor(cursor);
+            if (category != null) {
+                categories.add(category);
             }
         } while (cursor.moveToNext());
 
-        return entries;
+        return categories;
     }
 
     public EntryCategory findCategory(final int id) {
         openDatabaseIfNecessary();
 
-        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, "WHERE \"_id\" = " + id, null, null,
-                null, "title");
+        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, "\"_id\" = " + id, null, null, null,
+                "title");
 
         if (!cursor.moveToFirst()) {
             return null;
@@ -109,7 +109,7 @@ public class SQLiteRepository {
         //J-
         return new DatabaseEntry.Builder()
                 .withCategory((DatabaseEntryCategory) findCategory(cursor.getInt(1)))
-                .withId(cursor.getInt(1))
+                .withId(cursor.getInt(0))
                 .withTitle(cursor.getString(2))
                 .withUrl(cursor.getString(3))
                 .withUsername(cursor.getString(4))
@@ -121,8 +121,9 @@ public class SQLiteRepository {
     private EntryCategory newEntryCategoryFromCursor(final Cursor cursor) {
         //J-
         return new DatabaseEntryCategory.Builder()
-                .withId(cursor.getInt(1))
-                .withTitle(cursor.getString(2)).build();
+                .withId(cursor.getInt(0))
+                .withTitle(cursor.getString(1)).build();
         //J+
+
     }
 }
