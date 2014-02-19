@@ -19,8 +19,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.adapter.CategoryListAdapter;
+import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
@@ -82,23 +84,13 @@ public class ListActivity extends Activity {
     }
 
     protected List<EntryCategory> getCategoriesFromBackend() {
-
-        // TODO fetch categories from backend
-        return Lists.newArrayList(new EntryCategory("TEST CATEGORY"), new EntryCategory("TEST TEST CATEGORY"));
+        SQLiteRepository repository = ((PassSafeApplication) getApplication()).getRepository();
+        return repository.listCategories();
     }
 
     protected List<Entry> getEntriesFromBackend() {
-        /*
-         * SQLiteRepository repository = ((PassSafeApplication) getApplication()).getRepository();
-         * return repository.listEntries();
-         */
-
-        // TODO fetch all entries from backend
-        EntryCategory category = new EntryCategory("TEST CATEGORY");
-        return Lists.newArrayList(new Entry(category, category.getTitle() + "#1", "user", "pass"),
-                new Entry(category, category.getTitle() + "#2", "user", "pass"),
-                new Entry(category, category.getTitle() + "#3", "user", "pass"));
-
+        SQLiteRepository repository = ((PassSafeApplication) getApplication()).getRepository();
+        return repository.listEntries();
     }
 
     protected List<Entry> getEntriesFromBackend(final EntryCategory category) {

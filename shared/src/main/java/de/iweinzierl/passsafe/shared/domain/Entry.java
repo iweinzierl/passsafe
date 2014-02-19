@@ -14,6 +14,8 @@ public class Entry implements Serializable {
     private String password;
     private String comment;
 
+    public Entry() { }
+
     public Entry(final EntryCategory category, final String title, final String username, final String password) {
         this(category, title, null, username, password);
     }

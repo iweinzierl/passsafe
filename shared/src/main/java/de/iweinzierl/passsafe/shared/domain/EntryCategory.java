@@ -1,10 +1,9 @@
 package de.iweinzierl.passsafe.shared.domain;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class EntryCategory implements Serializable {
 
@@ -12,21 +11,19 @@ public class EntryCategory implements Serializable {
 
     private String title;
 
+    public EntryCategory() { }
 
-    public EntryCategory(String title) {
+    public EntryCategory(final String title) {
         this.title = title;
     }
-
 
     public String getTitle() {
         return title;
     }
 
-
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
-
 
     @Override
     public String toString() {
@@ -38,9 +35,8 @@ public class EntryCategory implements Serializable {
         return new HashCodeBuilder().appendSuper(super.hashCode()).append(title).toHashCode();
     }
 
-
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         }
