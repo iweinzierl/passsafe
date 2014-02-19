@@ -2,8 +2,6 @@ package de.iweinzierl.passsafe.android.activity.list;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import android.app.Activity;
 
 import android.content.Context;
@@ -22,6 +20,7 @@ import android.widget.ListView;
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.adapter.CategoryListAdapter;
+import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.shared.domain.Entry;
@@ -95,11 +94,8 @@ public class ListActivity extends Activity {
     }
 
     protected List<Entry> getEntriesFromBackend(final EntryCategory category) {
-
-        // TODO fetch entries from backend
-        return Lists.newArrayList(new Entry(category, category.getTitle() + "#1", "user", "pass"),
-                new Entry(category, category.getTitle() + "#2", "user", "pass"),
-                new Entry(category, category.getTitle() + "#3", "user", "pass"));
+        SQLiteRepository repository = ((PassSafeApplication) getApplication()).getRepository();
+        return repository.findEntries(((DatabaseEntryCategory) category).getId());
     }
 
     protected ListView getCategoryList() {

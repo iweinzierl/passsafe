@@ -27,6 +27,9 @@ public class SQLiteRepository {
         "\"_id\"", "category_id", "title", "url", "username", "password", "comment"
     };
 
+    private static final String QUERY_ENTRIES_BY_CATEGORY =
+        "SELECT \"_id\", category_id, title, url, username, password, comment WHERE category_id = %s";
+
     private static final String[] TABLE_CATEGORY_COLUMNS = new String[] {"_id", "title"};
 
     private Context context;
@@ -87,6 +90,28 @@ public class SQLiteRepository {
         }
 
         return newEntryCategoryFromCursor(cursor);
+    }
+
+    public List<Entry> findEntries(final int categoryId) {
+        openDatabaseIfNecessary();
+
+        Cursor cursor = database.query(TABLE_ENTRY, TABLE_ENTRY_COLUMNS, "category_id = " + categoryId, null, null,
+                null, "title");
+
+        List<Entry> entries = new ArrayList<Entry>();
+
+        if (!cursor.moveToFirst()) {
+            return entries;
+        }
+
+        do {
+            Entry entry = newEntryFromCursor(cursor);
+            if (entry != null) {
+                entries.add(entry);
+            }
+        } while (cursor.moveToNext());
+
+        return entries;
     }
 
     private void openDatabaseIfNecessary() {
