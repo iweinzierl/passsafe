@@ -25,7 +25,7 @@ import de.iweinzierl.passsafe.gui.util.UiUtils;
 
 public class ButtonBar extends JPanel {
 
-    public static final int BUTTON_WIDTH = 100;
+    public static final int BUTTON_WIDTH = 150;
     public static final int BUTTON_HEIGHT = 25;
 
     private Logger LOGGER = LoggerFactory.getLogger(ButtonBar.class);
