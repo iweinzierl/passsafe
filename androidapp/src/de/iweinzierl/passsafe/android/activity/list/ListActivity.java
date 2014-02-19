@@ -88,12 +88,17 @@ public class ListActivity extends Activity {
     }
 
     protected List<Entry> getEntriesFromBackend() {
+        /*
+         * SQLiteRepository repository = ((PassSafeApplication) getApplication()).getRepository();
+         * return repository.listEntries();
+         */
 
         // TODO fetch all entries from backend
         EntryCategory category = new EntryCategory("TEST CATEGORY");
         return Lists.newArrayList(new Entry(category, category.getTitle() + "#1", "user", "pass"),
                 new Entry(category, category.getTitle() + "#2", "user", "pass"),
                 new Entry(category, category.getTitle() + "#3", "user", "pass"));
+
     }
 
     protected List<Entry> getEntriesFromBackend(final EntryCategory category) {
