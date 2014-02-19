@@ -2,6 +2,8 @@ package de.iweinzierl.passsafe.android.activity.login;
 
 import android.app.Activity;
 
+import android.content.Intent;
+
 import android.os.Bundle;
 
 import android.view.Menu;
@@ -26,13 +28,24 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
     @Override
     public void onStart() {
         super.onStart();
-        new GoogleDriveSync(this).sync();
+        new GoogleDriveSync(LoginActivity.this).sync();
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.login, menu);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        LOGGER.info("Received result for requestCode: " + requestCode);
+
+        switch (requestCode) {
+
+            case 1 :
+        }
     }
 
     @Override
