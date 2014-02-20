@@ -21,15 +21,27 @@ public class CategoryListAdapter extends AbstractListAdapter<EntryCategory> {
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-
-        EntryCategory item = getItem(position);
-
         LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View entry = layoutInflater.inflate(R.layout.listitem_entry, parent, false);
+        View listItem = layoutInflater.inflate(R.layout.listitem_category, parent, false);
 
-        TextView tv = (TextView) entry.findViewById(R.id.title);
-        tv.setText(item.getTitle());
+        EntryCategory category = getItem(position);
+        applyTitle(listItem, category);
+        applyNumberOfEntries(listItem, category);
 
-        return entry;
+        return listItem;
+    }
+
+    private void applyTitle(final View listItem, final EntryCategory category) {
+        View view = listItem.findViewById(R.id.title);
+        if (view instanceof TextView) {
+            ((TextView) view).setText(category.getTitle());
+        }
+    }
+
+    private void applyNumberOfEntries(final View listItem, final EntryCategory category) {
+        View view = listItem.findViewById(R.id.entry_count);
+        if (view instanceof TextView) {
+            ((TextView) view).setText("0"); // TODO how to retrieve number of entries in this category?
+        }
     }
 }
