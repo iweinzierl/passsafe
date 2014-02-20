@@ -11,8 +11,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
+import de.iweinzierl.passsafe.android.util.ColorUtils;
 import de.iweinzierl.passsafe.android.util.UiUtils;
 import de.iweinzierl.passsafe.shared.domain.Entry;
+import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 public class EntryListAdapter extends AbstractListAdapter<Entry> {
 
@@ -29,10 +32,20 @@ public class EntryListAdapter extends AbstractListAdapter<Entry> {
         View listItem = inflater.inflate(R.layout.listitem_entry, parent, false);
 
         Entry entry = getItem(position);
+        applyColorBar(listItem, entry.getCategory());
         applyTitle(listItem, entry);
         applyCategory(listItem, entry);
 
         return listItem;
+    }
+
+    private void applyColorBar(final View listItem, final EntryCategory category) {
+        int id = ((DatabaseEntryCategory) category).getId();
+
+        View view = listItem.findViewById(R.id.colorbar);
+        if (view != null) {
+            view.setBackgroundColor(ColorUtils.colorById(id));
+        }
     }
 
     private void applyTitle(final View listItem, final Entry entry) {

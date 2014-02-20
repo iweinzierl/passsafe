@@ -5,13 +5,12 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
-    <!-- TODO FrameLayout must have the same height as the next LinearLayout -->
     <FrameLayout
-            android:background="@android:color/darker_gray"
+            android:id="@+id/colorbar"
+            android:background="@android:color/transparent"
             android:layout_width="10dp"
-            android:layout_height="20dp">
+            android:layout_height="match_parent">
     </FrameLayout>
-
 
     <LinearLayout
             android:orientation="vertical"

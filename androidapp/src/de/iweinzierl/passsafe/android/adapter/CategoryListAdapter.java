@@ -11,6 +11,7 @@ import android.widget.TextView;
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
+import de.iweinzierl.passsafe.android.util.ColorUtils;
 import de.iweinzierl.passsafe.android.util.UiUtils;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
@@ -32,10 +33,20 @@ public class CategoryListAdapter extends AbstractListAdapter<EntryCategory> {
         View listItem = layoutInflater.inflate(R.layout.listitem_category, parent, false);
 
         EntryCategory category = getItem(position);
+        applyColorBar(listItem, category);
         applyTitle(listItem, category);
         applyNumberOfEntries(listItem, category);
 
         return listItem;
+    }
+
+    private void applyColorBar(final View listItem, final EntryCategory category) {
+        int id = ((DatabaseEntryCategory) category).getId();
+
+        View view = listItem.findViewById(R.id.colorbar);
+        if (view != null) {
+            view.setBackgroundColor(ColorUtils.colorById(id));
+        }
     }
 
     private void applyTitle(final View listItem, final EntryCategory category) {
