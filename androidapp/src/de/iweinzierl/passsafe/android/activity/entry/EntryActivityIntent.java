@@ -11,7 +11,15 @@ public class EntryActivityIntent extends Intent {
         super(packageContext, EntryActivity.class);
     }
 
+    public EntryActivityIntent(final Intent o) {
+        super(o);
+    }
+
     public void putEntryId(final int id) {
         putExtra(EXTRA_ENTRY_ID, id);
+    }
+
+    public int getEntryId() {
+        return getIntExtra(EXTRA_ENTRY_ID, 0);
     }
 }

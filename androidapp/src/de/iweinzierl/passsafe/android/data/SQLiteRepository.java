@@ -24,11 +24,11 @@ public class SQLiteRepository {
     private static final String TABLE_CATEGORY = "category";
 
     private static final String[] TABLE_ENTRY_COLUMNS = new String[] {
-        "\"_id\"", "category_id", "title", "url", "username", "password", "comment"
+        "_id", "category_id", "title", "url", "username", "password", "comment"
     };
 
     private static final String QUERY_ENTRIES_BY_CATEGORY =
-        "SELECT \"_id\", category_id, title, url, username, password, comment WHERE category_id = %s";
+        "SELECT _id, category_id, title, url, username, password, comment WHERE category_id = %s";
 
     private static final String[] TABLE_CATEGORY_COLUMNS = new String[] {"_id", "title"};
 
@@ -79,17 +79,28 @@ public class SQLiteRepository {
         return categories;
     }
 
+    public Entry findEntry(final int id) {
+        openDatabaseIfNecessary();
+
+        Cursor cursor = database.query(TABLE_ENTRY, TABLE_ENTRY_COLUMNS, "_id = " + id, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            return newEntryFromCursor(cursor);
+        }
+
+        return null;
+    }
+
     public EntryCategory findCategory(final int id) {
         openDatabaseIfNecessary();
 
-        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, "\"_id\" = " + id, null, null, null,
-                "title");
+        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, "_id = " + id, null, null, null, null);
 
-        if (!cursor.moveToFirst()) {
-            return null;
+        if (cursor.moveToFirst()) {
+            return newEntryCategoryFromCursor(cursor);
         }
 
-        return newEntryCategoryFromCursor(cursor);
+        return null;
     }
 
     public List<Entry> findEntries(final int categoryId) {

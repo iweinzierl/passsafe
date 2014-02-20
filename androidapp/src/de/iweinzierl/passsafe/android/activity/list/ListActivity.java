@@ -78,8 +78,11 @@ public class ListActivity extends Activity implements ListFragment.Callback {
 
     @Override
     public void onEntryClicked(final Entry entry) {
+        int entryId = ((DatabaseEntry) entry).getId();
+        LOGGER.debug("Going to start EntryActivity with entry id: " + entryId);
+
         EntryActivityIntent intent = new EntryActivityIntent(this);
-        intent.putEntryId(((DatabaseEntry) entry).getId());
+        intent.putEntryId(entryId);
 
         startActivity(intent);
 
