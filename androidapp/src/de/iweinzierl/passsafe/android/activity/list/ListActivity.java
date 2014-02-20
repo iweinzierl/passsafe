@@ -19,14 +19,16 @@ import android.widget.ListView;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.activity.entry.EntryActivityIntent;
 import de.iweinzierl.passsafe.android.adapter.CategoryListAdapter;
+import de.iweinzierl.passsafe.android.data.DatabaseEntry;
 import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
-public class ListActivity extends Activity {
+public class ListActivity extends Activity implements ListFragment.Callback {
 
     private static final Logger LOGGER = new Logger("ListActivity");
 
@@ -72,6 +74,15 @@ public class ListActivity extends Activity {
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.list, menu);
         return true;
+    }
+
+    @Override
+    public void onEntryClicked(final Entry entry) {
+        EntryActivityIntent intent = new EntryActivityIntent(this);
+        intent.putEntryId(((DatabaseEntry) entry).getId());
+
+        startActivity(intent);
+
     }
 
     private void initializeCategoryList() {
