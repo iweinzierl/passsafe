@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.util.UiUtils;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 
 public class EntryListAdapter extends AbstractListAdapter<Entry> {
@@ -35,16 +36,16 @@ public class EntryListAdapter extends AbstractListAdapter<Entry> {
     }
 
     private void applyTitle(final View listItem, final Entry entry) {
-        View view = listItem.findViewById(RES_TITLE);
-        if (view instanceof TextView) {
-            ((TextView) view).setText(entry.getTitle());
+        TextView view = UiUtils.getTextView(listItem, RES_TITLE);
+        if (view != null) {
+            view.setText(entry.getTitle());
         }
     }
 
     private void applyCategory(final View listItem, final Entry entry) {
-        View view = listItem.findViewById(RES_CATEGORY);
-        if (view instanceof TextView && entry.getCategory() != null) {
-            ((TextView) view).setText(entry.getCategory().getTitle());
+        TextView view = UiUtils.getTextView(listItem, RES_CATEGORY);
+        if (view != null) {
+            view.setText(entry.getCategory().getTitle());
         }
     }
 }

@@ -11,9 +11,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.util.UiUtils;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 public class CategoryListAdapter extends AbstractListAdapter<EntryCategory> {
+
+    private static final int RES_TITLE = R.id.title;
+    public static final int RES_ENTRY_COUNT = R.id.entry_count;
 
     public CategoryListAdapter(final Context context, final List<EntryCategory> items) {
         super(context, items);
@@ -32,15 +36,15 @@ public class CategoryListAdapter extends AbstractListAdapter<EntryCategory> {
     }
 
     private void applyTitle(final View listItem, final EntryCategory category) {
-        View view = listItem.findViewById(R.id.title);
-        if (view instanceof TextView) {
-            ((TextView) view).setText(category.getTitle());
+        TextView view = UiUtils.getTextView(listItem, RES_TITLE);
+        if (view != null) {
+            view.setText(category.getTitle());
         }
     }
 
     private void applyNumberOfEntries(final View listItem, final EntryCategory category) {
-        View view = listItem.findViewById(R.id.entry_count);
-        if (view instanceof TextView) {
+        View view = UiUtils.getTextView(listItem, RES_ENTRY_COUNT);
+        if (view != null) {
             ((TextView) view).setText("0"); // TODO how to retrieve number of entries in this category?
         }
     }
