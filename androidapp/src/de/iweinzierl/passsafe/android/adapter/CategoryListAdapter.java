@@ -1,7 +1,5 @@
 package de.iweinzierl.passsafe.android.adapter;
 
-import java.util.List;
-
 import android.content.Context;
 
 import android.view.LayoutInflater;
@@ -11,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
+import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.util.UiUtils;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
@@ -19,8 +19,11 @@ public class CategoryListAdapter extends AbstractListAdapter<EntryCategory> {
     private static final int RES_TITLE = R.id.title;
     public static final int RES_ENTRY_COUNT = R.id.entry_count;
 
-    public CategoryListAdapter(final Context context, final List<EntryCategory> items) {
-        super(context, items);
+    private final SQLiteRepository repository;
+
+    public CategoryListAdapter(final Context context, final SQLiteRepository repository) {
+        super(context, repository.listCategories());
+        this.repository = repository;
     }
 
     @Override
@@ -45,7 +48,11 @@ public class CategoryListAdapter extends AbstractListAdapter<EntryCategory> {
     private void applyNumberOfEntries(final View listItem, final EntryCategory category) {
         View view = UiUtils.getTextView(listItem, RES_ENTRY_COUNT);
         if (view != null) {
-            ((TextView) view).setText("0"); // TODO how to retrieve number of entries in this category?
+            ((TextView) view).setText(String.valueOf(getNumberOfEntries(category)));
         }
+    }
+
+    private int getNumberOfEntries(final EntryCategory category) {
+        return repository.findEntries(((DatabaseEntryCategory) category).getId()).size();
     }
 }

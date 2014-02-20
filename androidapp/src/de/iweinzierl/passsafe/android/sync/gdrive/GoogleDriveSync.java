@@ -126,6 +126,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
             download(dbFile, metadata);
         } else if (isUploadRequired(dbFile, metadata)) {
             LOGGER.debug("Upload of database required");
+            LOGGER.error("Upload currently not implemented");
         }
     }
 

@@ -93,13 +93,9 @@ public class ListActivity extends Activity implements ListFragment.Callback {
 
         ListView categoryList = (ListView) findViewById(R.id.category_list);
         categoryList.addHeaderView(layoutInflater.inflate(R.layout.category_drawer_header, null, false));
-        categoryList.setAdapter(new CategoryListAdapter(this, getCategoriesFromBackend()));
+        categoryList.setAdapter(new CategoryListAdapter(this,
+                ((PassSafeApplication) getApplication()).getRepository()));
         categoryList.setOnItemClickListener(new DrawerClickListener());
-    }
-
-    protected List<EntryCategory> getCategoriesFromBackend() {
-        SQLiteRepository repository = ((PassSafeApplication) getApplication()).getRepository();
-        return repository.listCategories();
     }
 
     protected List<Entry> getEntriesFromBackend() {
