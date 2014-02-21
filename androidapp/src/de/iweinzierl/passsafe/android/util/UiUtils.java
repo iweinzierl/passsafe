@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -45,6 +46,16 @@ public final class UiUtils {
 
         if (view instanceof Button) {
             return (Button) view;
+        }
+
+        return null;
+    }
+
+    public static View getButtonOrImageButton(final View parent, final int resId) {
+        View view = parent.findViewById(resId);
+
+        if (view instanceof Button || view instanceof ImageButton) {
+            return view;
         }
 
         return null;

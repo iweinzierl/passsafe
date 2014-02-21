@@ -1,5 +1,8 @@
 package de.iweinzierl.passsafe.android.adapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
 import android.view.LayoutInflater;
@@ -38,6 +41,19 @@ public class CategoryListAdapter extends AbstractListAdapter<EntryCategory> {
         applyNumberOfEntries(listItem, category);
 
         return listItem;
+    }
+
+    @Override
+    protected List<EntryCategory> filter(final List<EntryCategory> items, final String filter) {
+        List<EntryCategory> categories = new ArrayList<EntryCategory>();
+
+        for (EntryCategory category : items) {
+            if (category.getTitle().toLowerCase().contains(filter.toLowerCase())) {
+                categories.add(category);
+            }
+        }
+
+        return categories;
     }
 
     private void applyColorBar(final View listItem, final EntryCategory category) {

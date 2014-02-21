@@ -2,72 +2,196 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
-              android:layout_margin="10dp"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <TextView
-            android:id="@+id/title"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    <TextView
-            android:id="@+id/category"
-            android:layout_marginBottom="30dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    <TextView
-            android:id="@+id/url"
-            android:layout_marginBottom="30dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
+    <!-- Header with title and category -->
     <LinearLayout
             android:orientation="horizontal"
+            android:background="@color/black"
+            android:paddingBottom="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <TextView
-                android:id="@+id/username"
-                android:layout_weight="0.7"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
+        <FrameLayout
+                android:id="@+id/header"
+                android:background="@android:color/transparent"
+                android:layout_width="10dp"
+                android:layout_height="match_parent"/>
 
-        <Button
-                android:id="@+id/toggle_username"
-                android:text="Show/Hide"
-                android:layout_weight="0.3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
+        <LinearLayout
+                android:orientation="vertical"
+                android:background="@color/grey"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <TextView
+                    android:id="@+id/title"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/category"
+                    android:layout_marginBottom="30dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
 
     </LinearLayout>
+    <!-- end of header -->
 
+    <!-- wrapper for entry content -->
     <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
+            android:padding="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <TextView
-                android:id="@+id/password"
-                android:layout_weight="0.7"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
+        <!-- wrapper for url -->
+        <LinearLayout
+                android:orientation="horizontal"
+                android:paddingBottom="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <Button
-                android:id="@+id/toggle_password"
-                android:text="Show/Hide"
-                android:layout_weight="0.3"
-                android:layout_width="0dp"
+            <!-- wrapper for url value and label -->
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:layout_weight="0.8"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:text="@string/fragment_entry_labelurl"
+                        android:textColor="@color/grey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/url"
+                        android:textSize="16sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <ImageButton
+                    android:id="@+id/open_url"
+                    android:src="@drawable/world"
+                    android:contentDescription="@string/fragment_entry_openurl"
+                    android:layout_weight="0.2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <!-- wrapper for username value and label -->
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:layout_weight="0.6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:text="@string/fragment_entry_labelusername"
+                        android:textColor="@color/grey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/username"
+                        android:textSize="16sp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <ImageButton
+                    android:id="@+id/toggle_username"
+                    android:src="@drawable/hideshow"
+                    android:contentDescription="@string/fragment_entry_hideshow"
+                    android:layout_weight="0.2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+            <ImageButton
+                    android:id="@+id/copy_username"
+                    android:src="@drawable/copy"
+                    android:contentDescription="@string/fragment_entry_copyusername"
+                    android:layout_weight="0.2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <!-- wrapper for password value and label -->
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:layout_weight="0.6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:text="@string/fragment_entry_labelpassword"
+                        android:textColor="@color/grey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/password"
+                        android:textSize="16sp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <ImageButton
+                    android:id="@+id/toggle_password"
+                    android:src="@drawable/hideshow"
+                    android:contentDescription="@string/fragment_entry_hideshow"
+                    android:layout_weight="0.2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+            <ImageButton
+                    android:id="@+id/copy_password"
+                    android:src="@drawable/copy"
+                    android:contentDescription="@string/fragment_entry_copypassword"
+                    android:layout_weight="0.2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/comment"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
     </LinearLayout>
-
-    <TextView
-            android:id="@+id/comment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
 </LinearLayout>

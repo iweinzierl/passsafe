@@ -12,4 +12,12 @@
     <string name="login_enterpassword">Bitte geben Sie ihr Passwort ein:</string>
     <string name="login_loginbutton">Einloggen</string>
     <string name="login_showpassword">Passwort anzeigen</string>
+
+    <string name="fragment_entry_hideshow">Anzeigen/Verstecken</string>
+    <string name="fragment_entry_copyusername">Benutzernamen kopieren</string>
+    <string name="fragment_entry_copypassword">Passwort kopieren</string>
+    <string name="fragment_entry_openurl">URL öffnen</string>
+    <string name="fragment_entry_labelurl">Webseite:</string>
+    <string name="fragment_entry_labelusername">Benutzer:</string>
+    <string name="fragment_entry_labelpassword">Passwort:</string>
 </resources>

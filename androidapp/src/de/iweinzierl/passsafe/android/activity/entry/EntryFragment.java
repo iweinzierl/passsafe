@@ -10,13 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.Button;
 import android.widget.TextView;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.android.exception.PassSafeSecurityException;
 import de.iweinzierl.passsafe.android.logging.Logger;
+import de.iweinzierl.passsafe.android.util.ColorUtils;
 import de.iweinzierl.passsafe.android.util.UiUtils;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 
@@ -38,6 +39,7 @@ public class EntryFragment extends Fragment {
         View parent = getView();
 
         if (entry != null) {
+            applyHeaderColor(parent, entry);
             applyTitle(parent, entry);
             applyCategory(parent, entry);
             applyUrl(parent, entry);
@@ -51,7 +53,7 @@ public class EntryFragment extends Fragment {
     }
 
     private void initToggleUsernameButton(final View parent, final Entry entry) {
-        Button button = UiUtils.getButton(parent, R.id.toggle_username);
+        View button = UiUtils.getButtonOrImageButton(parent, R.id.toggle_username);
         if (button != null) {
             button.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -63,7 +65,7 @@ public class EntryFragment extends Fragment {
     }
 
     private void initTogglePasswordButton(final View parent, final Entry entry) {
-        Button button = UiUtils.getButton(parent, R.id.toggle_password);
+        View button = UiUtils.getButtonOrImageButton(parent, R.id.toggle_password);
         if (button != null) {
             button.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -71,6 +73,13 @@ public class EntryFragment extends Fragment {
                         togglePassword(entry);
                     }
                 });
+        }
+    }
+
+    private void applyHeaderColor(final View parent, final Entry entry) {
+        View view = parent.findViewById(R.id.header);
+        if (view != null && entry.getCategory() instanceof DatabaseEntryCategory) {
+            view.setBackgroundColor(ColorUtils.colorById(((DatabaseEntryCategory) entry.getCategory()).getId()));
         }
     }
 
