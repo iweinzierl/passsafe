@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:background="@color/black"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textIsSelectable="false"
-            android:text="Categories"
-            />
+    <LinearLayout
+                  android:orientation="horizontal"
+                  android:background="@color/grey"
+                  android:padding="10dp"
+                  android:layout_marginBottom="1dp"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
 
-</LinearLayout>
+        <ImageView
+                android:src="@drawable/passsafe"
+                android:contentDescription="PassSafe Icon"
+                android:layout_marginRight="20dp"
+                android:layout_weight="0.7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:text="Categories"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textIsSelectable="false"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0.3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</FrameLayout>
