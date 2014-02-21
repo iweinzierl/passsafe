@@ -4,6 +4,8 @@ import java.util.List;
 
 import android.app.Activity;
 
+import android.content.Intent;
+
 import android.os.Bundle;
 
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +20,7 @@ import android.widget.SearchView;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.activity.addentry.AddEntryActivity;
 import de.iweinzierl.passsafe.android.activity.entry.EntryActivityIntent;
 import de.iweinzierl.passsafe.android.adapter.CategoryListAdapter;
 import de.iweinzierl.passsafe.android.data.DatabaseEntry;
@@ -101,6 +104,20 @@ public class ListActivity extends Activity implements ListFragment.Callback {
             });
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.add_entry :
+
+                startActivity(new Intent(this, AddEntryActivity.class));
+                return true;
+
+            default :
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

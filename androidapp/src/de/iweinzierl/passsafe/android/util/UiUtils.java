@@ -7,6 +7,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public final class UiUtils {
@@ -66,6 +67,16 @@ public final class UiUtils {
 
         if (view instanceof CheckBox) {
             return (CheckBox) view;
+        }
+
+        return null;
+    }
+
+    public static Spinner getSpinner(final View parent, final int resId) {
+        View view = parent.findViewById(resId);
+
+        if (view instanceof Spinner) {
+            return (Spinner) view;
         }
 
         return null;

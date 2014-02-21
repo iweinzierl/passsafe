@@ -4,6 +4,8 @@
     <string name="app_name">PassSafe4Android</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Suche</string>
+    <string name="action_addentry">Neuer Eintrag</string>
+
     <string name="hello_world">Hello world!</string>
 
     <string name="drawer_imagedescription">PassSafe Icon"</string>
@@ -29,4 +31,14 @@
     <string name="fragment_entry_hint_openurl">Öffnen der Webseite im Browser</string>
     <string name="fragment_entry_toast_copiedusername">Benutzer in die Zwischenablage kopiert.</string>
     <string name="fragment_entry_toast_copiedpassword">Passwort in die Zwischenablage kopiert.</string>
+
+    <string name="fragment_addentry_label_category">Kategorie: *</string>
+    <string name="fragment_addentry_label_title">Titel: *</string>
+    <string name="fragment_addentry_label_url">Webseite:</string>
+    <string name="fragment_addentry_label_username">Benutzer:</string>
+    <string name="fragment_addentry_label_password">Passwort: *</string>
+    <string name="fragment_addentry_label_verifypassword">Passwort bestätigen: *</string>
+    <string name="fragment_addentry_label_comment">Kommentar:</string>
+    <string name="fragment_addentry_label_requiredfields">* Pflichtfelder</string>
+    <string name="fragment_addentry_button_save">Speichern</string>
 </resources>

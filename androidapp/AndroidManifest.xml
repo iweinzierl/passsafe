@@ -26,9 +26,10 @@
                 android:label="@string/app_name"
                 android:exported="true">
 
-            <meta-data android:name="com.google.android.apps.drive.APP_ID" android:value="id=641661793300-7fkqs90b8d9j8p6nv45k2hjgjagtflsj.apps.googleusercontent.com"/>
+            <meta-data android:name="com.google.android.apps.drive.APP_ID"
+                       android:value="id=641661793300-7fkqs90b8d9j8p6nv45k2hjgjagtflsj.apps.googleusercontent.com"/>
 
-            <action android:name="com.google.android.apps.drive.DRIVE_OPEN" />
+            <action android:name="com.google.android.apps.drive.DRIVE_OPEN"/>
             <!-- optional
             <data android:mimeType="application/vnd.google-apps.drive-sdk.1234567890" />
             -->
@@ -44,8 +45,11 @@
         <activity
                 android:name=".activity.list.ListActivity"
                 android:label="@string/app_name"/>
-        
+
         <activity android:name=".activity.entry.EntryActivity"
+                  android:label="@string/app_name"/>
+
+        <activity android:name=".activity.addentry.AddEntryActivity"
                   android:label="@string/app_name"/>
 
     </application>
