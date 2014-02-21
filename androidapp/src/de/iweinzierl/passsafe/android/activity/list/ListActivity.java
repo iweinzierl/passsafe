@@ -86,6 +86,15 @@ public class ListActivity extends Activity implements ListFragment.Callback {
     }
 
     private void initializeCategoryList() {
+        View header = findViewById(R.id.drawer_header);
+        header.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    showAllEntries();
+                    categoryDrawer.closeDrawers();
+                }
+            });
+
         ListView categoryList = (ListView) findViewById(R.id.category_list);
         categoryList.setAdapter(new CategoryListAdapter(this,
                 ((PassSafeApplication) getApplication()).getRepository()));
