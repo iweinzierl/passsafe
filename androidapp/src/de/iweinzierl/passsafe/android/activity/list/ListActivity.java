@@ -4,13 +4,10 @@ import java.util.List;
 
 import android.app.Activity;
 
-import android.content.Context;
-
 import android.os.Bundle;
 
 import android.support.v4.widget.DrawerLayout;
 
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 
@@ -89,10 +86,7 @@ public class ListActivity extends Activity implements ListFragment.Callback {
     }
 
     private void initializeCategoryList() {
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         ListView categoryList = (ListView) findViewById(R.id.category_list);
-        categoryList.addHeaderView(layoutInflater.inflate(R.layout.category_drawer_header, null, false));
         categoryList.setAdapter(new CategoryListAdapter(this,
                 ((PassSafeApplication) getApplication()).getRepository()));
         categoryList.setOnItemClickListener(new DrawerClickListener());
