@@ -3,6 +3,8 @@ package de.iweinzierl.passsafe.android.data;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
@@ -26,9 +28,6 @@ public class SQLiteRepository {
     private static final String[] TABLE_ENTRY_COLUMNS = new String[] {
         "_id", "category_id", "title", "url", "username", "password", "comment"
     };
-
-    private static final String QUERY_ENTRIES_BY_CATEGORY =
-        "SELECT _id, category_id, title, url, username, password, comment WHERE category_id = %s";
 
     private static final String[] TABLE_CATEGORY_COLUMNS = new String[] {"_id", "title"};
 
@@ -56,6 +55,13 @@ public class SQLiteRepository {
             }
         } while (cursor.moveToNext());
 
+        Collections.sort(entries, new Comparator<Entry>() {
+                @Override
+                public int compare(final Entry a, final Entry b) {
+                    return a.getTitle().toLowerCase().compareTo(b.getTitle().toLowerCase());
+                }
+            });
+
         return entries;
     }
 
@@ -75,6 +81,13 @@ public class SQLiteRepository {
                 categories.add(category);
             }
         } while (cursor.moveToNext());
+
+        Collections.sort(categories, new Comparator<EntryCategory>() {
+                @Override
+                public int compare(final EntryCategory a, final EntryCategory b) {
+                    return a.getTitle().toLowerCase().compareTo(b.getTitle().toLowerCase());
+                }
+            });
 
         return categories;
     }
