@@ -90,6 +90,15 @@ public class EntryFragment extends Fragment {
                         toggleUsername(entry);
                     }
                 });
+
+            button.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(final View v) {
+                        Toast.makeText(getActivity(), R.string.fragment_entry_hint_toggleusername, Toast.LENGTH_SHORT)
+                             .show();
+                        return true;
+                    }
+                });
         }
     }
 
@@ -100,6 +109,15 @@ public class EntryFragment extends Fragment {
                     @Override
                     public void onClick(final View v) {
                         togglePassword(entry);
+                    }
+                });
+
+            button.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(final View v) {
+                        Toast.makeText(getActivity(), R.string.fragment_entry_hint_togglepassword, Toast.LENGTH_SHORT)
+                             .show();
+                        return true;
                     }
                 });
         }
@@ -114,6 +132,14 @@ public class EntryFragment extends Fragment {
                         if (callback != null) {
                             callback.onOpenUrl(entry.getUrl());
                         }
+                    }
+                });
+
+            button.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(final View v) {
+                        Toast.makeText(getActivity(), R.string.fragment_entry_hint_openurl, Toast.LENGTH_SHORT).show();
+                        return true;
                     }
                 });
         }
@@ -137,6 +163,15 @@ public class EntryFragment extends Fragment {
                         }
                     }
                 });
+
+            button.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(final View v) {
+                        Toast.makeText(getActivity(), R.string.fragment_entry_hint_copyusername, Toast.LENGTH_SHORT)
+                             .show();
+                        return true;
+                    }
+                });
         }
     }
 
@@ -156,6 +191,15 @@ public class EntryFragment extends Fragment {
                             Toast.makeText(getActivity(), R.string.fragment_entry_toast_copiedpassword,
                                 Toast.LENGTH_SHORT).show();
                         }
+                    }
+                });
+
+            button.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(final View v) {
+                        Toast.makeText(getActivity(), R.string.fragment_entry_hint_copypassword, Toast.LENGTH_SHORT)
+                             .show();
+                        return true;
                     }
                 });
         }
