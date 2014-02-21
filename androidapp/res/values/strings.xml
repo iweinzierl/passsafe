@@ -9,10 +9,9 @@
     <string name="drawer_imagedescription">PassSafe Icon"</string>
     <string name="drawer_title">Kategorien</string>
 
-    <string name="login_enterpassword">Bitte geben Sie ihr Passwort ein:</string>
-    <string name="login_loginbutton">Einloggen</string>
-    <string name="login_showpassword">Passwort anzeigen</string>
-
+    <string name="fragment_login_enterpassword">Bitte geben Sie ihr Passwort ein:</string>
+    <string name="fragment_login_loginbutton">Einloggen</string>
+    <string name="fragment_login_showpassword">Passwort anzeigen</string>
     <string name="fragment_login_apptitle">PassSafe 4 Android</string>
     <string name="fragment_login_appicon">PassSafe 4 Android Icon</string>
 
