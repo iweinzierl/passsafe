@@ -1,8 +1,15 @@
 package de.iweinzierl.passsafe.android.activity.entry;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Strings;
 
+import android.app.Activity;
 import android.app.Fragment;
+
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 
 import android.os.Bundle;
 
@@ -11,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
@@ -23,9 +31,17 @@ import de.iweinzierl.passsafe.shared.domain.Entry;
 
 public class EntryFragment extends Fragment {
 
+    public interface Callback {
+
+        void onOpenUrl(String url);
+    }
+
     private static final Logger LOGGER = new Logger("EntryFragment");
 
+    private static final String FAILURE_TEXT = "- failure -";
     private static final String DECRYPTED_VALUE_PLACEHOLDER = "**********";
+
+    private Callback callback;
 
     private boolean displayDecryptedUsername = false;
     private boolean displayDecryptedPassword = false;
@@ -33,6 +49,16 @@ public class EntryFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedState) {
         return inflater.inflate(R.layout.fragment_entry, container, false);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Activity activity = getActivity();
+        if (activity instanceof Callback) {
+            callback = (Callback) activity;
+        }
     }
 
     public void applyEntry(final Entry entry) {
@@ -49,6 +75,9 @@ public class EntryFragment extends Fragment {
 
             initToggleUsernameButton(parent, entry);
             initTogglePasswordButton(parent, entry);
+            initOpenUrlButton(parent, entry);
+            initCopyUsernameButton(parent, entry);
+            initCopyPasswordButton(parent, entry);
         }
     }
 
@@ -71,6 +100,62 @@ public class EntryFragment extends Fragment {
                     @Override
                     public void onClick(final View v) {
                         togglePassword(entry);
+                    }
+                });
+        }
+    }
+
+    private void initOpenUrlButton(final View parent, final Entry entry) {
+        View button = UiUtils.getButtonOrImageButton(parent, R.id.open_url);
+        if (button != null) {
+            button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        if (callback != null) {
+                            callback.onOpenUrl(entry.getUrl());
+                        }
+                    }
+                });
+        }
+    }
+
+    private void initCopyUsernameButton(final View parent, final Entry entry) {
+        View button = UiUtils.getButtonOrImageButton(parent, R.id.copy_username);
+        if (button != null) {
+            button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        String decryptedUsername = decrypt(entry, entry.getUsername());
+
+                        if (!StringUtils.equals(FAILURE_TEXT, decryptedUsername)) {
+                            ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(
+                                    Context.CLIPBOARD_SERVICE);
+                            clipboard.setPrimaryClip(ClipData.newPlainText("username", decryptedUsername));
+
+                            Toast.makeText(getActivity(), R.string.fragment_entry_toast_copiedusername,
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+        }
+    }
+
+    private void initCopyPasswordButton(final View parent, final Entry entry) {
+        View button = UiUtils.getButtonOrImageButton(parent, R.id.copy_password);
+        if (button != null) {
+            button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        String decryptedPassword = decrypt(entry, entry.getPassword());
+
+                        if (!StringUtils.equals(FAILURE_TEXT, decryptedPassword)) {
+                            ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(
+                                    Context.CLIPBOARD_SERVICE);
+                            clipboard.setPrimaryClip(ClipData.newPlainText("password", decryptedPassword));
+
+                            Toast.makeText(getActivity(), R.string.fragment_entry_toast_copiedpassword,
+                                Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
         }
@@ -140,7 +225,7 @@ public class EntryFragment extends Fragment {
             return application.getPasswordHandler().decrypt(encryptedValue);
         } catch (PassSafeSecurityException e) {
             LOGGER.error("Decryption of value failed entry:" + entry.getTitle());
-            return "- failure -";
+            return FAILURE_TEXT;
         }
     }
 }

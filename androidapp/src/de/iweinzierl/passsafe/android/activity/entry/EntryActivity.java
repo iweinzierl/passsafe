@@ -1,6 +1,12 @@
 package de.iweinzierl.passsafe.android.activity.entry;
 
+import com.google.common.base.Strings;
+
 import android.app.Activity;
+
+import android.content.Intent;
+
+import android.net.Uri;
 
 import android.os.Bundle;
 
@@ -10,7 +16,7 @@ import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 
-public class EntryActivity extends Activity {
+public class EntryActivity extends Activity implements EntryFragment.Callback {
 
     private static final Logger LOGGER = new Logger("EntryActivity");
 
@@ -34,6 +40,23 @@ public class EntryActivity extends Activity {
 
         Entry entry = getEntryById(entryId);
         entryFragment.applyEntry(entry);
+    }
+
+    @Override
+    public void onOpenUrl(final String url) {
+        if (!Strings.isNullOrEmpty(url)) {
+
+            Uri uriToOpen;
+
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                uriToOpen = Uri.parse("http://" + url);
+            } else {
+                uriToOpen = Uri.parse(url);
+            }
+
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, uriToOpen);
+            startActivity(browserIntent);
+        }
     }
 
     private int getEntryIdFromIntent() {
