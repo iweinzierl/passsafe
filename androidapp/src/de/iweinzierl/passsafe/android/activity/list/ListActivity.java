@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
@@ -28,6 +30,8 @@ import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 public class ListActivity extends Activity implements ListFragment.Callback {
 
     private static final Logger LOGGER = new Logger("ListActivity");
+
+    private SearchView searchView;
 
     private class DrawerClickListener implements ListView.OnItemClickListener {
 
@@ -68,8 +72,34 @@ public class ListActivity extends Activity implements ListFragment.Callback {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (searchView != null) {
+            filterEntries(searchView.getQuery().toString());
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.list, menu);
+
+        final MenuItem item = menu.findItem(R.id.search);
+        searchView = (SearchView) item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(final String searchText) {
+                    filterEntries(searchText);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(final String searchText) {
+                    filterEntries(searchText);
+                    return true;
+                }
+            });
+
         return true;
     }
 
@@ -127,10 +157,22 @@ public class ListActivity extends Activity implements ListFragment.Callback {
     protected void showAllEntries() {
         LOGGER.debug("> showAllEntries");
         getListFragment().showEntries(getEntriesFromBackend());
+
+        if (searchView != null) {
+            filterEntries(searchView.getQuery().toString());
+        }
     }
 
     protected void showCategory(final EntryCategory category) {
         LOGGER.debug(String.format("> showCategory(%s)", category.getTitle()));
         getListFragment().showEntries(getEntriesFromBackend(category));
+
+        if (searchView != null) {
+            filterEntries(searchView.getQuery().toString());
+        }
+    }
+
+    protected void filterEntries(final String filter) {
+        getListFragment().filterEntries(filter);
     }
 }

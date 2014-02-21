@@ -3,6 +3,7 @@
 
     <string name="app_name">PassSafe4Android</string>
     <string name="action_settings">Settings</string>
+    <string name="action_search">Suche</string>
     <string name="hello_world">Hello world!</string>
 
     <string name="drawer_imagedescription">PassSafe Icon"</string>

@@ -1,17 +1,22 @@
 package de.iweinzierl.passsafe.android.adapter;
 
-import android.content.Context;
-import android.widget.BaseAdapter;
-import com.google.common.base.Preconditions;
-
+import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import android.content.Context;
+
+import android.widget.BaseAdapter;
 
 public abstract class AbstractListAdapter<T> extends BaseAdapter {
 
+    private List<T> visibleItems;
     private List<T> items;
     private Context context;
 
-    public AbstractListAdapter(Context context, List<T> items) {
+    public AbstractListAdapter(final Context context, final List<T> items) {
         super();
 
         Preconditions.checkNotNull(context, "Context in AbstractListAdapter constructor may not be null.");
@@ -19,25 +24,39 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter {
 
         this.context = context;
         this.items = items;
+        this.visibleItems = new ArrayList<T>(items);
     }
+
+    protected abstract List<T> filter(List<T> items, String filter);
 
     @Override
     public int getCount() {
-        return items.size();
+        return visibleItems.size();
     }
 
     @Override
-    public T getItem(int position) {
+    public T getItem(final int position) {
         if (position < getCount()) {
-            return items.get(position);
+            return visibleItems.get(position);
         }
 
         return null;
     }
 
     @Override
-    public long getItemId(int position) {
+    public long getItemId(final int position) {
         return position;
+    }
+
+    public void filter(final String filter) {
+        if (Strings.isNullOrEmpty(filter)) {
+            visibleItems = new ArrayList<T>(items);
+            notifyDataSetChanged();
+            return;
+        }
+
+        visibleItems = filter(items, filter);
+        notifyDataSetChanged();
     }
 
     protected Context getContext() {

@@ -67,4 +67,9 @@ public class ListFragment extends Fragment {
                 }
             });
     }
+
+    public void filterEntries(final String filter) {
+        ListView entryList = UiUtils.getListView(getView(), R.id.entry_list);
+        ((EntryListAdapter) entryList.getAdapter()).filter(filter);
+    }
 }
