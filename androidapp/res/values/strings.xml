@@ -13,6 +13,9 @@
     <string name="login_loginbutton">Einloggen</string>
     <string name="login_showpassword">Passwort anzeigen</string>
 
+    <string name="fragment_login_apptitle">PassSafe 4 Android</string>
+    <string name="fragment_login_appicon">PassSafe 4 Android Icon</string>
+
     <string name="fragment_entry_hideshow">Anzeigen/Verstecken</string>
     <string name="fragment_entry_copyusername">Benutzernamen kopieren</string>
     <string name="fragment_entry_copypassword">Passwort kopieren</string>
