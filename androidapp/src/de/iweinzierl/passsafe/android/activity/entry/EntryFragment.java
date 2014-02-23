@@ -14,6 +14,9 @@ import android.content.Context;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -34,6 +37,8 @@ public class EntryFragment extends Fragment {
     public interface Callback {
 
         void onOpenUrl(String url);
+
+        void onRemoveEntry(Entry entry);
     }
 
     private static final Logger LOGGER = new Logger("EntryFragment");
@@ -43,12 +48,35 @@ public class EntryFragment extends Fragment {
 
     private Callback callback;
 
+    private Entry entry;
+
     private boolean displayDecryptedUsername = false;
     private boolean displayDecryptedPassword = false;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_entry, container, false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.entry, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == R.id.remove_entry) {
+
+            if (callback != null) {
+                callback.onRemoveEntry(entry);
+            }
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -62,6 +90,8 @@ public class EntryFragment extends Fragment {
     }
 
     public void applyEntry(final Entry entry) {
+        this.entry = entry;
+
         View parent = getView();
 
         if (entry != null) {

@@ -10,6 +10,8 @@ import android.net.Uri;
 
 import android.os.Bundle;
 
+import android.widget.Toast;
+
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
@@ -56,6 +58,17 @@ public class EntryActivity extends Activity implements EntryFragment.Callback {
 
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, uriToOpen);
             startActivity(browserIntent);
+        }
+    }
+
+    @Override
+    public void onRemoveEntry(final Entry entry) {
+        SQLiteRepository repository = ((PassSafeApplication) getApplication()).getRepository();
+        if (repository.delete(entry)) {
+            Toast.makeText(this, R.string.fragment_entry_toast_removalsuccessful, Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            Toast.makeText(this, R.string.fragment_entry_toast_removalfailed, Toast.LENGTH_SHORT).show();
         }
     }
 
