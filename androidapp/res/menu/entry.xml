@@ -7,4 +7,10 @@
             android:title="@string/action_removeentry"
             android:icon="@android:drawable/ic_menu_delete"
             android:showAsAction="ifRoom"/>
+
+    <item
+            android:id="@+id/edit_entry"
+            android:title="@string/action_editentry"
+            android:icon="@android:drawable/ic_menu_edit"
+            android:showAsAction="ifRoom"/>
 </menu>

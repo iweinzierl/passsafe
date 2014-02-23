@@ -48,6 +48,10 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter {
         return position;
     }
 
+    public int getPosition(final T category) {
+        return items.indexOf(category);
+    }
+
     public void remove(final T item) {
         items.remove(item);
         visibleItems.remove(item);

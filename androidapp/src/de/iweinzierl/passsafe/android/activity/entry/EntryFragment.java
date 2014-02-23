@@ -39,6 +39,8 @@ public class EntryFragment extends Fragment {
         void onOpenUrl(String url);
 
         void onRemoveEntry(Entry entry);
+
+        void onEditEntry(Entry entry);
     }
 
     private static final Logger LOGGER = new Logger("EntryFragment");
@@ -67,13 +69,23 @@ public class EntryFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        if (item.getItemId() == R.id.remove_entry) {
+        switch (item.getItemId()) {
 
-            if (callback != null) {
-                callback.onRemoveEntry(entry);
-            }
+            case R.id.remove_entry :
 
-            return true;
+                if (callback != null) {
+                    callback.onRemoveEntry(entry);
+                }
+
+                return true;
+
+            case R.id.edit_entry :
+
+                if (callback != null) {
+                    callback.onEditEntry(entry);
+                }
+
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

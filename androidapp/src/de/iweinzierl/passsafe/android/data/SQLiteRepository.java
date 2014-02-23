@@ -159,6 +159,24 @@ public class SQLiteRepository {
         }
     }
 
+    public Entry update(final Entry entry) {
+        openDatabaseIfNecessary();
+
+        int id = ((DatabaseEntry) entry).getId();
+
+        ContentValues values = new ContentValues();
+        values.put("category_id", ((DatabaseEntryCategory) entry.getCategory()).getId());
+        values.put("title", entry.getTitle());
+        values.put("url", entry.getUrl());
+        values.put("username", entry.getUsername());
+        values.put("password", entry.getPassword());
+        values.put("comment", entry.getComment());
+
+        int update = database.update(TABLE_ENTRY, values, "_id = ?", new String[] {String.valueOf(id)});
+
+        return update > 0 ? entry : null;
+    }
+
     public boolean delete(final Entry entry) {
         openDatabaseIfNecessary();
 

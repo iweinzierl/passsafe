@@ -23,6 +23,7 @@ import android.widget.Toast;
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.activity.addentry.AddEntryActivity;
+import de.iweinzierl.passsafe.android.activity.editentry.EditEntryIntent;
 import de.iweinzierl.passsafe.android.activity.entry.EntryActivityIntent;
 import de.iweinzierl.passsafe.android.adapter.CategoryListAdapter;
 import de.iweinzierl.passsafe.android.data.DatabaseEntry;
@@ -143,7 +144,13 @@ public class ListActivity extends Activity implements ListFragment.Callback {
 
     @Override
     public void onEntryEdit(final Entry entry) {
-        // TODO create activity to edit entry
+        int entryId = ((DatabaseEntry) entry).getId();
+        LOGGER.debug("Going to start EditEntryActivity with entry id: " + entryId);
+
+        EditEntryIntent i = new EditEntryIntent(this);
+        i.putEntryId(entryId);
+
+        startActivity(i);
     }
 
     @Override

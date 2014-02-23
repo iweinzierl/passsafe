@@ -6,6 +6,7 @@
     <string name="action_search">Suche</string>
     <string name="action_addentry">Neuer Eintrag</string>
     <string name="action_removeentry">Eintrag entfernen</string>
+    <string name="action_editentry">Eintrag bearbeiten</string>
 
     <string name="hello_world">Hello world!</string>
 
@@ -55,4 +56,7 @@
     <string name="fragment_addentry_error_passwordmissing">Sie müssen ein Passwort eingeben.</string>
     <string name="fragment_addentry_error_passwordverificationmissing">Sie müssen das Passwort zur Sicherheit bestätigen.</string>
     <string name="fragment_addentry_error_passwordverificationfailed">Die beiden Passwörter sind nicht gleich.</string>
+
+    <string name="fragment_editentry_updatesuccessful">Eintrag aktualisiert.</string>
+    <string name="fragment_editentry_updatefailed">Eintrag konnte nicht aktualisiert werden.</string>
 </resources>

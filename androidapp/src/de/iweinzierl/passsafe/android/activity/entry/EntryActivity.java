@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.activity.editentry.EditEntryIntent;
+import de.iweinzierl.passsafe.android.data.DatabaseEntry;
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.shared.domain.Entry;
@@ -70,6 +72,14 @@ public class EntryActivity extends Activity implements EntryFragment.Callback {
         } else {
             Toast.makeText(this, R.string.fragment_entry_toast_removalfailed, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onEditEntry(final Entry entry) {
+        EditEntryIntent i = new EditEntryIntent(this);
+        i.putEntryId(((DatabaseEntry) entry).getId());
+
+        startActivity(i);
     }
 
     private int getEntryIdFromIntent() {
