@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -77,6 +78,8 @@ public class ListActivity extends Activity implements ListFragment.Callback {
     @Override
     protected void onResume() {
         super.onResume();
+
+        updateCategories();
 
         if (searchView != null) {
             filterEntries(searchView.getQuery().toString());
@@ -142,7 +145,7 @@ public class ListActivity extends Activity implements ListFragment.Callback {
                 }
             });
 
-        ListView categoryList = (ListView) findViewById(R.id.category_list);
+        ListView categoryList = getCategoryList();
         categoryList.setAdapter(new CategoryListAdapter(this,
                 ((PassSafeApplication) getApplication()).getRepository()));
         categoryList.setOnItemClickListener(new DrawerClickListener());
@@ -186,6 +189,15 @@ public class ListActivity extends Activity implements ListFragment.Callback {
 
         if (searchView != null) {
             filterEntries(searchView.getQuery().toString());
+        }
+    }
+
+    protected void updateCategories() {
+        ListView categoryList = getCategoryList();
+        ListAdapter adapter = categoryList.getAdapter();
+
+        if (adapter instanceof CategoryListAdapter) {
+            ((CategoryListAdapter) adapter).notifyDataSetChanged();
         }
     }
 
