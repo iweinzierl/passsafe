@@ -41,4 +41,10 @@
     <string name="fragment_addentry_label_comment">Kommentar:</string>
     <string name="fragment_addentry_label_requiredfields">* Pflichtfelder</string>
     <string name="fragment_addentry_button_save">Speichern</string>
+    <string name="fragment_addentry_savedsuccessfully">Eintrag gespeichert.</string>
+    <string name="fragment_addentry_savefailed">Speichern fehlgeschlagen.</string>
+    <string name="fragment_addentry_error_titlemissing">Sie müssen einen Namen eingeben.</string>
+    <string name="fragment_addentry_error_passwordmissing">Sie müssen ein Passwort eingeben.</string>
+    <string name="fragment_addentry_error_passwordverificationmissing">Sie müssen das Passwort zur Sicherheit bestätigen.</string>
+    <string name="fragment_addentry_error_passwordverificationfailed">Die beiden Passwörter sind nicht gleich.</string>
 </resources>

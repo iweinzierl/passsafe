@@ -1,9 +1,5 @@
 package de.iweinzierl.passsafe.android.secure;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +9,10 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import de.iweinzierl.passsafe.android.exception.PassSafeSecurityException;
 import de.iweinzierl.passsafe.android.logging.Logger;
@@ -24,30 +24,29 @@ public class AesPasswordHandler implements PasswordHandler {
     private static final String KEY_ALGORITHM = "AES";
     private String secret;
 
-    public AesPasswordHandler(String secret) {
+    public AesPasswordHandler(final String secret) {
         this.secret = secret;
     }
 
-    private Key getSecretKey(String secret) {
+    private Key getSecretKey(final String secret) {
         return new SecretKeySpec(DigestUtils.md5(secret), KEY_ALGORITHM);
     }
 
     @Override
-    public String encrypt(String decrypted) throws PassSafeSecurityException {
+    public String encrypt(final String decrypted) throws PassSafeSecurityException {
         try {
 
             Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(secret));
 
             byte[] bytes = cipher.doFinal(decrypted.getBytes());
-            return Hex.encodeHexString(bytes);
+            return new String(Hex.encodeHex(bytes));
 
-        } catch (InvalidKeyException e) {
-        } catch (IllegalBlockSizeException e) {
-        } catch (BadPaddingException e) {
-        } catch (NoSuchAlgorithmException e) {
-        } catch (NoSuchPaddingException e) {
-        }
+        } catch (InvalidKeyException e) { }
+        catch (IllegalBlockSizeException e) { }
+        catch (BadPaddingException e) { }
+        catch (NoSuchAlgorithmException e) { }
+        catch (NoSuchPaddingException e) { }
 
         LOGGER.error("Unable to encrypt password");
 
@@ -55,7 +54,7 @@ public class AesPasswordHandler implements PasswordHandler {
     }
 
     @Override
-    public String decrypt(String encrypted) throws PassSafeSecurityException {
+    public String decrypt(final String encrypted) throws PassSafeSecurityException {
         try {
 
             Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
@@ -64,14 +63,12 @@ public class AesPasswordHandler implements PasswordHandler {
             byte[] bytes = cipher.doFinal(Hex.decodeHex(encrypted.toCharArray()));
             return new String(bytes);
 
-
-        } catch (InvalidKeyException e) {
-        } catch (IllegalBlockSizeException e) {
-        } catch (BadPaddingException e) {
-        } catch (NoSuchAlgorithmException e) {
-        } catch (NoSuchPaddingException e) {
-        } catch (DecoderException e) {
-        }
+        } catch (InvalidKeyException e) { }
+        catch (IllegalBlockSizeException e) { }
+        catch (BadPaddingException e) { }
+        catch (NoSuchAlgorithmException e) { }
+        catch (NoSuchPaddingException e) { }
+        catch (DecoderException e) { }
 
         LOGGER.error("Unable to decrypt password");
         throw new PassSafeSecurityException("Unable to decrypt password. See logfiles for further details.");

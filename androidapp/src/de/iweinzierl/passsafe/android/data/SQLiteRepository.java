@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.content.ContentValues;
 import android.content.Context;
 
 import android.database.Cursor;
@@ -136,6 +137,26 @@ public class SQLiteRepository {
         } while (cursor.moveToNext());
 
         return entries;
+    }
+
+    public Entry save(final Entry entry) {
+        openDatabaseIfNecessary();
+
+        ContentValues values = new ContentValues();
+        values.put("category_id", ((DatabaseEntryCategory) entry.getCategory()).getId());
+        values.put("title", entry.getTitle());
+        values.put("url", entry.getUrl());
+        values.put("username", entry.getUsername());
+        values.put("password", entry.getPassword());
+        values.put("comment", entry.getComment());
+
+        long id = database.insert(TABLE_ENTRY, null, values);
+
+        if (id > 0) {
+            return entry;
+        } else {
+            return null;
+        }
     }
 
     private void openDatabaseIfNecessary() {
