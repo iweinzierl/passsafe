@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
@@ -36,6 +37,7 @@ public class ListActivity extends Activity implements ListFragment.Callback {
     private static final Logger LOGGER = new Logger("ListActivity");
 
     private SearchView searchView;
+    private EntryCategory selectedCategory;
 
     private class DrawerClickListener implements ListView.OnItemClickListener {
 
@@ -80,6 +82,10 @@ public class ListActivity extends Activity implements ListFragment.Callback {
         super.onResume();
 
         updateCategories();
+
+        if (selectedCategory != null) {
+            showEntries(selectedCategory);
+        }
 
         if (searchView != null) {
             filterEntries(searchView.getQuery().toString());
@@ -135,6 +141,25 @@ public class ListActivity extends Activity implements ListFragment.Callback {
 
     }
 
+    @Override
+    public void onEntryEdit(final Entry entry) {
+        // TODO create activity to edit entry
+    }
+
+    @Override
+    public void onEntryDelete(final Entry entry) {
+        PassSafeApplication application = (PassSafeApplication) getApplication();
+        SQLiteRepository repository = application.getRepository();
+
+        if (repository.delete(entry)) {
+            Toast.makeText(this, R.string.fragment_entrylist_info_deletionsuccessful, Toast.LENGTH_SHORT).show();
+            getListFragment().remove(entry);
+            updateCategories();
+        } else {
+            Toast.makeText(this, R.string.fragment_entrylist_info_deletionfailed, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void initializeCategoryList() {
         View header = findViewById(R.id.drawer_header);
         header.setOnClickListener(new View.OnClickListener() {
@@ -176,6 +201,8 @@ public class ListActivity extends Activity implements ListFragment.Callback {
 
     protected void showAllEntries() {
         LOGGER.debug("> showAllEntries");
+        selectedCategory = null;
+
         getListFragment().showEntries(getEntriesFromBackend());
 
         if (searchView != null) {
@@ -184,6 +211,11 @@ public class ListActivity extends Activity implements ListFragment.Callback {
     }
 
     protected void showCategory(final EntryCategory category) {
+        selectedCategory = category;
+        showEntries(category);
+    }
+
+    protected void showEntries(final EntryCategory category) {
         LOGGER.debug(String.format("> showCategory(%s)", category.getTitle()));
         getListFragment().showEntries(getEntriesFromBackend(category));
 

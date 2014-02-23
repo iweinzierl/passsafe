@@ -159,6 +159,15 @@ public class SQLiteRepository {
         }
     }
 
+    public boolean delete(final Entry entry) {
+        openDatabaseIfNecessary();
+
+        DatabaseEntry dbEntry = (DatabaseEntry) entry;
+        int delete = database.delete(TABLE_ENTRY, "_id = ?", new String[] {String.valueOf(dbEntry.getId())});
+
+        return delete > 0;
+    }
+
     private void openDatabaseIfNecessary() {
         if (database == null || !database.isOpen()) {
             connect();

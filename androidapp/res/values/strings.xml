@@ -17,6 +17,11 @@
     <string name="fragment_login_apptitle">PassSafe 4 Android</string>
     <string name="fragment_login_appicon">PassSafe 4 Android Icon</string>
 
+    <string name="fragment_entrylist_contextmenu_edit">Editieren</string>
+    <string name="fragment_entrylist_contextmenu_delete">Entfernen</string>
+    <string name="fragment_entrylist_info_deletionsuccessful">Eintrag erfolgreich entfernt.</string>
+    <string name="fragment_entrylist_info_deletionfailed">Eintrag konnte nicht entfernt werden.</string>
+
     <string name="fragment_entry_hideshow">Anzeigen/Verstecken</string>
     <string name="fragment_entry_copyusername">Benutzernamen kopieren</string>
     <string name="fragment_entry_copypassword">Passwort kopieren</string>
@@ -45,6 +50,8 @@
     <string name="fragment_addentry_savefailed">Speichern fehlgeschlagen.</string>
     <string name="fragment_addentry_error_titlemissing">Sie müssen einen Namen eingeben.</string>
     <string name="fragment_addentry_error_passwordmissing">Sie müssen ein Passwort eingeben.</string>
-    <string name="fragment_addentry_error_passwordverificationmissing">Sie müssen das Passwort zur Sicherheit bestätigen.</string>
+    <string name="fragment_addentry_error_passwordverificationmissing">Sie müssen das Passwort zur Sicherheit
+        bestätigen.
+    </string>
     <string name="fragment_addentry_error_passwordverificationfailed">Die beiden Passwörter sind nicht gleich.</string>
 </resources>

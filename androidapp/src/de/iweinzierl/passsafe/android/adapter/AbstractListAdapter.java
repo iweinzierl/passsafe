@@ -48,6 +48,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter {
         return position;
     }
 
+    public void remove(final T item) {
+        items.remove(item);
+        visibleItems.remove(item);
+        notifyDataSetChanged();
+    }
+
     public void filter(final String filter) {
         if (Strings.isNullOrEmpty(filter)) {
             visibleItems = new ArrayList<T>(items);
