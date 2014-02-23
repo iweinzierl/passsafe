@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:title="@string/fragment_preferences_sync"
+            android:key="prefs_sync">
+
+        <CheckBoxPreference
+                android:id="@+id/prefs_sync_activation"
+                android:key="prefs_sync_activation"
+                android:defaultValue="false"
+                android:title="@string/fragment_preferences_sync_activation"/>
+
+        <CheckBoxPreference
+                android:id="@+id/prefs_sync_gdrive"
+                android:key="prefs_sync_gdrive"
+                android:defaultValue="false"
+                android:dependency="prefs_sync_activation"
+                android:title="@string/fragment_preferences_sync_gdrive"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

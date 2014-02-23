@@ -25,6 +25,7 @@ import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.activity.addentry.AddEntryActivity;
 import de.iweinzierl.passsafe.android.activity.editentry.EditEntryIntent;
 import de.iweinzierl.passsafe.android.activity.entry.EntryActivityIntent;
+import de.iweinzierl.passsafe.android.activity.settings.SettingsActivity;
 import de.iweinzierl.passsafe.android.adapter.CategoryListAdapter;
 import de.iweinzierl.passsafe.android.data.DatabaseEntry;
 import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
@@ -123,6 +124,11 @@ public class ListActivity extends Activity implements ListFragment.Callback {
             case R.id.add_entry :
 
                 startActivity(new Intent(this, AddEntryActivity.class));
+                return true;
+
+            case R.id.settings :
+
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
 
             default :

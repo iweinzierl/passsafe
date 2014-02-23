@@ -3,7 +3,7 @@
     <item
             android:id="@+id/add_entry"
             android:title="@string/action_addentry"
-            android:icon="@android:drawable/ic_input_add"
+            android:icon="@android:drawable/ic_menu_add"
             android:showAsAction="ifRoom"/>
 
     <item
@@ -14,7 +14,7 @@
             android:actionViewClass="android.widget.SearchView"/>
 
     <item
-            android:id="@+id/action_settings"
+            android:id="@+id/settings"
             android:title="@string/action_settings"
             android:orderInCategory="100"
             android:showAsAction="never"/>

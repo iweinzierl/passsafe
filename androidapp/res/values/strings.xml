@@ -8,6 +8,11 @@
     <string name="action_removeentry">Eintrag entfernen</string>
     <string name="action_editentry">Eintrag bearbeiten</string>
 
+    <string name="fragment_preferences_sync">Synchronisierung</string>
+    <string name="fragment_preferences_sync_activation">Synchronisierung einschalten</string>
+    <string name="fragment_preferences_sync_types">Storage für Synchronisierung</string>
+    <string name="fragment_preferences_sync_gdrive">GoogleDrive</string>
+
     <string name="hello_world">Hello world!</string>
 
     <string name="drawer_imagedescription">PassSafe Icon"</string>
