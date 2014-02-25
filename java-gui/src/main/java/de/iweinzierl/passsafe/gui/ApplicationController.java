@@ -161,6 +161,32 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         }
     }
 
+    public boolean verifyPassword() {
+        List<EntryCategory> categories = dataSource.getCategories();
+        if (categories == null || categories.isEmpty()) {
+            return true;
+        }
+
+        for (EntryCategory category : categories) {
+            List<Entry> entries = dataSource.getAllEntries(category);
+
+            if (entries == null || entries.isEmpty()) {
+                continue;
+            }
+
+            try {
+                passwordHandler.decrypt(entries.get(0).getPassword());
+                return true;
+
+            } catch (PassSafeSecurityException e) {
+                LOGGER.warn("Password verification failed!", e);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public PassSafeDataSource getDataSource() {
         return dataSource;
     }
