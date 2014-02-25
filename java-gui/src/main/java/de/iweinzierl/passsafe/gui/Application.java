@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import java.sql.SQLException;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
@@ -34,6 +35,7 @@ import de.iweinzierl.passsafe.gui.widget.Display;
 import de.iweinzierl.passsafe.gui.widget.EntryList;
 import de.iweinzierl.passsafe.gui.widget.EntryView;
 import de.iweinzierl.passsafe.gui.widget.StartupDialogBuilder;
+import de.iweinzierl.passsafe.gui.widget.SynchronizationDialog;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTable;
 import de.iweinzierl.passsafe.gui.widget.table.EntryTableModel;
 import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
@@ -93,6 +95,8 @@ public class Application extends JFrame {
             return;
         }
 
+        displaySynchronizationDialog();
+
         try {
             controller.requestSync();
 
@@ -105,6 +109,12 @@ public class Application extends JFrame {
 
         Application app = new Application(controller);
         setupUI(controller, app);
+    }
+
+    private static void displaySynchronizationDialog() {
+        JDialog dialog = new SynchronizationDialog();
+
+        UiUtils.center(dialog);
     }
 
     private static void setupUI(final ApplicationController controller, final Application app) {
