@@ -1,11 +1,13 @@
 package de.iweinzierl.passsafe.gui.widget;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 
 import de.iweinzierl.passsafe.gui.resources.Messages;
 
@@ -32,6 +34,15 @@ public class EnterPasswordPanel extends JPanel {
 
         public Builder withLabel(final String label) {
             panel.setLabel(label);
+            return this;
+        }
+
+        public Builder withErrorMessage(final String errorMessage) {
+            if (Strings.isNullOrEmpty(errorMessage)) {
+                return this;
+            }
+
+            panel.setErrorMessage(errorMessage);
             return this;
         }
 
@@ -63,6 +74,7 @@ public class EnterPasswordPanel extends JPanel {
 
     private String title;
     private String label;
+    private String errorMessage;
 
     public EnterPasswordPanel() { }
 
@@ -76,6 +88,10 @@ public class EnterPasswordPanel extends JPanel {
 
     public void setLabel(final String label) {
         this.label = label;
+    }
+
+    public void setErrorMessage(final String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     private void init() {
@@ -104,12 +120,16 @@ public class EnterPasswordPanel extends JPanel {
                 }
             });
 
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         add(WidgetFactory.createLabel(title, LABEL_WIDTH, LABEL_HEIGHT));
 
         add(WidgetFactory.createInputPanel(
                 WidgetFactory.createLabel(label, PASSWORD_LABEL_WIDTH, PASSWORD_LABEL_HEIGHT), passwordField));
+
+        if (!Strings.isNullOrEmpty(errorMessage)) {
+            add(WidgetFactory.createErrorLabel(errorMessage, LABEL_WIDTH, LABEL_HEIGHT));
+        }
 
         add(WidgetFactory.createButtonPanel(okButton, cancelButton));
     }

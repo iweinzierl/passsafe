@@ -1,8 +1,13 @@
 package de.iweinzierl.passsafe.gui.widget;
 
-import de.iweinzierl.passsafe.gui.resources.Images;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.event.ActionListener;
+
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -10,11 +15,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.event.ActionListener;
-import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.iweinzierl.passsafe.gui.resources.Images;
 
 public class WidgetFactory {
 
@@ -23,22 +28,22 @@ public class WidgetFactory {
     public static final int DEFAULT_ICON_WIDTH = 16;
     public static final int DEFAULT_ICON_HEIGHT = 16;
 
-    public static JButton createImageButton(String key) {
+    public static JButton createImageButton(final String key) {
         try {
             ImageIcon imageIcon = Images.getImageIcon(key);
             Image scaledInstance = imageIcon.getImage().getScaledInstance(DEFAULT_ICON_WIDTH, DEFAULT_ICON_HEIGHT,
                     Image.SCALE_SMOOTH);
 
-            JButton button = new JButton(new ImageIcon(scaledInstance));
+            return new JButton(new ImageIcon(scaledInstance));
 
-            return button;
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
             throw new RuntimeException("Unable to load icon '" + key + "'");
         }
     }
 
-    public static JComponent createComponent(Class<? extends JComponent> targetClass, int width, int height) {
+    public static JComponent createComponent(final Class<? extends JComponent> targetClass, final int width,
+            final int height) {
 
         try {
             JComponent jComponent = targetClass.newInstance();
@@ -53,32 +58,36 @@ public class WidgetFactory {
         return null;
     }
 
-    public static JLabel createLabel(String text, int width, int height) {
+    public static JLabel createLabel(final String text, final int width, final int height) {
         JLabel label = new JLabel(text);
         label.setPreferredSize(new Dimension(width, height));
 
         return label;
     }
 
-    public static JButton createButton(String text, int width, int height, ActionListener listener) {
+    public static Component createErrorLabel(final String errorMessage, final int width, final int height) {
+        JLabel label = createLabel(errorMessage, width, height);
+        label.setForeground(Color.RED);
+
+        return label;
+    }
+
+    public static JButton createButton(final String text, final int width, final int height,
+            final ActionListener listener) {
         JButton button = createButton(text, width, height);
         button.addActionListener(listener);
 
         return button;
     }
 
-    public static JButton createButton(String text, int width, int height) {
+    public static JButton createButton(final String text, final int width, final int height) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(width, height));
 
         return button;
     }
 
-    public static JPanel createInputPanel(String label, JTextField textField) {
-        return createInputPanel(label, textField);
-    }
-
-    public static JPanel createInputPanel(JLabel label, JTextField textField) {
+    public static JPanel createInputPanel(final JLabel label, final JTextField textField) {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
@@ -88,7 +97,7 @@ public class WidgetFactory {
         return panel;
     }
 
-    public static JPanel createButtonPanel(JButton... buttons) {
+    public static JPanel createButtonPanel(final JButton... buttons) {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 

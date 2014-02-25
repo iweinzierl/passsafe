@@ -19,8 +19,11 @@ public class StartupDialogBuilder {
     public static final int DIALOG_HEIGHT = 150;
 
     private ActionListener actionListener;
+    private String errorMessage;
 
-    public StartupDialogBuilder() { }
+    public StartupDialogBuilder(final String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 
     public StartupDialogBuilder setActionListener(final ActionListener actionListener) {
         this.actionListener = actionListener;
@@ -34,6 +37,7 @@ public class StartupDialogBuilder {
         EnterPasswordPanel enterPasswordPanel = new EnterPasswordPanel.Builder()
                 .withTitle(Messages.getMessage(Messages.CHANGEPASSWORD_PANEL_TITLE))
                 .withLabel(Messages.getMessage(Messages.CHANGEPASSWORD_PANEL_LABEL))
+                .withErrorMessage(errorMessage)
                 .withListener(new EnterPasswordPanel.ActionListener() {
                     @Override
                     public void submitted(final String password) {

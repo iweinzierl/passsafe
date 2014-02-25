@@ -58,10 +58,8 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
     private EntryView entryView;
     private ButtonBar buttonBar;
 
-    public ApplicationController(final Configuration configuration, final PasswordHandler passwordHandler,
-            final Sync sync) {
+    public ApplicationController(final Configuration configuration, final Sync sync) {
         this.configuration = configuration;
-        this.passwordHandler = passwordHandler;
         this.sync = sync;
         setupEventListeners();
     }
@@ -70,8 +68,16 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         return passwordHandler;
     }
 
+    public void setPasswordHandler(final PasswordHandler passwordHandler) {
+        this.passwordHandler = passwordHandler;
+    }
+
     public Application getApplication() {
         return application;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     @Override

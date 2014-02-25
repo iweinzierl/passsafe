@@ -55,43 +55,59 @@ public class Application extends JFrame {
         initializeLogging();
         initializeLookAndFeel();
 
-        new StartupDialogBuilder().setActionListener(new StartupDialogBuilder.ActionListener() {
-
-                                          @Override
-                                          public void submitted(final String password) {
-                                              try {
-                                                  start(password);
-                                              } catch (Exception e) {
-                                                  LOGGER.error("Unable to start PassSafe application", e);
-                                                  System.exit(1);
-                                              }
-                                          }
-
-                                          @Override
-                                          public void canceled() {
-                                              System.exit(1);
-                                          }
-                                      }).build();
-    }
-
-    private static void start(final String password) throws Exception {
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
-        ApplicationController controller = new ApplicationController(configuration, new AesPasswordHandler(password),
+        ApplicationController controller = new ApplicationController(configuration,
                 SyncFactory.createSync(configuration.getSyncType(), configuration));
-
-        try {
-            controller.requestSync();
-        } catch (IOException e) {
-            LOGGER.error("Unable to sync PassSafe storage with sync type '{}'", configuration.getSyncType());
-            UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
-        }
-
-        Application app = new Application(controller);
 
         PassSafeDataSource dataSource = new SqliteDataSource(configuration.getDatabase());
         controller.setDataSource(dataSource);
 
+        displayEnterPasswordDialog(controller, null);
+    }
+
+    private static void displayEnterPasswordDialog(final ApplicationController controller, final String errorMessage) {
+        new StartupDialogBuilder(errorMessage).setActionListener(new StartupDialogBuilder.ActionListener() {
+
+                                                      @Override
+                                                      public void submitted(final String password) {
+                                                          try {
+                                                              start(controller, password);
+                                                          } catch (Exception e) {
+                                                              LOGGER.error("Unable to start PassSafe application", e);
+                                                              System.exit(1);
+                                                          }
+                                                      }
+
+                                                      @Override
+                                                      public void canceled() {
+                                                          System.exit(1);
+                                                      }
+                                                  }).build();
+    }
+
+    private static void start(final ApplicationController controller, final String password) throws Exception {
+        controller.setPasswordHandler(new AesPasswordHandler(password));
+        if (!controller.verifyPassword()) {
+            displayEnterPasswordDialog(controller, Errors.getError(Errors.PASSWORD_VERIFICATION_FAILED));
+            return;
+        }
+
+        try {
+            controller.requestSync();
+
+        } catch (IOException e) {
+            LOGGER.error("Unable to sync PassSafe storage with sync type '{}'",
+                controller.getConfiguration().getSyncType());
+
+            UiUtils.displayError(null, Errors.getError(Errors.SYNC_FAILED));
+        }
+
+        Application app = new Application(controller);
+        setupUI(controller, app);
+    }
+
+    private static void setupUI(final ApplicationController controller, final Application app) {
         ButtonBar buttonBar = new ButtonBar(controller, app);
         EntryList entryList = EntryList.create(controller, app, controller.getDataSource());
         EntryTable entryTable = new EntryTable(controller, new EntryTableModel(), controller);
@@ -111,7 +127,7 @@ public class Application extends JFrame {
 
         try {
             app.initialize();
-            app.show();
+            app.setVisible(true);
 
         } catch (SQLException | ClassNotFoundException | IOException e) {
             LOGGER.error("Unable to initialize application", e);
@@ -146,7 +162,8 @@ public class Application extends JFrame {
                     break;
                 }
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {                                                         /* nothing to do */
+        }
     }
 
     private void initializeLayout() {
@@ -173,11 +190,8 @@ public class Application extends JFrame {
         manager.addKeyEventDispatcher(new KeyEventDispatcher() {
                 @Override
                 public boolean dispatchKeyEvent(final KeyEvent e) {
-                    if (e.isConsumed()) {
-                        return false;
-                    }
+                    return !e.isConsumed() && KeyStrokeHandler.getKeyStrokeHandler(controller).handle(e);
 
-                    return KeyStrokeHandler.getKeyStrokeHandler(controller).handle(e);
                 }
             });
     }
