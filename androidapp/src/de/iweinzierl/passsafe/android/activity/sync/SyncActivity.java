@@ -7,10 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.activity.list.ListActivityIntent;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.android.sync.gdrive.GoogleDriveSync;
 
-public class SyncActivity extends Activity {
+public class SyncActivity extends Activity implements GoogleDriveSync.Callback {
 
     public static final int GDRIVE_LOGIN_REQUEST = 1001;
 
@@ -44,6 +45,11 @@ public class SyncActivity extends Activity {
             default :
                 super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onSyncFinished() {
+        startActivity(new ListActivityIntent(this));
     }
 
     private void onGDriveLoginResult(final int resultCode, final Intent data) {

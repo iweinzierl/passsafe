@@ -33,12 +33,17 @@ import de.iweinzierl.passsafe.android.util.FileUtils;
 public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
     ResultCallback<DriveApi.MetadataBufferResult> {
 
+    public interface Callback {
+        void onSyncFinished();
+    }
+
     private static final Logger LOGGER = new Logger("GoogleDriveSync");
     private static final String PASSSAFE_DATABASE_FILE = "passsafe.sqlite";
 
     private final Activity activity;
     private final GoogleApiClient googleApiClient;
 
+    private Callback callback;
     private boolean syncRequested;
 
     public GoogleDriveSync(final Activity activity) {
@@ -52,6 +57,10 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
                 .addOnConnectionFailedListener(this)
                 .build();
         //J+
+
+        if (activity instanceof Callback) {
+            callback = (Callback) activity;
+        }
     }
 
     public void sync() {
@@ -124,6 +133,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
                 sync(metadataBuffer.get(0));
             } else {
                 LOGGER.warn("No files found for synchronization");
+                callback.onSyncFinished();
             }
         }
     }
@@ -139,6 +149,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
         } else if (isUploadRequired(dbFile, metadata)) {
             LOGGER.debug("Upload of database required");
             LOGGER.error("Upload currently not implemented");
+            callback.onSyncFinished();
         }
     }
 
@@ -191,6 +202,9 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
                         org.apache.commons.io.IOUtils.copy(in, out);
 
                         LOGGER.info(String.format("Download finished: %s bytes", dbFile.length()));
+
+                        callback.onSyncFinished();
+
                     } catch (IOException e) {
                         LOGGER.error("Unable to download database file", e);
                     }
