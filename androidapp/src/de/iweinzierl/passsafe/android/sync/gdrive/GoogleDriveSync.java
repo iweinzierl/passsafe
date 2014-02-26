@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.util.Date;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -14,6 +16,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.Metadata;
+import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.metadata.StringMetadataField;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
@@ -52,22 +55,23 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
     }
 
     public void sync() {
-        if (!googleApiClient.isConnected() && !googleApiClient.isConnected()) {
+        if (!googleApiClient.isConnected() && !googleApiClient.isConnecting()) {
             syncRequested = true;
             connect();
-        }
+        } else {
 
-        //J-
-        PendingResult<DriveApi.MetadataBufferResult> queryResult = Drive.DriveApi.query(googleApiClient,
+            //J-
+            PendingResult<DriveApi.MetadataBufferResult> queryResult = Drive.DriveApi.query(googleApiClient,
                 new Query.Builder()
                         .addFilter(
                                 Filters.and(
                                         Filters.eq(new StringMetadataField("title"), PASSSAFE_DATABASE_FILE),
                                         Filters.eq(new StringMetadataField("trashed"), "false")))
                         .build());
-        //J+
+            //J+
 
-        queryResult.setResultCallback(this);
+            queryResult.setResultCallback(this);
+        }
     }
 
     private void connect() {
@@ -111,8 +115,16 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
     public void onResult(final DriveApi.MetadataBufferResult result) {
         if (!result.getStatus().isSuccess()) {
             LOGGER.warn(String.format("Did not find a '%s' file in GoogleDrive account", PASSSAFE_DATABASE_FILE));
+
         } else {
-            sync(result.getMetadataBuffer().get(0));
+            MetadataBuffer metadataBuffer = result.getMetadataBuffer();
+
+            if (metadataBuffer.getCount() > 0) {
+                LOGGER.debug("Found " + metadataBuffer.getCount() + " results for search");
+                sync(metadataBuffer.get(0));
+            } else {
+                LOGGER.warn("No files found for synchronization");
+            }
         }
     }
 
@@ -137,6 +149,10 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks, Goo
 
         long dbFileLastModified = dbFile.lastModified();
         long onlineLastModified = metadata.getModifiedDate().getTime();
+
+        LOGGER.debug("Current local time:       " + new Date(System.currentTimeMillis()));
+        LOGGER.debug("Last local  modification: " + new Date(dbFileLastModified));
+        LOGGER.debug("Last online modification: " + new Date(onlineLastModified));
 
         return onlineLastModified > dbFileLastModified;
     }

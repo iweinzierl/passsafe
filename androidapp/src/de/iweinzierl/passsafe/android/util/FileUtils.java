@@ -24,7 +24,13 @@ public final class FileUtils {
     }
 
     public static File getDatabaseFile(final Context context) {
-        File dataDir = getDataDir(context);
-        return new File(dataDir, DB_FILE);
+        File dbFile = context.getDatabasePath(DB_FILE);
+        File dir = dbFile.getParentFile();
+
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+
+        return dbFile;
     }
 }

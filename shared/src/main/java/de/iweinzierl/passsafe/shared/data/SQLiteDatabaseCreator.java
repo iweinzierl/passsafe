@@ -4,6 +4,11 @@ import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 
 public class SQLiteDatabaseCreator {
 
+    public enum OS {
+        DESKTOP,
+        ANDROID
+    }
+
     public static interface SQLiteCommandExecutor {
         boolean execute(String sql) throws PassSafeSqlException;
     }
@@ -16,10 +21,12 @@ public class SQLiteDatabaseCreator {
             + "  password TEXT NOT NULL, " + "  comment  TEXT, "
             + "  FOREIGN KEY (category_id) REFERENCES category(_id)" + ");";
 
-    private SQLiteCommandExecutor commandExecutor;
+    private final SQLiteCommandExecutor commandExecutor;
+    private final OS os;
 
-    public SQLiteDatabaseCreator(final SQLiteCommandExecutor commandExecutor) {
+    public SQLiteDatabaseCreator(final SQLiteCommandExecutor commandExecutor, final OS os) {
         this.commandExecutor = commandExecutor;
+        this.os = os;
     }
 
     public void setup() throws PassSafeSqlException {

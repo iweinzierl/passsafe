@@ -100,7 +100,7 @@ public class SqliteDataSource implements PassSafeDataSource {
                                 throw new PassSafeSqlException(e.getMessage(), e.getCause());
                             }
                         }
-                    }).setup();
+                    }, SQLiteDatabaseCreator.OS.DESKTOP).setup();
             } catch (PassSafeSqlException e) {
                 db.delete();
                 throw e;
