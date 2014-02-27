@@ -9,10 +9,6 @@ public class SQLiteDatabaseCreator {
         ANDROID
     }
 
-    public static interface SQLiteCommandExecutor {
-        boolean execute(String sql) throws PassSafeSqlException;
-    }
-
     public static final String SQL_CREATE_CATEGORY = "CREATE TABLE category ("
             + "  _id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, last_modified TEXT NOT NULL);";
 

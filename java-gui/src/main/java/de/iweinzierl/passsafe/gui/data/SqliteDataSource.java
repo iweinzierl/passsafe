@@ -23,6 +23,7 @@ import com.google.common.collect.Multimap;
 
 import de.iweinzierl.passsafe.shared.data.DataSourceChangedListener;
 import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
+import de.iweinzierl.passsafe.shared.data.SQLiteCommandExecutor;
 import de.iweinzierl.passsafe.shared.data.SQLiteDatabaseCreator;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
@@ -87,7 +88,7 @@ public class SqliteDataSource implements PassSafeDataSource {
             LOGGER.info("SQLite database is new. Initialize now...");
 
             try {
-                new SQLiteDatabaseCreator(new SQLiteDatabaseCreator.SQLiteCommandExecutor() {
+                new SQLiteDatabaseCreator(new SQLiteCommandExecutor() {
                         @Override
                         public boolean execute(final String sql) throws PassSafeSqlException {
                             try {
