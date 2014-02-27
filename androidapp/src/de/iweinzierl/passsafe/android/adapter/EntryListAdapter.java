@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import de.iweinzierl.passsafe.android.R;
-import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.android.util.ColorUtils;
 import de.iweinzierl.passsafe.android.util.UiUtils;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 

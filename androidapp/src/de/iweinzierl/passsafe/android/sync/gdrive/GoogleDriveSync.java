@@ -10,6 +10,7 @@ import android.content.IntentSender;
 
 import android.os.Bundle;
 
+import de.iweinzierl.passsafe.android.data.DatabaseSyncProcessor;
 import de.iweinzierl.passsafe.android.logging.Logger;
 
 public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
@@ -92,7 +93,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
 
             case DATABASE_SYNC_REQUESTED :
 
-                // TODO
+                new DatabaseSyncProcessor(activity, this).sync();
                 callback.onSyncFinished();
                 break;
 

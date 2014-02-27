@@ -19,6 +19,7 @@ import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.android.sync.gdrive.GoogleDriveSync;
 import de.iweinzierl.passsafe.android.util.UiUtils;
+import de.iweinzierl.passsafe.shared.data.SQLiteCommandExecutor;
 import de.iweinzierl.passsafe.shared.data.SQLiteDatabaseCreator;
 import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 
@@ -82,8 +83,7 @@ public class FirstAppStartDialog {
                 public void onCreate(final SQLiteDatabase db) {
 
                     try {
-                        final SQLiteDatabaseCreator creator = new SQLiteDatabaseCreator(
-                                new SQLiteDatabaseCreator.SQLiteCommandExecutor() {
+                        final SQLiteDatabaseCreator creator = new SQLiteDatabaseCreator(new SQLiteCommandExecutor() {
                                     @Override
                                     public boolean execute(final String sql) throws PassSafeSqlException {
                                         db.execSQL(sql);

@@ -15,9 +15,9 @@ import android.widget.Toast;
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.activity.editentry.EditEntryIntent;
-import de.iweinzierl.passsafe.android.data.DatabaseEntry;
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntry;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 
 public class EntryActivity extends Activity implements EntryFragment.Callback {

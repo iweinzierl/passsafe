@@ -25,11 +25,11 @@ import android.widget.Toast;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
-import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.android.exception.PassSafeSecurityException;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.android.util.ColorUtils;
 import de.iweinzierl.passsafe.android.util.UiUtils;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 
 public class EntryFragment extends Fragment {

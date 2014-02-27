@@ -15,7 +15,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import de.iweinzierl.passsafe.android.logging.Logger;
-import de.iweinzierl.passsafe.android.util.FileUtils;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntry;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
@@ -33,10 +34,13 @@ public class SQLiteRepository {
     private static final String[] TABLE_CATEGORY_COLUMNS = new String[] {"_id", "title"};
 
     private Context context;
+
+    private File databaseFile;
     private SQLiteDatabase database;
 
-    public SQLiteRepository(final Context context) {
+    public SQLiteRepository(final Context context, final File databaseFile) {
         this.context = context;
+        this.databaseFile = databaseFile;
     }
 
     public List<Entry> listEntries() {
@@ -193,13 +197,8 @@ public class SQLiteRepository {
     }
 
     private void connect() {
-        database = SQLiteDatabase.openDatabase(getDatabaseFilePath(), null, SQLiteDatabase.OPEN_READWRITE);
+        database = SQLiteDatabase.openDatabase(databaseFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
         LOGGER.info("Connection to database ");
-    }
-
-    private String getDatabaseFilePath() {
-        File databaseFile = FileUtils.getDatabaseFile(context);
-        return databaseFile.getAbsolutePath();
     }
 
     private Entry newEntryFromCursor(final Cursor cursor) {
@@ -221,6 +220,5 @@ public class SQLiteRepository {
                 .withId(cursor.getInt(0))
                 .withTitle(cursor.getString(1)).build();
         //J+
-
     }
 }

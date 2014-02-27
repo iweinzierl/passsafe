@@ -27,10 +27,10 @@ import de.iweinzierl.passsafe.android.activity.editentry.EditEntryIntent;
 import de.iweinzierl.passsafe.android.activity.entry.EntryActivityIntent;
 import de.iweinzierl.passsafe.android.activity.settings.SettingsActivity;
 import de.iweinzierl.passsafe.android.adapter.CategoryListAdapter;
-import de.iweinzierl.passsafe.android.data.DatabaseEntry;
-import de.iweinzierl.passsafe.android.data.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntry;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
