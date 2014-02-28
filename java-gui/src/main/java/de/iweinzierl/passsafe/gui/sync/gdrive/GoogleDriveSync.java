@@ -35,7 +35,8 @@ public class GoogleDriveSync implements Sync {
         DOWNLOAD_FINISHED,
         DOWNLOAD_FAILED,
         UPLOAD_REQUIRED,
-        UPLOAD_FAILED
+        UPLOAD_FAILED,
+        SYNC_FINISHED
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleDriveSync.class);
@@ -107,6 +108,10 @@ public class GoogleDriveSync implements Sync {
 
                 // TODO display somehow a dialog to inform the user
                 break;
+
+            case SYNC_FINISHED :
+                deleteTempDatabase();
+                break;
         }
     }
 
@@ -133,9 +138,7 @@ public class GoogleDriveSync implements Sync {
             SqliteDataSource localDatasource = new SqliteDataSource(localDb.getAbsolutePath());
             SqliteDataSource tempDatasource = new SqliteDataSource(tempDb.getAbsolutePath());
 
-            if (new DatabaseSyncProcessor(localDatasource, tempDatasource).sync()) {
-                onStateChanged(State.UPLOAD_REQUIRED);
-            }
+            new DatabaseSyncProcessor(this, localDatasource, tempDatasource).sync();
 
         } catch (SQLException | ClassNotFoundException | IOException | PassSafeSqlException e) {
             LOGGER.error("Unable to synchronize databases", e);
@@ -147,11 +150,14 @@ public class GoogleDriveSync implements Sync {
     }
 
     private void startUpload() {
-        try {
-            new GoogleDriveUpload(this, configuration, client).upload(localDatabase);
-        } catch (IOException e) {
-            LOGGER.error("Unable to upload local database file", e);
-            onStateChanged(State.UPLOAD_FAILED);
+        new GoogleDriveUpload(this, client).upload(localDatabase);
+    }
+
+    private void deleteTempDatabase() {
+        if (tempDatabase.exists()) {
+            if (!tempDatabase.delete()) {
+                LOGGER.warn("Unable to delete temporary database file downloaded for synchronization");
+            }
         }
     }
 }

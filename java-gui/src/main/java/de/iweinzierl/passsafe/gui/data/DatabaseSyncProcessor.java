@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.iweinzierl.passsafe.gui.sync.gdrive.GoogleDriveSync;
 import de.iweinzierl.passsafe.shared.data.DatabaseData;
 import de.iweinzierl.passsafe.shared.data.DatabaseSyncHelper;
 import de.iweinzierl.passsafe.shared.domain.DatabaseEntry;
@@ -18,10 +19,13 @@ public class DatabaseSyncProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSyncProcessor.class);
 
+    private final GoogleDriveSync googleDriveSync;
     private final SqliteDataSource localDatasource;
     private final SqliteDataSource onlineDatasource;
 
-    public DatabaseSyncProcessor(final SqliteDataSource localDatasource, final SqliteDataSource onlineDatasource) {
+    public DatabaseSyncProcessor(final GoogleDriveSync googleDriveSync, final SqliteDataSource localDatasource,
+            final SqliteDataSource onlineDatasource) {
+        this.googleDriveSync = googleDriveSync;
         this.localDatasource = localDatasource;
         this.onlineDatasource = onlineDatasource;
     }
@@ -44,7 +48,15 @@ public class DatabaseSyncProcessor {
             updateSynchronizationDate();
         }
 
-        return helper.isUploadRequired();
+        boolean uploadRequired = helper.isUploadRequired();
+
+        if (uploadRequired) {
+            googleDriveSync.onStateChanged(GoogleDriveSync.State.UPLOAD_REQUIRED);
+        }
+
+        googleDriveSync.onStateChanged(GoogleDriveSync.State.SYNC_FINISHED);
+
+        return uploadRequired;
     }
 
     /**

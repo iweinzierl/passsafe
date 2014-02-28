@@ -25,7 +25,7 @@ public class SQLiteDatabaseCreator {
         "CREATE TABLE passsafe_metadata (_id INTEGER PRIMARY KEY AUTOINCREMENT, meta_key TEXT NOT NULL, value TEXT NOT NULL);";
 
     public static final String SQL_INSERT_PASSSAFE_METADATA =
-        "INSERT INTO passsafe_metadata (meta_key, value) VALUES ('sync.timestamp', '01.01.2000 00:00:00');";
+        "INSERT INTO passsafe_metadata (meta_key, value) VALUES ('sync.timestamp', '2000-01-01 00:00:00');";
 
     private final SQLiteCommandExecutor commandExecutor;
     private final OS os;
