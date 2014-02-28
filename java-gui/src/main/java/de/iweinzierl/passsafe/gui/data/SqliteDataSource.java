@@ -33,6 +33,12 @@ import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 
 public class SqliteDataSource implements PassSafeDataSource {
 
+    public static final String SQL_UPDATE_SYNCHRONIZATION_TIMESTAMP =
+        "UPDATE passsafe_metadata SET value = ? WHERE meta_key = ?";
+
+    public static final String SQL_QUERY_SYNCHRONIZATION_TIMESTAMP =
+        "SELECT value FROM passsafe_metadata WHERE meta_key = ?";
+
     public static final String SQL_LOAD_CATEGORIES =
         "SELECT \"_id\", title, last_modified FROM category ORDER BY title";
 
@@ -49,7 +55,7 @@ public class SqliteDataSource implements PassSafeDataSource {
 
     public static final String SQL_FIND_ENTRY_ID = "SELECT \"_id\" FROM entry WHERE title = ?";
 
-    public static final String SQL_INSERT_CATEGORY = "INSERT INTO category (title) VALUES (?)";
+    public static final String SQL_INSERT_CATEGORY = "INSERT INTO category (title, last_modified) VALUES (?, ?)";
 
     public static final String SQL_REMOVE_CATEGORY = "DELETE FROM category WHERE \"_id\" = ?";
 
@@ -177,6 +183,55 @@ public class SqliteDataSource implements PassSafeDataSource {
             if (((DatabaseEntryCategory) category).getId() == id) {
                 return category;
             }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void updateSynchronizationDate() {
+        try {
+            if (conn.isReadOnly()) {
+                LOGGER.error("Database is read-only!");
+                return;
+            }
+
+            PreparedStatement statement = conn.prepareStatement(SQL_UPDATE_SYNCHRONIZATION_TIMESTAMP);
+            statement.setString(1, DateUtils.formatDatabaseDate(new Date()));
+            statement.setString(2, METADATA_SYNCHRONIZATION_TIMESTAMP);
+
+            int i = statement.executeUpdate();
+
+            if (i <= 0) {
+                LOGGER.error("Update of synchronization timestamp failed");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Update of synchronization timestamp failed");
+        }
+    }
+
+    @Override
+    public Date getLastSynchronizationDate() {
+        try {
+            if (conn.isReadOnly()) {
+                LOGGER.error("Database is read-only!");
+                return null;
+            }
+
+            PreparedStatement statement = conn.prepareStatement(SQL_QUERY_SYNCHRONIZATION_TIMESTAMP);
+            statement.setString(1, METADATA_SYNCHRONIZATION_TIMESTAMP);
+
+            ResultSet result = statement.executeQuery();
+            if (result != null) {
+                String rawDate = result.getString(1);
+                return DateUtils.parseDatabaseDate(rawDate);
+            } else {
+                LOGGER.error("Did not find a metadata row for '{}' to determine last synchronization timestamp",
+                    METADATA_SYNCHRONIZATION_TIMESTAMP);
+            }
+
+        } catch (SQLException e) {
+            LOGGER.error("Unable to determine synchronization timestamp");
         }
 
         return null;
@@ -359,6 +414,7 @@ public class SqliteDataSource implements PassSafeDataSource {
         try {
             PreparedStatement addCategory = conn.prepareStatement(SQL_INSERT_CATEGORY);
             addCategory.setString(1, category.getTitle());
+            addCategory.setString(2, DateUtils.formatDatabaseDate(new Date()));
             addCategory.executeUpdate();
 
             ResultSet generatedKeys = addCategory.getGeneratedKeys();

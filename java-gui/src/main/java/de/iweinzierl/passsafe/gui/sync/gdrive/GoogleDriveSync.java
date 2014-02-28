@@ -95,14 +95,8 @@ public class GoogleDriveSync implements Sync {
                 break;
 
             case DOWNLOAD_FAILED :
-                try {
 
-                    // TODO display somehow a dialog to inform the user
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+                // TODO display somehow a dialog to inform the user
                 break;
 
             case UPLOAD_REQUIRED :
@@ -110,14 +104,8 @@ public class GoogleDriveSync implements Sync {
                 break;
 
             case UPLOAD_FAILED :
-                try {
 
-                    // TODO display somehow a dialog to inform the user
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+                // TODO display somehow a dialog to inform the user
                 break;
         }
     }

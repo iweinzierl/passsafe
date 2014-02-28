@@ -2,7 +2,6 @@ package de.iweinzierl.passsafe.gui.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -37,35 +36,73 @@ public class DatabaseSyncProcessor {
         DatabaseSyncHelper helper = new DatabaseSyncHelper(getDatabaseData(localDatasource),
                 getDatabaseData(onlineDatasource));
 
-        updateExistingEntries(helper.getEntriesWithRequiredUpdate());
-        insertEntries(helper.getNewEntries());
-        removeEntries(helper.getRemovedEntries());
+        boolean updated = updateExistingEntries(helper.getEntriesWithRequiredUpdate());
+        boolean inserted = insertEntries(helper.getNewEntries());
+        boolean removed = removeEntries(helper.getRemovedEntries());
+
+        if (updated || inserted || removed) {
+            updateSynchronizationDate();
+        }
 
         return helper.isUploadRequired();
     }
 
-    private void updateExistingEntries(final List<DatabaseEntry> entriesWithRequiredUpdate) {
+    /**
+     * Update existing entries with the information in the <i>entriesWithRequiredUpdate</i> list.
+     *
+     * @param   entriesWithRequiredUpdate  The updated entries that must be persisted to local database.
+     *
+     * @return  true if local entries were updated, otherwise false.
+     */
+    private boolean updateExistingEntries(final List<DatabaseEntry> entriesWithRequiredUpdate) {
         LOGGER.info("Found {} entries that need to be updated", entriesWithRequiredUpdate.size());
 
         for (DatabaseEntry entry : entriesWithRequiredUpdate) {
             localDatasource.updateEntry(entry);
         }
+
+        return !entriesWithRequiredUpdate.isEmpty();
     }
 
-    private void insertEntries(final List<DatabaseEntry> newEntries) {
+    /**
+     * Insert new entries into local database.
+     *
+     * @param   newEntries  The new entries that must be inserted into local database.
+     *
+     * @return  true if local entries were inserted, otherwise false.
+     */
+    private boolean insertEntries(final List<DatabaseEntry> newEntries) {
         LOGGER.info("Found {} entries that need to be inserted", newEntries.size());
 
         for (DatabaseEntry entry : newEntries) {
             localDatasource.addEntry(entry.getCategory(), entry);
         }
+
+        return !newEntries.isEmpty();
     }
 
-    private void removeEntries(final List<DatabaseEntry> removedEntries) {
+    /**
+     * Remove all entries contained in the <i>removedEntries</i> list.
+     *
+     * @param   removedEntries  The entries that must be removed from local database.
+     *
+     * @return  true if local entries were removed, otherwise false.
+     */
+    private boolean removeEntries(final List<DatabaseEntry> removedEntries) {
         LOGGER.info("Found {} entries that need to be removed", removedEntries.size());
 
         for (DatabaseEntry entry : removedEntries) {
             localDatasource.removeEntry(entry);
         }
+
+        return !removedEntries.isEmpty();
+    }
+
+    /**
+     * Update the synchronization date in the passsafe_metadata table to the current date time.
+     */
+    private void updateSynchronizationDate() {
+        localDatasource.updateSynchronizationDate();
     }
 
     private static DatabaseData getDatabaseData(final SqliteDataSource dataSource) {
@@ -80,7 +117,7 @@ public class DatabaseSyncProcessor {
             databaseEntries.addAll(getDatabaseEntries(dataSource, category));
         }
 
-        return new DatabaseData(new Date(), databaseEntries, databaseCategories);
+        return new DatabaseData(dataSource.getLastSynchronizationDate(), databaseEntries, databaseCategories);
     }
 
     private static Collection<DatabaseEntry> getDatabaseEntries(final SqliteDataSource dataSource,

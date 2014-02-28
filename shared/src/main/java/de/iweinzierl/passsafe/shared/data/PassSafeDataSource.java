@@ -1,11 +1,18 @@
 package de.iweinzierl.passsafe.shared.data;
 
+import java.util.Date;
 import java.util.List;
 
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 
 public interface PassSafeDataSource {
+
+    String METADATA_SYNCHRONIZATION_TIMESTAMP = "sync.timestamp";
+
+    void updateSynchronizationDate();
+
+    Date getLastSynchronizationDate();
 
     int getItemCount(EntryCategory category);
 
