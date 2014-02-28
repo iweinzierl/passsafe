@@ -143,7 +143,7 @@ public class GoogleDriveSync implements Sync {
     }
 
     private void startDownload() {
-        new GoogleDriveDownload(this, configuration, client).download(localDatabase.getName(), tempDatabase);
+        new GoogleDriveDownload(this, client).download(localDatabase.getName(), tempDatabase);
     }
 
     private void startUpload() {
