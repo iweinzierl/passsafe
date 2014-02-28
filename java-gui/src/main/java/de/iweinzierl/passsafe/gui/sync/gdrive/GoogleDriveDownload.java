@@ -37,7 +37,7 @@ public class GoogleDriveDownload {
         this.client = client;
     }
 
-    public void download(final String filename) {
+    public void download(final String filename, final java.io.File destination) {
         try {
             File online = find(filename);
             java.io.File local = getLocalFile(filename);
@@ -50,14 +50,15 @@ public class GoogleDriveDownload {
             if (onlineModificationTime > localModificationDate) {
                 long diff = onlineModificationTime - localModificationDate;
                 LOGGER.info("File '{}' needs to be downloaded from GoogleDrive: {} sec younger", filename, diff / 1000);
-                download(online);
+                download(online, destination);
             } else {
                 long diff = localModificationDate - onlineModificationTime;
                 LOGGER.info("File '{}' needs to be uploaded to GoogleDrive: {} sec younger", filename, diff / 1000);
-                googleDriveSync.uploadRequired(local, online);
+                googleDriveSync.onStateChanged(GoogleDriveSync.State.UPLOAD_REQUIRED);
             }
         } catch (IOException ioe) {
             LOGGER.error("Downloading of file {} failed", filename, ioe);
+            googleDriveSync.onStateChanged(GoogleDriveSync.State.DOWNLOAD_FAILED);
         }
     }
 
@@ -99,14 +100,12 @@ public class GoogleDriveDownload {
         return file.exists() ? file.lastModified() : 0;
     }
 
-    private void download(final File file) throws IOException {
-        java.io.File output = new java.io.File(configuration.getBaseFolder(), file.getTitle());
-
-        LOGGER.info("Download '{}' to '{}'", file.getTitle(), output.getAbsoluteFile());
+    private void download(final File file, final java.io.File destination) throws IOException {
+        LOGGER.info("Download '{}' to '{}'", file.getTitle(), destination.getAbsoluteFile());
 
         HttpRequest request = client.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()));
         HttpResponse response = request.execute();
 
-        IOUtils.copy(response.getContent(), new FileOutputStream(output));
+        IOUtils.copy(response.getContent(), new FileOutputStream(destination));
     }
 }

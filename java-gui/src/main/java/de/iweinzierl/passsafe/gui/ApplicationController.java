@@ -204,7 +204,7 @@ public class ApplicationController implements NewEntryDialog.OnEntryAddedListene
         }
 
         File dataSource = new File(configuration.getDatabase());
-        sync.sync(dataSource.getName());
+        sync.sync();
 
         LOGGER.info("Successfully synchronized data source '{}'", dataSource);
     }

@@ -14,14 +14,11 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.googleapis.media.MediaHttpUploader;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveRequest;
 import com.google.api.services.drive.DriveScopes;
 
 import de.iweinzierl.passsafe.gui.configuration.Configuration;
@@ -34,8 +31,11 @@ import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 public class GoogleDriveSync implements Sync {
 
     public enum State {
+        SYNC_REQUESTED,
         DOWNLOAD_FINISHED,
-        UPLOAD_REQUIRED
+        DOWNLOAD_FAILED,
+        UPLOAD_REQUIRED,
+        UPLOAD_FAILED
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleDriveSync.class);
@@ -54,6 +54,9 @@ public class GoogleDriveSync implements Sync {
     private final Drive client;
     private final Configuration configuration;
 
+    private File localDatabase;
+    private File tempDatabase;
+
     public GoogleDriveSync(final Configuration configuration) throws Exception {
         this.configuration = configuration;
         this.dataStoreDir = new FileDataStoreFactory(FileUtils.getOrCreateStoreDir(configuration, DRIVE_STORE_DIR));
@@ -68,39 +71,73 @@ public class GoogleDriveSync implements Sync {
 
         GoogleDriveSync driveSync = new GoogleDriveSync(configuration);
 
-        // driveSync.sync("passsafe.sqlite");
+        // driveSync.sync();
         driveSync.onStateChanged(State.DOWNLOAD_FINISHED);
     }
 
     @Override
-    public void sync(final String filename) throws IOException {
-        new GoogleDriveDownload(this, configuration, client).download(filename);
+    public void sync() throws IOException {
+        localDatabase = FileUtils.getLocalDatabaseFile(configuration);
+        tempDatabase = FileUtils.getTempDatabaseFile(configuration);
+
+        onStateChanged(State.SYNC_REQUESTED);
     }
 
     public void onStateChanged(final State nextState) {
         switch (nextState) {
 
+            case SYNC_REQUESTED :
+                startDownload();
+                break;
+
             case DOWNLOAD_FINISHED :
-                synchronizeDatabases();
+                startSynchronizeDatabases();
+                break;
+
+            case DOWNLOAD_FAILED :
+                try {
+
+                    // TODO display somehow a dialog to inform the user
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 break;
 
             case UPLOAD_REQUIRED :
+                startUpload();
+                break;
 
-                // TODO
-                LOGGER.warn("Upload required but currently not implemented");
+            case UPLOAD_FAILED :
+                try {
+
+                    // TODO display somehow a dialog to inform the user
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 break;
         }
     }
 
-    public void uploadRequired(final File local, final com.google.api.services.drive.model.File online) {
-        try {
-            upload(local, online);
-        } catch (IOException e) {
-            LOGGER.error("Upload of file {} failed", local.getName(), e);
-        }
+    private Credential authorize() throws Exception {
+
+        GoogleClientSecrets.Details details = new GoogleClientSecrets.Details();
+        details.setClientId(CLIENT_ID);
+        details.setClientSecret(CLIENT_SECRET);
+
+        GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
+        clientSecrets.setInstalled(details);
+
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
+                clientSecrets, DriveScopes.all()).setDataStoreFactory(dataStoreDir).build();
+
+        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
 
-    private void synchronizeDatabases() {
+    private void startSynchronizeDatabases() {
         File localDb = FileUtils.getLocalDatabaseFile(configuration);
         File tempDb = FileUtils.getTempDatabaseFile(configuration);
 
@@ -117,46 +154,16 @@ public class GoogleDriveSync implements Sync {
         }
     }
 
-    private void upload(final File local, final com.google.api.services.drive.model.File online) throws IOException {
-
-        // TODO override existing file
-        LOGGER.info("Upload '{}' to Google Drive", local.getAbsoluteFile());
-
-        com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
-        fileMetadata.setTitle(local.getName());
-
-        if (online != null) {
-            fileMetadata.setId(online.getId());
-        }
-
-        FileContent mediaContent = new FileContent("application/octet-stream", local);
-        DriveRequest<com.google.api.services.drive.model.File> request;
-
-        if (online != null) {
-            request = client.files().update(online.getId(), online, mediaContent);
-        } else {
-            request = client.files().insert(fileMetadata, mediaContent);
-        }
-
-        MediaHttpUploader uploader = request.getMediaHttpUploader();
-        uploader.setDirectUploadEnabled(true);
-        // uploader.setProgressListener(new FileUploadProgressListener());
-
-        request.execute();
+    private void startDownload() {
+        new GoogleDriveDownload(this, configuration, client).download(localDatabase.getName(), tempDatabase);
     }
 
-    private Credential authorize() throws Exception {
-
-        GoogleClientSecrets.Details details = new GoogleClientSecrets.Details();
-        details.setClientId(CLIENT_ID);
-        details.setClientSecret(CLIENT_SECRET);
-
-        GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
-        clientSecrets.setInstalled(details);
-
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
-                clientSecrets, DriveScopes.all()).setDataStoreFactory(dataStoreDir).build();
-
-        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+    private void startUpload() {
+        try {
+            new GoogleDriveUpload(this, configuration, client).upload(localDatabase);
+        } catch (IOException e) {
+            LOGGER.error("Unable to upload local database file", e);
+            onStateChanged(State.UPLOAD_FAILED);
+        }
     }
 }
