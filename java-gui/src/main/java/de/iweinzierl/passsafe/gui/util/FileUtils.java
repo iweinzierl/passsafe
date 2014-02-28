@@ -11,6 +11,16 @@ public final class FileUtils {
 
     private FileUtils() { }
 
+    public static File getOrCreateStoreDir(final Configuration configuration, final String dirName) {
+        String baseFolder = configuration.getBaseFolder();
+        File driveStoreDir = new File(baseFolder, dirName);
+        if (!driveStoreDir.exists()) {
+            driveStoreDir.mkdir();
+        }
+
+        return driveStoreDir;
+    }
+
     public static File getLocalDatabaseFile(final Configuration configuration) {
         String baseFolder = configuration.getBaseFolder();
 

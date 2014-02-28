@@ -40,12 +40,12 @@ public class SqliteDataSource implements PassSafeDataSource {
         "SELECT \"_id\", category_id, title, url, username, password, comment, last_modified FROM entry";
 
     public static final String SQL_INSERT_ENTRY =
-        "INSERT INTO entry (category_id, title, url, username, password, comment) VALUES (?, ?, ?, ?, ?, ?)";
+        "INSERT INTO entry (category_id, title, url, username, password, comment, last_modified) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE \"_id\" = ?";
 
     public static final String SQL_UPDATE_ENTRY =
-        "UPDATE entry SET title = ?, url = ?, username = ?, password = ?, comment = ? WHERE \"_id\" = ?";
+        "UPDATE entry SET title = ?, url = ?, username = ?, password = ?, comment = ?, last_modified = ? WHERE \"_id\" = ?";
 
     public static final String SQL_FIND_ENTRY_ID = "SELECT \"_id\" FROM entry WHERE title = ?";
 
@@ -237,6 +237,7 @@ public class SqliteDataSource implements PassSafeDataSource {
             statement.setString(4, entry.getUsername());
             statement.setString(5, entry.getPassword());
             statement.setString(6, entry.getComment());
+            statement.setString(7, DateUtils.formatDatabaseDate(new Date()));
 
             statement.executeUpdate();
 
@@ -335,7 +336,8 @@ public class SqliteDataSource implements PassSafeDataSource {
             updateEntry.setString(3, entry.getUsername());
             updateEntry.setString(4, entry.getPassword());
             updateEntry.setString(5, entry.getComment());
-            updateEntry.setInt(6, sqliteEntry.getId());
+            updateEntry.setString(6, DateUtils.formatDatabaseDate(sqliteEntry.getLastModified()));
+            updateEntry.setInt(7, sqliteEntry.getId());
 
             int affected = updateEntry.executeUpdate();
             if (affected <= 0) {

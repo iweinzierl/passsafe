@@ -45,6 +45,31 @@ public final class DatabaseSyncHelper {
         return findRemoved(localTable.getLastSynchronization(), localTable.getEntries(), upstreamTable.getEntries());
     }
 
+    public boolean isUploadRequired() {
+
+        A:
+        for (DatabaseEntry localEntry : localTable.getEntries()) {
+
+            for (DatabaseEntry onlineEntry : upstreamTable.getEntries()) {
+
+                if (localEntry.getId() == onlineEntry.getId()
+                        && localEntry.getLastModified().after(onlineEntry.getLastModified())) {
+
+                    LOGGER.info("Updated local entry found - upload is required!");
+                    return true;
+
+                } else if (localEntry.getId() == onlineEntry.getId()) {
+                    continue A;
+                }
+            }
+
+            LOGGER.info("New local entry found - upload is required!");
+            return true;
+        }
+
+        return false;
+    }
+
     private List<DatabaseEntry> findRequiredUpdates(final List<DatabaseEntry> local, final List<DatabaseEntry> online) {
 
         List<DatabaseEntry> updateRequired = new ArrayList<DatabaseEntry>();

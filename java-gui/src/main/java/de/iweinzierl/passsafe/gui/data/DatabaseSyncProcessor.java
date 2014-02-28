@@ -27,28 +27,45 @@ public class DatabaseSyncProcessor {
         this.onlineDatasource = onlineDatasource;
     }
 
-    public void sync() {
+    /**
+     * Starts synchronizing the local database with the downloaded database. At the end, it returns true if an upload is
+     * required or false if not.
+     *
+     * @return  true if an upload of the synchronized database is required or false if not.
+     */
+    public boolean sync() {
         DatabaseSyncHelper helper = new DatabaseSyncHelper(getDatabaseData(localDatasource),
                 getDatabaseData(onlineDatasource));
 
         updateExistingEntries(helper.getEntriesWithRequiredUpdate());
         insertEntries(helper.getNewEntries());
         removeEntries(helper.getRemovedEntries());
+
+        return helper.isUploadRequired();
     }
 
     private void updateExistingEntries(final List<DatabaseEntry> entriesWithRequiredUpdate) {
         LOGGER.info("Found {} entries that need to be updated", entriesWithRequiredUpdate.size());
-        // TODO
+
+        for (DatabaseEntry entry : entriesWithRequiredUpdate) {
+            localDatasource.updateEntry(entry);
+        }
     }
 
     private void insertEntries(final List<DatabaseEntry> newEntries) {
         LOGGER.info("Found {} entries that need to be inserted", newEntries.size());
-        // TODO
+
+        for (DatabaseEntry entry : newEntries) {
+            localDatasource.addEntry(entry.getCategory(), entry);
+        }
     }
 
     private void removeEntries(final List<DatabaseEntry> removedEntries) {
         LOGGER.info("Found {} entries that need to be removed", removedEntries.size());
-        // TODO
+
+        for (DatabaseEntry entry : removedEntries) {
+            localDatasource.removeEntry(entry);
+        }
     }
 
     private static DatabaseData getDatabaseData(final SqliteDataSource dataSource) {

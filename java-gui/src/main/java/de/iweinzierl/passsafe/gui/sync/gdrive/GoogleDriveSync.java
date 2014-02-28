@@ -34,7 +34,8 @@ import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 public class GoogleDriveSync implements Sync {
 
     public enum State {
-        DOWNLOAD_FINISHED
+        DOWNLOAD_FINISHED,
+        UPLOAD_REQUIRED
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleDriveSync.class);
@@ -55,7 +56,7 @@ public class GoogleDriveSync implements Sync {
 
     public GoogleDriveSync(final Configuration configuration) throws Exception {
         this.configuration = configuration;
-        this.dataStoreDir = new FileDataStoreFactory(getOrCreateStoreDir(DRIVE_STORE_DIR));
+        this.dataStoreDir = new FileDataStoreFactory(FileUtils.getOrCreateStoreDir(configuration, DRIVE_STORE_DIR));
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         this.jsonFactory = new JacksonFactory();
 
@@ -71,16 +72,6 @@ public class GoogleDriveSync implements Sync {
         driveSync.onStateChanged(State.DOWNLOAD_FINISHED);
     }
 
-    private File getOrCreateStoreDir(final String dirName) {
-        String baseFolder = configuration.getBaseFolder();
-        File driveStoreDir = new File(baseFolder, dirName);
-        if (!driveStoreDir.exists()) {
-            driveStoreDir.mkdir();
-        }
-
-        return driveStoreDir;
-    }
-
     @Override
     public void sync(final String filename) throws IOException {
         new GoogleDriveDownload(this, configuration, client).download(filename);
@@ -91,6 +82,13 @@ public class GoogleDriveSync implements Sync {
 
             case DOWNLOAD_FINISHED :
                 synchronizeDatabases();
+                break;
+
+            case UPLOAD_REQUIRED :
+
+                // TODO
+                LOGGER.warn("Upload required but currently not implemented");
+                break;
         }
     }
 
@@ -110,7 +108,10 @@ public class GoogleDriveSync implements Sync {
             SqliteDataSource localDatasource = new SqliteDataSource(localDb.getAbsolutePath());
             SqliteDataSource tempDatasource = new SqliteDataSource(tempDb.getAbsolutePath());
 
-            new DatabaseSyncProcessor(localDatasource, tempDatasource).sync();
+            if (new DatabaseSyncProcessor(localDatasource, tempDatasource).sync()) {
+                onStateChanged(State.UPLOAD_REQUIRED);
+            }
+
         } catch (SQLException | ClassNotFoundException | IOException | PassSafeSqlException e) {
             LOGGER.error("Unable to synchronize databases", e);
         }
