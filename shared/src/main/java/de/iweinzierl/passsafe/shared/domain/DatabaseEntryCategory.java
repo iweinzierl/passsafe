@@ -1,5 +1,7 @@
 package de.iweinzierl.passsafe.shared.domain;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -23,12 +25,19 @@ public class DatabaseEntryCategory extends EntryCategory {
             return this;
         }
 
+        public Builder withLastModified(final Date lastModified) {
+            category.setLastModified(lastModified);
+            return this;
+        }
+
         public DatabaseEntryCategory build() {
             return category;
         }
     }
 
     private int id;
+
+    private Date lastModified;
 
     private DatabaseEntryCategory() {
         super();
@@ -40,6 +49,14 @@ public class DatabaseEntryCategory extends EntryCategory {
 
     public void setId(final int id) {
         this.id = id;
+    }
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(final Date lastModified) {
+        this.lastModified = lastModified;
     }
 
     @Override

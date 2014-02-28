@@ -12,6 +12,23 @@ public class DatabaseEntry extends Entry {
             entry = new DatabaseEntry();
         }
 
+        public Builder withEntry(final Entry entry) {
+            if (entry.getCategory() instanceof DatabaseEntryCategory) {
+                withCategory((DatabaseEntryCategory) entry.getCategory());
+            }
+
+            if (entry instanceof DatabaseEntry) {
+                withLastModified(((DatabaseEntry) entry).getLastModified());
+            }
+
+            withTitle(entry.getTitle());
+            withUrl(entry.getUrl());
+            withUsername(entry.getUsername());
+            withPassword(entry.getPassword());
+            withComment(entry.getComment());
+            return this;
+        }
+
         public Builder withId(final int id) {
             entry.setId(id);
             return this;

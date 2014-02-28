@@ -11,9 +11,8 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,20 +20,24 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import de.iweinzierl.passsafe.gui.util.DateUtils;
 import de.iweinzierl.passsafe.shared.data.DataSourceChangedListener;
 import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.shared.data.SQLiteCommandExecutor;
 import de.iweinzierl.passsafe.shared.data.SQLiteDatabaseCreator;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntry;
+import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 
 public class SqliteDataSource implements PassSafeDataSource {
 
-    public static final String SQL_LOAD_CATEGORIES = "SELECT \"_id\", title FROM category ORDER BY title";
+    public static final String SQL_LOAD_CATEGORIES =
+        "SELECT \"_id\", title, last_modified FROM category ORDER BY title";
 
     public static final String SQL_LOAD_ENTRIES =
-        "SELECT \"_id\", category_id, title, url, username, password, comment FROM entry";
+        "SELECT \"_id\", category_id, title, url, username, password, comment, last_modified FROM entry";
 
     public static final String SQL_INSERT_ENTRY =
         "INSERT INTO entry (category_id, title, url, username, password, comment) VALUES (?, ?, ?, ?, ?, ?)";
@@ -121,8 +124,10 @@ public class SqliteDataSource implements PassSafeDataSource {
         while (resultSet.next()) {
             int id = resultSet.getInt(1);
             String title = resultSet.getString(2);
+            Date lastModified = DateUtils.parseDatabaseDate(resultSet.getString(3));
 
-            categories.add(new SqliteEntryCategory(id, title));
+            categories.add(new DatabaseEntryCategory.Builder().withId(id).withTitle(title).withLastModified(
+                    lastModified).build());
         }
 
         LOGGER.debug("PreLoaded {} categories", categories.size());
@@ -142,8 +147,9 @@ public class SqliteDataSource implements PassSafeDataSource {
             String username = resultSet.getString(5);
             String password = resultSet.getString(6);
             String comment = resultSet.getString(7);
+            Date lastModified = DateUtils.parseDatabaseDate(resultSet.getString(8));
 
-            EntryCategory category = getCategoryById(categoryId);
+            DatabaseEntryCategory category = (DatabaseEntryCategory) getCategoryById(categoryId);
 
             if (category != null) {
                 Collection<Entry> entries = entryMap.get(category);
@@ -153,7 +159,12 @@ public class SqliteDataSource implements PassSafeDataSource {
                     entryMap.put(category, (Entry) entries);
                 }
 
-                entries.add(new SqliteEntry(category, id, title, url, username, password, comment));
+                DatabaseEntry databaseEntry = new DatabaseEntry.Builder().withId(id).withCategory(category)
+                                                                         .withTitle(title).withUrl(url)
+                                                                         .withUsername(username).withPassword(password)
+                                                                         .withComment(comment)
+                                                                         .withLastModified(lastModified).build();
+                entries.add(databaseEntry);
                 loaded++;
             }
         }
@@ -163,7 +174,7 @@ public class SqliteDataSource implements PassSafeDataSource {
 
     private EntryCategory getCategoryById(final int id) {
         for (EntryCategory category : categories) {
-            if (((SqliteEntryCategory) category).getId() == id) {
+            if (((DatabaseEntryCategory) category).getId() == id) {
                 return category;
             }
         }
@@ -200,12 +211,12 @@ public class SqliteDataSource implements PassSafeDataSource {
 
     @Override
     public Entry addEntry(final EntryCategory category, final Entry entry) {
-        SqliteEntryCategory sqliteCategory;
+        DatabaseEntryCategory sqliteCategory;
 
-        if (!(category instanceof SqliteEntryCategory)) {
+        if (!(category instanceof DatabaseEntryCategory)) {
             sqliteCategory = findCategory(category);
         } else {
-            sqliteCategory = (SqliteEntryCategory) category;
+            sqliteCategory = (DatabaseEntryCategory) category;
         }
 
         if (sqliteCategory == null) {
@@ -236,7 +247,7 @@ public class SqliteDataSource implements PassSafeDataSource {
                 return null;
             }
 
-            SqliteEntry added = new SqliteEntry(entry, id);
+            DatabaseEntry added = new DatabaseEntry.Builder().withEntry(entry).withId(id).build();
 
             entryMap.put(category, added);
 
@@ -268,10 +279,10 @@ public class SqliteDataSource implements PassSafeDataSource {
         return null;
     }
 
-    public SqliteEntryCategory findCategory(final EntryCategory category) {
+    public DatabaseEntryCategory findCategory(final EntryCategory category) {
         for (EntryCategory tmp : categories) {
             if (tmp.getTitle().equals(category.getTitle())) {
-                return (SqliteEntryCategory) category;
+                return (DatabaseEntryCategory) category;
             }
         }
 
@@ -282,14 +293,14 @@ public class SqliteDataSource implements PassSafeDataSource {
     public void removeEntry(final Entry entry) {
         LOGGER.debug("Go an remove entry '{}'", entry);
 
-        if (!(entry instanceof SqliteEntry)) {
+        if (!(entry instanceof DatabaseEntry)) {
             LOGGER.warn("Cannot remove entry from type '{}'", entry.getClass());
             return;
         }
 
         try {
             PreparedStatement remove = conn.prepareStatement(SQL_REMOVE_ENTRY);
-            remove.setInt(1, ((SqliteEntry) entry).getId());
+            remove.setInt(1, ((DatabaseEntry) entry).getId());
 
             int affected = remove.executeUpdate();
 
@@ -310,12 +321,12 @@ public class SqliteDataSource implements PassSafeDataSource {
     public void updateEntry(final Entry entry) {
         LOGGER.debug("Go and update entry '{}'", entry);
 
-        if (!(entry instanceof SqliteEntry)) {
+        if (!(entry instanceof DatabaseEntry)) {
             LOGGER.warn("Cannot remove entry from type '{}'", entry.getClass());
             return;
         }
 
-        SqliteEntry sqliteEntry = (SqliteEntry) entry;
+        DatabaseEntry sqliteEntry = (DatabaseEntry) entry;
 
         try {
             PreparedStatement updateEntry = conn.prepareStatement(SQL_UPDATE_ENTRY);
@@ -352,7 +363,8 @@ public class SqliteDataSource implements PassSafeDataSource {
             int id = generatedKeys.getInt(1);
 
             if (id > 0) {
-                EntryCategory newCategory = new SqliteEntryCategory(id, category.getTitle());
+                EntryCategory newCategory = new DatabaseEntryCategory.Builder().withId(id)
+                                                                               .withTitle(category.getTitle()).build();
                 LOGGER.info("Successfully inserted category '{}'", newCategory);
 
                 categories.add(newCategory);
@@ -371,18 +383,18 @@ public class SqliteDataSource implements PassSafeDataSource {
     public void removeCategory(final EntryCategory category) {
         LOGGER.debug("Go an remove category '{}'", category);
 
-        if (!(category instanceof SqliteEntryCategory)) {
+        if (!(category instanceof DatabaseEntryCategory)) {
             LOGGER.warn("Cannot remove category from type '{}'", category.getClass());
             return;
         }
 
         try {
             PreparedStatement removeEntries = conn.prepareStatement(SQL_REMOVE_CATEGORY_ENTRIES);
-            removeEntries.setInt(1, ((SqliteEntryCategory) category).getId());
+            removeEntries.setInt(1, ((DatabaseEntryCategory) category).getId());
             removeEntries.execute();
 
             PreparedStatement remove = conn.prepareStatement(SQL_REMOVE_CATEGORY);
-            remove.setInt(1, ((SqliteEntryCategory) category).getId());
+            remove.setInt(1, ((DatabaseEntryCategory) category).getId());
 
             int affected = remove.executeUpdate();
 
@@ -405,20 +417,20 @@ public class SqliteDataSource implements PassSafeDataSource {
 
         final EntryCategory oldCategory = entry.getCategory();
 
-        if (!(category instanceof SqliteEntryCategory)) {
+        if (!(category instanceof DatabaseEntryCategory)) {
             LOGGER.warn("Cannot update entry with category from type '{}'", category.getClass());
             return;
         }
 
-        if (!(entry instanceof SqliteEntry)) {
+        if (!(entry instanceof DatabaseEntry)) {
             LOGGER.warn("Cannot update entry of type '{}'", entry.getClass());
             return;
         }
 
         try {
             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_CATEGORY_OF_ENTRY);
-            stmt.setInt(1, ((SqliteEntryCategory) category).getId());
-            stmt.setInt(2, ((SqliteEntry) entry).getId());
+            stmt.setInt(1, ((DatabaseEntryCategory) category).getId());
+            stmt.setInt(2, ((DatabaseEntry) entry).getId());
 
             int affected = stmt.executeUpdate();
             if (affected <= 0) {
@@ -450,56 +462,8 @@ public class SqliteDataSource implements PassSafeDataSource {
         }
     }
 
-    private static class SqliteEntryCategory extends EntryCategory {
-
-        private int id;
-
-        public SqliteEntryCategory(final String title) {
-            super(title);
-        }
-
-        public SqliteEntryCategory(final int id, final String title) {
-            this(title);
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        @Override
-        public String toString() {
-            return new ToStringBuilder(this).append("id", id).append("title", getTitle()).toString();
-        }
-    }
-
     @Override
     public void setDataSourceChangedListener(final DataSourceChangedListener listener) {
         this.dataSourceChangedListener = listener;
-    }
-
-    private static class SqliteEntry extends Entry {
-
-        private int id;
-
-        public SqliteEntry(final Entry entry, final int id) {
-            this(entry.getCategory(), id, entry.getTitle(), null, entry.getUsername(), entry.getPassword(), null);
-        }
-
-        public SqliteEntry(final EntryCategory category, final int id, final String title, final String url,
-                final String username, final String password, final String comment) {
-
-            super(category, title, url, username, password, comment);
-            this.id = id;
-        }
-
-        protected int getId() {
-            return id;
-        }
-
-        @Override
-        public String toString() {
-            return new ToStringBuilder(this).appendSuper(super.toString()).append("id", id).toString();
-        }
     }
 }

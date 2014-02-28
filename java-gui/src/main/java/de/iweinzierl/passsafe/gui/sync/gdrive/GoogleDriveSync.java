@@ -1,5 +1,13 @@
 package de.iweinzierl.passsafe.gui.sync.gdrive;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.sql.SQLException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -8,31 +16,26 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.client.util.DateTime;
-import com.google.api.client.util.IOUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveRequest;
 import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
-import de.iweinzierl.passsafe.gui.configuration.Configuration;
-import de.iweinzierl.passsafe.gui.sync.Sync;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
+import de.iweinzierl.passsafe.gui.configuration.Configuration;
+import de.iweinzierl.passsafe.gui.data.DatabaseSyncProcessor;
+import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
+import de.iweinzierl.passsafe.gui.sync.Sync;
+import de.iweinzierl.passsafe.gui.util.FileUtils;
+import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 
 public class GoogleDriveSync implements Sync {
+
+    public enum State {
+        DOWNLOAD_FINISHED
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleDriveSync.class);
 
@@ -50,7 +53,7 @@ public class GoogleDriveSync implements Sync {
     private final Drive client;
     private final Configuration configuration;
 
-    public GoogleDriveSync(Configuration configuration) throws Exception {
+    public GoogleDriveSync(final Configuration configuration) throws Exception {
         this.configuration = configuration;
         this.dataStoreDir = new FileDataStoreFactory(getOrCreateStoreDir(DRIVE_STORE_DIR));
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -59,16 +62,18 @@ public class GoogleDriveSync implements Sync {
         this.client = new Drive.Builder(httpTransport, jsonFactory, authorize()).setApplicationName(APP_NAME).build();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
         GoogleDriveSync driveSync = new GoogleDriveSync(configuration);
-        driveSync.sync("passsafe.sqlite");
+
+        // driveSync.sync("passsafe.sqlite");
+        driveSync.onStateChanged(State.DOWNLOAD_FINISHED);
     }
 
-    private java.io.File getOrCreateStoreDir(String dirName) {
+    private File getOrCreateStoreDir(final String dirName) {
         String baseFolder = configuration.getBaseFolder();
-        java.io.File driveStoreDir = new java.io.File(baseFolder, dirName);
+        File driveStoreDir = new File(baseFolder, dirName);
         if (!driveStoreDir.exists()) {
             driveStoreDir.mkdir();
         }
@@ -77,80 +82,46 @@ public class GoogleDriveSync implements Sync {
     }
 
     @Override
-    public void sync(String filename) throws IOException {
-        File online = find(filename);
-        java.io.File local = getLocalFile(filename);
+    public void sync(final String filename) throws IOException {
+        new GoogleDriveDownload(this, configuration, client).download(filename);
+    }
 
-        DateTime onlineModificationDate = getOnlineModificationDate(online);
+    public void onStateChanged(final State nextState) {
+        switch (nextState) {
 
-        long onlineModificationTime = onlineModificationDate != null ? onlineModificationDate.getValue() : 0;
-        long localModificationDate = getLocalModificationDate(local);
+            case DOWNLOAD_FINISHED :
+                synchronizeDatabases();
+        }
+    }
 
-        if (onlineModificationTime > localModificationDate) {
-            long diff = onlineModificationTime - localModificationDate;
-            LOGGER.info("File '{}' needs to be downloaded from GoogleDrive: {} sec younger", filename, diff / 1000);
-            download(online);
-        } else {
-            long diff = localModificationDate - onlineModificationTime;
-            LOGGER.info("File '{}' needs to be uploaded to GoogleDrive: {} sec younger", filename, diff / 1000);
+    public void uploadRequired(final File local, final com.google.api.services.drive.model.File online) {
+        try {
             upload(local, online);
+        } catch (IOException e) {
+            LOGGER.error("Upload of file {} failed", local.getName(), e);
         }
     }
 
-    private File find(String filename) throws IOException {
-        String q = String.format("title = '%s' and trashed = false", filename);
+    private void synchronizeDatabases() {
+        File localDb = FileUtils.getLocalDatabaseFile(configuration);
+        File tempDb = FileUtils.getTempDatabaseFile(configuration);
 
-        final Drive.Files.List request = client.files().list();
+        try {
+            SqliteDataSource localDatasource = new SqliteDataSource(localDb.getAbsolutePath());
+            SqliteDataSource tempDatasource = new SqliteDataSource(tempDb.getAbsolutePath());
 
-        FileList fileList = request.setQ(q).execute();
-
-        do {
-
-            List<File> items = fileList.getItems();
-
-            if (items != null && !items.isEmpty()) {
-                return items.get(0);
-            }
-
-            request.setPageToken(fileList.getNextPageToken());
-        } while (!Strings.isNullOrEmpty(request.getPageToken()));
-
-        return null;
-    }
-
-    private DateTime getOnlineModificationDate(File online) throws IOException {
-        if (online == null) {
-            return null;
+            new DatabaseSyncProcessor(localDatasource, tempDatasource).sync();
+        } catch (SQLException | ClassNotFoundException | IOException | PassSafeSqlException e) {
+            LOGGER.error("Unable to synchronize databases", e);
         }
-
-        return online.getModifiedDate();
     }
 
-    private java.io.File getLocalFile(String filename) {
-        java.io.File passSafeDirectory = new java.io.File(configuration.getBaseFolder());
-        return new java.io.File(passSafeDirectory, filename);
-    }
+    private void upload(final File local, final com.google.api.services.drive.model.File online) throws IOException {
 
-    private long getLocalModificationDate(java.io.File file) {
-        return file.exists() ? file.lastModified() : 0;
-    }
-
-    private void download(File file) throws IOException {
-        java.io.File output = new java.io.File(configuration.getBaseFolder(), file.getTitle());
-
-        LOGGER.info("Download '{}' to '{}'", file.getTitle(), output.getAbsoluteFile());
-
-        HttpRequest request = client.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()));
-        HttpResponse response = request.execute();
-
-        IOUtils.copy(response.getContent(), new FileOutputStream(output));
-    }
-
-    private void upload(java.io.File local, File online) throws IOException {
         // TODO override existing file
         LOGGER.info("Upload '{}' to Google Drive", local.getAbsoluteFile());
 
-        File fileMetadata = new File();
+        com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
         fileMetadata.setTitle(local.getName());
 
         if (online != null) {
@@ -158,16 +129,17 @@ public class GoogleDriveSync implements Sync {
         }
 
         FileContent mediaContent = new FileContent("application/octet-stream", local);
-        DriveRequest<File> request;
+        DriveRequest<com.google.api.services.drive.model.File> request;
 
         if (online != null) {
             request = client.files().update(online.getId(), online, mediaContent);
         } else {
             request = client.files().insert(fileMetadata, mediaContent);
         }
+
         MediaHttpUploader uploader = request.getMediaHttpUploader();
         uploader.setDirectUploadEnabled(true);
-        //uploader.setProgressListener(new FileUploadProgressListener());
+        // uploader.setProgressListener(new FileUploadProgressListener());
 
         request.execute();
     }

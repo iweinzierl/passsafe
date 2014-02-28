@@ -22,14 +22,26 @@ public final class DatabaseSyncHelper {
     }
 
     public List<DatabaseEntry> getEntriesWithRequiredUpdate() {
+        if (upstreamTable.getEntries().isEmpty()) {
+            return new ArrayList<DatabaseEntry>(0);
+        }
+
         return findRequiredUpdates(localTable.getEntries(), upstreamTable.getEntries());
     }
 
     public List<DatabaseEntry> getNewEntries() {
+        if (upstreamTable.getEntries().isEmpty()) {
+            return new ArrayList<DatabaseEntry>(0);
+        }
+
         return findNew(localTable.getEntries(), upstreamTable.getEntries());
     }
 
     public List<DatabaseEntry> getRemovedEntries() {
+        if (upstreamTable.getEntries().isEmpty()) {
+            return new ArrayList<DatabaseEntry>(0);
+        }
+
         return findRemoved(localTable.getLastSynchronization(), localTable.getEntries(), upstreamTable.getEntries());
     }
 
