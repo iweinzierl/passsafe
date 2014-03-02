@@ -140,6 +140,9 @@ public class GoogleDriveSync implements Sync {
 
             new DatabaseSyncProcessor(this, localDatasource, tempDatasource).sync();
 
+            localDatasource.close();
+            tempDatasource.close();
+
         } catch (SQLException | ClassNotFoundException | IOException | PassSafeSqlException e) {
             LOGGER.error("Unable to synchronize databases", e);
         }

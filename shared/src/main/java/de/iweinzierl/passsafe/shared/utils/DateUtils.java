@@ -1,4 +1,4 @@
-package de.iweinzierl.passsafe.gui.util;
+package de.iweinzierl.passsafe.shared.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

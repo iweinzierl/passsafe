@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.util.Date;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -23,7 +21,6 @@ import com.google.android.gms.drive.query.Query;
 import android.content.Context;
 
 import de.iweinzierl.passsafe.android.logging.Logger;
-import de.iweinzierl.passsafe.android.util.FileUtils;
 
 public class GoogleDriveDownload implements ResultCallback<DriveApi.MetadataBufferResult> {
 
@@ -34,12 +31,15 @@ public class GoogleDriveDownload implements ResultCallback<DriveApi.MetadataBuff
     private final Context context;
     private final GoogleDriveSync googleDriveSync;
     private final GoogleApiClient googleApiClient;
+    private final File destination;
 
     public GoogleDriveDownload(final Context context, final GoogleDriveSync googleDriveSync,
-            final GoogleApiClient googleApiClient) {
+            final GoogleApiClient googleApiClient, final File destination) {
+
         this.context = context;
         this.googleDriveSync = googleDriveSync;
         this.googleApiClient = googleApiClient;
+        this.destination = destination;
     }
 
     /**
@@ -76,41 +76,12 @@ public class GoogleDriveDownload implements ResultCallback<DriveApi.MetadataBuff
 
             if (metadataBuffer.getCount() > 0) {
                 LOGGER.debug("Found " + metadataBuffer.getCount() + " results for search");
-                download(metadataBuffer.get(0));
+                download(destination, metadataBuffer.get(0));
             } else {
                 LOGGER.warn("No files found for synchronization");
                 googleDriveSync.onUpdate(GoogleDriveSync.State.DOWNLOAD_CANCELED);
             }
         }
-    }
-
-    private void download(final Metadata metadata) {
-        File dbFile = FileUtils.getDatabaseFile(context);
-        LOGGER.debug(String.format("Local database file is located at: %s", dbFile.getAbsolutePath()));
-        LOGGER.debug(String.format("Local database file is %s big", dbFile.length()));
-
-        if (isDownloadRequired(dbFile, metadata)) {
-            LOGGER.debug("Download of database required");
-            download(dbFile, metadata);
-        } else {
-            LOGGER.debug("Download is not required");
-            googleDriveSync.onUpdate(GoogleDriveSync.State.DOWNLOAD_FINISHED);
-        }
-    }
-
-    private boolean isDownloadRequired(final File dbFile, final Metadata metadata) {
-        if (!dbFile.exists()) {
-            return true;
-        }
-
-        long dbFileLastModified = dbFile.lastModified();
-        long onlineLastModified = metadata.getModifiedDate().getTime();
-
-        LOGGER.debug("Current local time:       " + new Date(System.currentTimeMillis()));
-        LOGGER.debug("Last local  modification: " + new Date(dbFileLastModified));
-        LOGGER.debug("Last online modification: " + new Date(onlineLastModified));
-
-        return onlineLastModified > dbFileLastModified;
     }
 
     private void download(final File dbFile, final Metadata metadata) {

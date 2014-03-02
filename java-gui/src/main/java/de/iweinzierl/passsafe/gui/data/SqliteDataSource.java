@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import de.iweinzierl.passsafe.gui.util.DateUtils;
 import de.iweinzierl.passsafe.shared.data.DataSourceChangedListener;
 import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.shared.data.SQLiteCommandExecutor;
@@ -30,6 +29,7 @@ import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
 import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
+import de.iweinzierl.passsafe.shared.utils.DateUtils;
 
 public class SqliteDataSource implements PassSafeDataSource {
 
@@ -75,6 +75,8 @@ public class SqliteDataSource implements PassSafeDataSource {
     public SqliteDataSource(final String dbfile) throws SQLException, ClassNotFoundException, IOException,
         PassSafeSqlException {
         Class.forName("org.sqlite.JDBC");
+
+        LOGGER.info("Establish database connection to {}", dbfile);
 
         this.dbfile = dbfile;
         this.categories = new ArrayList<>();

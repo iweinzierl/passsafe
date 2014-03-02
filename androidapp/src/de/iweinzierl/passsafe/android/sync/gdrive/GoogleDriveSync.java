@@ -1,5 +1,7 @@
 package de.iweinzierl.passsafe.android.sync.gdrive;
 
+import java.io.File;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 
 import de.iweinzierl.passsafe.android.data.DatabaseSyncProcessor;
 import de.iweinzierl.passsafe.android.logging.Logger;
+import de.iweinzierl.passsafe.android.util.FileUtils;
 
 public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
@@ -72,7 +75,8 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
 
             case DOWNLOAD_REQUESTED :
 
-                new GoogleDriveDownload(activity, this, googleApiClient).download();
+                new GoogleDriveDownload(activity, this, googleApiClient, FileUtils.getTemporaryDatabaseFile(activity))
+                    .download();
                 break;
 
             case DOWNLOAD_CANCELED :
@@ -93,8 +97,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
 
             case DATABASE_SYNC_REQUESTED :
 
-                new DatabaseSyncProcessor(activity, this).sync();
-                callback.onSyncFinished();
+                startDatabaseSync();
                 break;
 
             case COMPLETED :
@@ -139,5 +142,20 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
                 connect();
             }
         }
+    }
+
+    private void startDatabaseSync() {
+        File localDb = FileUtils.getDatabaseFile(activity);
+        File upstreamDb = FileUtils.getTemporaryDatabaseFile(activity);
+
+        if (localDb.exists() && upstreamDb.exists()) {
+            new DatabaseSyncProcessor(activity, this, localDb, upstreamDb).sync();
+        } else if (upstreamDb.exists()) {
+            if (!upstreamDb.renameTo(localDb)) {
+                LOGGER.error("Cannot rename temporary database file to local database file.");
+            }
+        }
+
+        callback.onSyncFinished();
     }
 }

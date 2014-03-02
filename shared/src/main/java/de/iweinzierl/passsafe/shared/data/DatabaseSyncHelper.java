@@ -47,6 +47,7 @@ public final class DatabaseSyncHelper {
 
     public boolean isUploadRequired() {
 
+        // search for local entries that have been inserted and that are not online yet
         A:
         for (DatabaseEntry localEntry : localTable.getEntries()) {
 
@@ -64,6 +65,20 @@ public final class DatabaseSyncHelper {
             }
 
             LOGGER.info("New local entry found - upload is required!");
+            return true;
+        }
+
+        // search for upstream entries that have been deleted locally
+        B:
+        for (DatabaseEntry upstreamEntry : upstreamTable.getEntries()) {
+
+            for (DatabaseEntry localEntry : localTable.getEntries()) {
+
+                if (localEntry.getId() == upstreamEntry.getId()) {
+                    continue B;
+                }
+            }
+
             return true;
         }
 
@@ -116,7 +131,12 @@ public final class DatabaseSyncHelper {
                 }
             }
 
-            newEntries.add(upstreamEntry);
+            Date entryLastModified = upstreamEntry.getLastModified();
+            Date tableLastSynchronized = localTable.getLastSynchronization();
+
+            if (entryLastModified.after(tableLastSynchronized)) {
+                newEntries.add(upstreamEntry);
+            }
         }
 
         return newEntries;

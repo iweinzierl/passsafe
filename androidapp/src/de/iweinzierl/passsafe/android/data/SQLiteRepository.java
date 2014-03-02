@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -19,16 +20,20 @@ import de.iweinzierl.passsafe.shared.domain.DatabaseEntry;
 import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
 import de.iweinzierl.passsafe.shared.domain.EntryCategory;
+import de.iweinzierl.passsafe.shared.utils.DateUtils;
 
 public class SQLiteRepository {
 
     private static final Logger LOGGER = new Logger("SQLiteRepository");
 
+    private static final String TABLE_PASSSAFE_METADATA = "passsafe_metadata";
     private static final String TABLE_ENTRY = "entry";
     private static final String TABLE_CATEGORY = "category";
 
+    private static final String[] TABLE_PASSSAFE_METADATA_COLUMNS = new String[] {"_id", "meta_key", "value"};
+
     private static final String[] TABLE_ENTRY_COLUMNS = new String[] {
-        "_id", "category_id", "title", "url", "username", "password", "comment"
+        "_id", "category_id", "title", "url", "username", "password", "comment", "last_modified"
     };
 
     private static final String[] TABLE_CATEGORY_COLUMNS = new String[] {"_id", "title"};
@@ -41,6 +46,19 @@ public class SQLiteRepository {
     public SQLiteRepository(final Context context, final File databaseFile) {
         this.context = context;
         this.databaseFile = databaseFile;
+    }
+
+    public void updateSynchronizationDate() {
+        openDatabaseIfNecessary();
+
+        ContentValues values = new ContentValues();
+        values.put("value", DateUtils.formatDatabaseDate(new Date()));
+
+        int updated = database.update(TABLE_PASSSAFE_METADATA, values, "meta_key = ?", new String[] {"sync.timestamp"});
+
+        if (updated <= 0) {
+            LOGGER.error("Update of synchronization date failed");
+        }
     }
 
     public List<Entry> listEntries() {
@@ -153,6 +171,7 @@ public class SQLiteRepository {
         values.put("username", entry.getUsername());
         values.put("password", entry.getPassword());
         values.put("comment", entry.getComment());
+        values.put("last_modified", DateUtils.formatDatabaseDate(new Date()));
 
         long id = database.insert(TABLE_ENTRY, null, values);
 
@@ -175,6 +194,7 @@ public class SQLiteRepository {
         values.put("username", entry.getUsername());
         values.put("password", entry.getPassword());
         values.put("comment", entry.getComment());
+        values.put("last_modified", DateUtils.formatDatabaseDate(new Date()));
 
         int update = database.update(TABLE_ENTRY, values, "_id = ?", new String[] {String.valueOf(id)});
 
@@ -210,7 +230,9 @@ public class SQLiteRepository {
                 .withUrl(cursor.getString(3))
                 .withUsername(cursor.getString(4))
                 .withPassword(cursor.getString(5))
-                .withComment(cursor.getString(6)).build();
+                .withComment(cursor.getString(6))
+                .withLastModified(DateUtils.parseDatabaseDate(cursor.getString(7)))
+                .build();
         //J+
     }
 
