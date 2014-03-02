@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import de.iweinzierl.passsafe.gui.sync.gdrive.GoogleDriveSync;
 import de.iweinzierl.passsafe.shared.data.DatabaseData;
 import de.iweinzierl.passsafe.shared.data.DatabaseSyncHelper;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.shared.domain.DatabaseEntry;
 import de.iweinzierl.passsafe.shared.domain.DatabaseEntryCategory;
 import de.iweinzierl.passsafe.shared.domain.Entry;
@@ -20,10 +21,10 @@ public class DatabaseSyncProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSyncProcessor.class);
 
     private final GoogleDriveSync googleDriveSync;
-    private final SqliteDataSource localDatasource;
-    private final SqliteDataSource onlineDatasource;
+    private final PassSafeDataSource localDatasource;
+    private final PassSafeDataSource onlineDatasource;
 
-    public DatabaseSyncProcessor(final GoogleDriveSync googleDriveSync, final SqliteDataSource localDatasource,
+    public DatabaseSyncProcessor(final GoogleDriveSync googleDriveSync, final PassSafeDataSource localDatasource,
             final SqliteDataSource onlineDatasource) {
         this.googleDriveSync = googleDriveSync;
         this.localDatasource = localDatasource;
@@ -117,7 +118,7 @@ public class DatabaseSyncProcessor {
         localDatasource.updateSynchronizationDate();
     }
 
-    private static DatabaseData getDatabaseData(final SqliteDataSource dataSource) {
+    private static DatabaseData getDatabaseData(final PassSafeDataSource dataSource) {
         List<EntryCategory> categories = dataSource.getCategories();
 
         List<DatabaseEntryCategory> databaseCategories = new ArrayList<>();
@@ -132,7 +133,7 @@ public class DatabaseSyncProcessor {
         return new DatabaseData(dataSource.getLastSynchronizationDate(), databaseEntries, databaseCategories);
     }
 
-    private static Collection<DatabaseEntry> getDatabaseEntries(final SqliteDataSource dataSource,
+    private static Collection<DatabaseEntry> getDatabaseEntries(final PassSafeDataSource dataSource,
             final EntryCategory category) {
         List<Entry> allEntries = dataSource.getAllEntries(category);
         List<DatabaseEntry> databaseEntries = new ArrayList<>(allEntries.size());

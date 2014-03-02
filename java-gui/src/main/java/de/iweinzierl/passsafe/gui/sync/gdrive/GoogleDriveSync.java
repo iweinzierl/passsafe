@@ -26,6 +26,7 @@ import de.iweinzierl.passsafe.gui.data.DatabaseSyncProcessor;
 import de.iweinzierl.passsafe.gui.data.SqliteDataSource;
 import de.iweinzierl.passsafe.gui.sync.Sync;
 import de.iweinzierl.passsafe.gui.util.FileUtils;
+import de.iweinzierl.passsafe.shared.data.PassSafeDataSource;
 import de.iweinzierl.passsafe.shared.exception.PassSafeSqlException;
 
 public class GoogleDriveSync implements Sync {
@@ -54,12 +55,14 @@ public class GoogleDriveSync implements Sync {
 
     private final Drive client;
     private final Configuration configuration;
+    private final PassSafeDataSource localDatabase;
 
-    private File localDatabase;
+    private File localDatabaseFile;
     private File tempDatabase;
 
-    public GoogleDriveSync(final Configuration configuration) throws Exception {
+    public GoogleDriveSync(final Configuration configuration, final PassSafeDataSource localDatabase) throws Exception {
         this.configuration = configuration;
+        this.localDatabase = localDatabase;
         this.dataStoreDir = new FileDataStoreFactory(FileUtils.getOrCreateStoreDir(configuration, DRIVE_STORE_DIR));
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         this.jsonFactory = new JacksonFactory();
@@ -70,7 +73,10 @@ public class GoogleDriveSync implements Sync {
     public static void main(final String[] args) throws Exception {
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
-        GoogleDriveSync driveSync = new GoogleDriveSync(configuration);
+        SqliteDataSource dataSource = new SqliteDataSource(FileUtils.getLocalDatabaseFile(configuration)
+                    .getAbsolutePath());
+
+        GoogleDriveSync driveSync = new GoogleDriveSync(configuration, dataSource);
 
         // driveSync.sync();
         driveSync.onStateChanged(State.DOWNLOAD_FINISHED);
@@ -78,7 +84,7 @@ public class GoogleDriveSync implements Sync {
 
     @Override
     public void sync() throws IOException {
-        localDatabase = FileUtils.getLocalDatabaseFile(configuration);
+        localDatabaseFile = FileUtils.getLocalDatabaseFile(configuration);
         tempDatabase = FileUtils.getTempDatabaseFile(configuration);
 
         onStateChanged(State.SYNC_REQUESTED);
@@ -131,16 +137,12 @@ public class GoogleDriveSync implements Sync {
     }
 
     private void startSynchronizeDatabases() {
-        File localDb = FileUtils.getLocalDatabaseFile(configuration);
         File tempDb = FileUtils.getTempDatabaseFile(configuration);
 
         try {
-            SqliteDataSource localDatasource = new SqliteDataSource(localDb.getAbsolutePath());
             SqliteDataSource tempDatasource = new SqliteDataSource(tempDb.getAbsolutePath());
 
-            new DatabaseSyncProcessor(this, localDatasource, tempDatasource).sync();
-
-            localDatasource.close();
+            new DatabaseSyncProcessor(this, localDatabase, tempDatasource).sync();
             tempDatasource.close();
 
         } catch (SQLException | ClassNotFoundException | IOException | PassSafeSqlException e) {
@@ -149,11 +151,11 @@ public class GoogleDriveSync implements Sync {
     }
 
     private void startDownload() {
-        new GoogleDriveDownload(this, client).download(localDatabase.getName(), tempDatabase);
+        new GoogleDriveDownload(this, client).download(localDatabaseFile.getName(), tempDatabase);
     }
 
     private void startUpload() {
-        new GoogleDriveUpload(this, client).upload(localDatabase);
+        new GoogleDriveUpload(this, client).upload(localDatabaseFile);
     }
 
     private void deleteTempDatabase() {

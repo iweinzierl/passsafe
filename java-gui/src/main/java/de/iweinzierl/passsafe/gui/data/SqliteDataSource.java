@@ -287,6 +287,8 @@ public class SqliteDataSource implements PassSafeDataSource {
                 return null;
             }
 
+            Date now = new Date();
+
             PreparedStatement statement = conn.prepareStatement(SQL_INSERT_ENTRY);
             statement.setInt(1, sqliteCategory.getId());
             statement.setString(2, entry.getTitle());
@@ -294,7 +296,7 @@ public class SqliteDataSource implements PassSafeDataSource {
             statement.setString(4, entry.getUsername());
             statement.setString(5, entry.getPassword());
             statement.setString(6, entry.getComment());
-            statement.setString(7, DateUtils.formatDatabaseDate(new Date()));
+            statement.setString(7, DateUtils.formatDatabaseDate(now));
 
             statement.executeUpdate();
 
@@ -306,6 +308,7 @@ public class SqliteDataSource implements PassSafeDataSource {
             }
 
             DatabaseEntry added = new DatabaseEntry.Builder().withEntry(entry).withId(id).build();
+            added.setLastModified(now);
 
             entryMap.put(category, added);
 

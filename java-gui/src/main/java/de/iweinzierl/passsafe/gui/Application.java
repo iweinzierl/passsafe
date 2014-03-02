@@ -59,10 +59,11 @@ public class Application extends JFrame {
 
         Configuration configuration = Configuration.parse(Configuration.DEFAULT_CONFIGURATION_FILE);
 
-        ApplicationController controller = new ApplicationController(configuration,
-                SyncFactory.createSync(configuration.getSyncType(), configuration));
-
         PassSafeDataSource dataSource = new SqliteDataSource(configuration.getDatabase());
+
+        ApplicationController controller = new ApplicationController(configuration,
+                SyncFactory.createSync(configuration.getSyncType(), configuration, dataSource));
+
         controller.setDataSource(dataSource);
 
         displayEnterPasswordDialog(controller, null);
