@@ -28,6 +28,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
         DOWNLOAD_CANCELED,
         DOWNLOAD_FINISHED,
         UPLOAD_REQUESTED,
+        UPLOAD_FINISHED,
         DATABASE_SYNC_REQUESTED,
         COMPLETED
     }
@@ -75,8 +76,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
 
             case DOWNLOAD_REQUESTED :
 
-                new GoogleDriveDownload(activity, this, googleApiClient, FileUtils.getTemporaryDatabaseFile(activity))
-                    .download();
+                new GoogleDriveDownload(this, googleApiClient, FileUtils.getTemporaryDatabaseFile(activity)).download();
                 break;
 
             case DOWNLOAD_CANCELED :
@@ -91,7 +91,11 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
 
             case UPLOAD_REQUESTED :
 
-                // TODO
+                new GoogleDriveUpload(activity, this, googleApiClient).upload(FileUtils.getDatabaseFile(activity));
+                break;
+
+            case UPLOAD_FINISHED :
+
                 callback.onSyncFinished();
                 break;
 

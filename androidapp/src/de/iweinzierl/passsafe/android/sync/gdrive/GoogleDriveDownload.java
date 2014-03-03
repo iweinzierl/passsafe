@@ -13,30 +13,22 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.Metadata;
-import com.google.android.gms.drive.MetadataBuffer;
-import com.google.android.gms.drive.metadata.StringMetadataField;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.Query;
-
-import android.content.Context;
 
 import de.iweinzierl.passsafe.android.logging.Logger;
 
-public class GoogleDriveDownload implements ResultCallback<DriveApi.MetadataBufferResult> {
+public class GoogleDriveDownload {
 
     private static final String PASSSAFE_DATABASE_FILE = "passsafe.sqlite";
 
     private static final Logger LOGGER = new Logger("GoogleDriveDownload");
 
-    private final Context context;
     private final GoogleDriveSync googleDriveSync;
     private final GoogleApiClient googleApiClient;
     private final File destination;
 
-    public GoogleDriveDownload(final Context context, final GoogleDriveSync googleDriveSync,
-            final GoogleApiClient googleApiClient, final File destination) {
+    public GoogleDriveDownload(final GoogleDriveSync googleDriveSync, final GoogleApiClient googleApiClient,
+            final File destination) {
 
-        this.context = context;
         this.googleDriveSync = googleDriveSync;
         this.googleApiClient = googleApiClient;
         this.destination = destination;
@@ -48,40 +40,17 @@ public class GoogleDriveDownload implements ResultCallback<DriveApi.MetadataBuff
      * is called.
      */
     public void download() {
-        //J-
-        PendingResult<DriveApi.MetadataBufferResult> queryResult = Drive.DriveApi.query(googleApiClient,
-                new Query.Builder()
-                        .addFilter(
-                                Filters.and(
-                                        Filters.eq(new StringMetadataField("title"), PASSSAFE_DATABASE_FILE),
-                                        Filters.eq(new StringMetadataField("trashed"), "false")))
-                        .build());
-        //J+
+        new GoogleDriveSearch(googleApiClient, new GoogleDriveSearch.Callback() {
+                @Override
+                public void onSearchSucceeded(final Metadata metadata) {
+                    download(destination, metadata);
+                }
 
-        queryResult.setResultCallback(this);
-    }
-
-    /**
-     * Called after GoogleDrive search for PassSafe database file is finished.
-     *
-     * @param  result  The search result.
-     */
-    @Override
-    public void onResult(final DriveApi.MetadataBufferResult result) {
-        if (!result.getStatus().isSuccess()) {
-            LOGGER.warn(String.format("Did not find a '%s' file in GoogleDrive account", PASSSAFE_DATABASE_FILE));
-
-        } else {
-            MetadataBuffer metadataBuffer = result.getMetadataBuffer();
-
-            if (metadataBuffer.getCount() > 0) {
-                LOGGER.debug("Found " + metadataBuffer.getCount() + " results for search");
-                download(destination, metadataBuffer.get(0));
-            } else {
-                LOGGER.warn("No files found for synchronization");
-                googleDriveSync.onUpdate(GoogleDriveSync.State.DOWNLOAD_CANCELED);
-            }
-        }
+                @Override
+                public void onSearchFailed() {
+                    googleDriveSync.onUpdate(GoogleDriveSync.State.DOWNLOAD_CANCELED);
+                }
+            }, PASSSAFE_DATABASE_FILE).search();
     }
 
     private void download(final File dbFile, final Metadata metadata) {
