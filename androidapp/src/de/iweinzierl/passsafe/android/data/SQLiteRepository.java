@@ -61,6 +61,20 @@ public class SQLiteRepository {
         }
     }
 
+    public Date getSynchronizationDate() {
+        openDatabaseIfNecessary();
+
+        Cursor cursor = database.query(TABLE_PASSSAFE_METADATA, TABLE_PASSSAFE_METADATA_COLUMNS, "meta_key = ?",
+                new String[] {"sync.timestamp"}, null, null, null);
+
+        if (!cursor.moveToFirst()) {
+            LOGGER.warn("Last sync timestamp not found in database");
+            return new Date();
+        } else {
+            return DateUtils.parseDatabaseDate(cursor.getString(2));
+        }
+    }
+
     public List<Entry> listEntries() {
         openDatabaseIfNecessary();
 

@@ -155,6 +155,7 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
         if (localDb.exists() && upstreamDb.exists()) {
             new DatabaseSyncProcessor(activity, this, localDb, upstreamDb).sync();
         } else if (upstreamDb.exists()) {
+            LOGGER.debug("No local database file found - rename temp database file.");
             if (!upstreamDb.renameTo(localDb)) {
                 LOGGER.error("Cannot rename temporary database file to local database file.");
             }

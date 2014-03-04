@@ -8,9 +8,12 @@ import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.drive.Contents;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.Metadata;
 
 import android.app.Activity;
@@ -47,20 +50,33 @@ public class GoogleDriveUpload {
     }
 
     private void upload(final File databaseFile, final Metadata metadata) {
-        Drive.DriveApi.newContents(googleApiClient).setResultCallback(new ResultCallback<DriveApi.ContentsResult>() {
-                @Override
-                public void onResult(final DriveApi.ContentsResult contentsResult) {
-                    OutputStream outputStream = contentsResult.getContents().getOutputStream();
+        LOGGER.debug("Going to upload database file '%s' to GoogleDrive", databaseFile.getName());
 
-                    try {
-                        IOUtils.copy(new FileInputStream(databaseFile), outputStream);
-                        LOGGER.info("Upload of file '" + databaseFile.getName() + "' successful");
+        final DriveId driveId = metadata.getDriveId();
+        final DriveFile driveFile = Drive.DriveApi.getFile(googleApiClient, driveId);
+        final PendingResult<DriveApi.ContentsResult> pendingResult = driveFile.openContents(googleApiClient,
+                DriveFile.MODE_WRITE_ONLY, null);
 
-                        googleDriveSync.onUpdate(GoogleDriveSync.State.UPLOAD_FINISHED);
-                    } catch (IOException e) {
-                        LOGGER.error("Upload of file '" + databaseFile.getName() + "' failed", e);
-                    }
-                }
-            });
+        LOGGER.debug("Synchronize upstream file to prepare upload");
+
+        final DriveApi.ContentsResult upstreamFile = pendingResult.await();
+
+        LOGGER.debug("Upload file '%s' to GoogleDrive", databaseFile.getName());
+
+        try {
+            Contents contents = upstreamFile.getContents();
+
+            OutputStream outputStream = contents.getOutputStream();
+            IOUtils.copy(new FileInputStream(databaseFile), outputStream);
+
+            LOGGER.debug("Updated content of file '" + databaseFile.getName() + "' successfully");
+
+            driveFile.commitAndCloseContents(googleApiClient, contents);
+
+            LOGGER.info("Upload of file '%s' finished", databaseFile.getName());
+
+        } catch (IOException ioe) {
+            LOGGER.error("Upload of file '%s' failed", ioe, databaseFile.getName());
+        }
     }
 }

@@ -3,7 +3,6 @@ package de.iweinzierl.passsafe.android.data;
 import java.io.File;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
@@ -44,9 +43,7 @@ public class DatabaseSyncProcessor {
         boolean inserted = insertEntries(databaseSyncHelper.getNewEntries());
         boolean removed = removeEntries(databaseSyncHelper.getRemovedEntries());
 
-        if (updated || inserted || removed) {
-            updateSynchronizationDate();
-        }
+        updateSynchronizationDate();
 
         boolean uploadRequired = databaseSyncHelper.isUploadRequired();
 
@@ -88,7 +85,7 @@ public class DatabaseSyncProcessor {
     }
 
     private DatabaseData getDatabaseData(final SQLiteRepository repository) {
-        return new DatabaseData(new Date(), getEntries(repository), getCategories(repository));
+        return new DatabaseData(repository.getSynchronizationDate(), getEntries(repository), getCategories(repository));
     }
 
     private List<DatabaseEntry> getEntries(final SQLiteRepository repository) {

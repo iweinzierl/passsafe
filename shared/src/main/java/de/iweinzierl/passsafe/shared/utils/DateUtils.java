@@ -14,7 +14,7 @@ public class DateUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DateUtils.class);
 
-    public static final String DATABASE_DATE_PATTERN = "yyyy-MM-dd hh:mm:ss";
+    public static final String DATABASE_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     public static final FastDateFormat DATABASE_DATEFORMAT = FastDateFormat.getInstance(DATABASE_DATE_PATTERN);
 

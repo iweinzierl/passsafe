@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
@@ -56,32 +57,39 @@ public class GoogleDriveDownload {
     private void download(final File dbFile, final Metadata metadata) {
         LOGGER.debug("Download online database file now...");
 
-        DriveFile file = Drive.DriveApi.getFile(googleApiClient, metadata.getDriveId());
-        PendingResult<DriveApi.ContentsResult> contentsResultPendingResult = file.openContents(googleApiClient,
-                DriveFile.MODE_READ_ONLY, new DriveFile.DownloadProgressListener() {
-                    @Override
-                    public void onProgress(final long downloaded, final long expected) {
-                        LOGGER.debug(String.format("Downloaded %s of %s", downloaded, expected));
-                    }
-                }); // add listener here
-
-        contentsResultPendingResult.setResultCallback(new ResultCallback<DriveApi.ContentsResult>() {
+        Drive.DriveApi.requestSync(googleApiClient).setResultCallback(new ResultCallback<Status>() {
                 @Override
-                public void onResult(final DriveApi.ContentsResult contentsResult) {
-                    LOGGER.debug("Copy online database file to disk");
-                    try {
-                        InputStream in = contentsResult.getContents().getInputStream();
-                        OutputStream out = new FileOutputStream(dbFile);
+                public void onResult(final Status status) {
+                    LOGGER.info("GoogleDrive sync request finished: %s", status.isSuccess());
 
-                        org.apache.commons.io.IOUtils.copy(in, out);
+                    DriveFile file = Drive.DriveApi.getFile(googleApiClient, metadata.getDriveId());
+                    PendingResult<DriveApi.ContentsResult> contentsResultPendingResult = file.openContents(
+                            googleApiClient, DriveFile.MODE_READ_ONLY, new DriveFile.DownloadProgressListener() {
+                                @Override
+                                public void onProgress(final long downloaded, final long expected) {
+                                    LOGGER.debug(String.format("Downloaded %s of %s", downloaded, expected));
+                                }
+                            }); // add listener here
 
-                        LOGGER.info(String.format("Download finished: %s bytes", dbFile.length()));
+                    contentsResultPendingResult.setResultCallback(new ResultCallback<DriveApi.ContentsResult>() {
+                            @Override
+                            public void onResult(final DriveApi.ContentsResult contentsResult) {
+                                LOGGER.debug("Copy online database file to disk");
+                                try {
+                                    InputStream in = contentsResult.getContents().getInputStream();
+                                    OutputStream out = new FileOutputStream(dbFile);
 
-                        googleDriveSync.onUpdate(GoogleDriveSync.State.DOWNLOAD_FINISHED);
+                                    org.apache.commons.io.IOUtils.copy(in, out);
 
-                    } catch (IOException e) {
-                        LOGGER.error("Unable to download database file", e);
-                    }
+                                    LOGGER.info(String.format("Download finished: %s bytes", dbFile.length()));
+
+                                    googleDriveSync.onUpdate(GoogleDriveSync.State.DOWNLOAD_FINISHED);
+
+                                } catch (IOException e) {
+                                    LOGGER.error("Unable to download database file", e);
+                                }
+                            }
+                        });
                 }
             });
     }

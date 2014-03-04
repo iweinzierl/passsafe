@@ -10,8 +10,10 @@ import android.view.Menu;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.activity.list.ListActivityIntent;
 import de.iweinzierl.passsafe.android.activity.sync.SyncActivity;
 import de.iweinzierl.passsafe.android.logging.Logger;
+import de.iweinzierl.passsafe.android.util.Constants;
 
 public class LoginActivity extends Activity implements LoginFragment.ActionHandler {
 
@@ -36,6 +38,19 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
         ((PassSafeApplication) getApplication()).setPassword(password);
 
         // TODO Verify password
-        startActivity(new Intent(this, SyncActivity.class));
+        startActivityForResult(new Intent(this, SyncActivity.class), Constants.ACTIVITY_SYNC_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        if (requestCode == Constants.ACTIVITY_SYNC_REQUEST) {
+            LOGGER.info("Returned to Activity (request code = %d | result code = %d)", requestCode, resultCode);
+
+            if (resultCode == Constants.ACTIVITY_SYNC_FINISHED_SUCCESSFUL) {
+                startActivity(new ListActivityIntent(this));
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }
