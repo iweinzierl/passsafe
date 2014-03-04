@@ -22,6 +22,7 @@ public class DatabaseSyncProcessor {
 
     private final GoogleDriveSync googleDriveSync;
     private final SQLiteRepository localRepository;
+    private final SQLiteRepository onlineRepository;
     private final DatabaseSyncHelper databaseSyncHelper;
 
     public DatabaseSyncProcessor(final Activity activity, final GoogleDriveSync googleDriveSync, final File local,
@@ -30,7 +31,7 @@ public class DatabaseSyncProcessor {
 
         localRepository = new SQLiteRepository(activity, local);
 
-        SQLiteRepository onlineRepository = new SQLiteRepository(activity, upstream);
+        onlineRepository = new SQLiteRepository(activity, upstream);
 
         databaseSyncHelper = new DatabaseSyncHelper(getDatabaseData(localRepository),
                 getDatabaseData(onlineRepository));
@@ -39,13 +40,17 @@ public class DatabaseSyncProcessor {
     public boolean sync() {
         LOGGER.info("Start synchronizing databases");
 
-        boolean updated = updateExistingEntries(databaseSyncHelper.getEntriesWithRequiredUpdate());
-        boolean inserted = insertEntries(databaseSyncHelper.getNewEntries());
-        boolean removed = removeEntries(databaseSyncHelper.getRemovedEntries());
+        insertCategories(databaseSyncHelper.getNewCategories());
+        removeCategories(databaseSyncHelper.getRemovedCategories());
+
+        updateExistingEntries(databaseSyncHelper.getEntriesWithRequiredUpdate());
+        insertEntries(databaseSyncHelper.getNewEntries());
+        removeEntries(databaseSyncHelper.getRemovedEntries());
 
         updateSynchronizationDate();
 
-        boolean uploadRequired = databaseSyncHelper.isUploadRequired();
+        boolean uploadRequired = databaseSyncHelper.isUploadRequired(getEntries(localRepository),
+                getEntries(onlineRepository));
 
         if (uploadRequired) {
             googleDriveSync.onUpdate(GoogleDriveSync.State.UPLOAD_REQUESTED);
@@ -54,6 +59,24 @@ public class DatabaseSyncProcessor {
         googleDriveSync.onUpdate(GoogleDriveSync.State.COMPLETED);
 
         return uploadRequired;
+    }
+
+    private boolean insertCategories(final List<DatabaseEntryCategory> newCategories) {
+        LOGGER.info("Found {} categories that need to be inserted", newCategories.size());
+        for (DatabaseEntryCategory category : newCategories) {
+            localRepository.save(category);
+        }
+
+        return !newCategories.isEmpty();
+    }
+
+    private boolean removeCategories(final List<DatabaseEntryCategory> removedCategories) {
+        LOGGER.info("Found {} categories that need to be removed", removedCategories.size());
+        for (DatabaseEntryCategory category : removedCategories) {
+            localRepository.delete(category);
+        }
+
+        return !removedCategories.isEmpty();
     }
 
     private boolean updateExistingEntries(final List<DatabaseEntry> entriesWithRequiredUpdate) {

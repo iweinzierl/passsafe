@@ -41,15 +41,17 @@ public class DatabaseSyncProcessor {
         DatabaseSyncHelper helper = new DatabaseSyncHelper(getDatabaseData(localDatasource),
                 getDatabaseData(onlineDatasource));
 
-        boolean updated = updateExistingEntries(helper.getEntriesWithRequiredUpdate());
-        boolean inserted = insertEntries(helper.getNewEntries());
-        boolean removed = removeEntries(helper.getRemovedEntries());
+        insertCategories(helper.getNewCategories());
+        removeCategories(helper.getRemovedCategories());
 
-        if (updated || inserted || removed) {
-            updateSynchronizationDate();
-        }
+        updateExistingEntries(helper.getEntriesWithRequiredUpdate());
+        insertEntries(helper.getNewEntries());
+        removeEntries(helper.getRemovedEntries());
 
-        boolean uploadRequired = helper.isUploadRequired();
+        updateSynchronizationDate();
+
+        boolean uploadRequired = helper.isUploadRequired(getDatabaseEntries(localDatasource),
+                getDatabaseEntries(onlineDatasource));
 
         if (uploadRequired) {
             googleDriveSync.onStateChanged(GoogleDriveSync.State.UPLOAD_REQUIRED);
@@ -58,6 +60,24 @@ public class DatabaseSyncProcessor {
         googleDriveSync.onStateChanged(GoogleDriveSync.State.SYNC_FINISHED);
 
         return uploadRequired;
+    }
+
+    private boolean insertCategories(final List<DatabaseEntryCategory> newCategories) {
+        LOGGER.info("Found {} categories that need to be inserted", newCategories.size());
+        for (DatabaseEntryCategory category : newCategories) {
+            localDatasource.addCategory(category);
+        }
+
+        return !newCategories.isEmpty();
+    }
+
+    private boolean removeCategories(final List<DatabaseEntryCategory> removedCategories) {
+        LOGGER.info("Found {} categories that need to be removed", removedCategories.size());
+        for (DatabaseEntryCategory category : removedCategories) {
+            localDatasource.removeCategory(category);
+        }
+
+        return !removedCategories.isEmpty();
     }
 
     /**
@@ -119,18 +139,20 @@ public class DatabaseSyncProcessor {
     }
 
     private static DatabaseData getDatabaseData(final PassSafeDataSource dataSource) {
-        List<EntryCategory> categories = dataSource.getCategories();
-
         List<DatabaseEntryCategory> databaseCategories = new ArrayList<>();
+        List<DatabaseEntry> databaseEntries = getDatabaseEntries(dataSource);
+
+        return new DatabaseData(dataSource.getLastSynchronizationDate(), databaseEntries, databaseCategories);
+    }
+
+    private static List<DatabaseEntry> getDatabaseEntries(final PassSafeDataSource dataSource) {
         List<DatabaseEntry> databaseEntries = new ArrayList<>();
 
-        for (EntryCategory category : categories) {
-            databaseCategories.add((DatabaseEntryCategory) category);
-
+        for (EntryCategory category : dataSource.getCategories()) {
             databaseEntries.addAll(getDatabaseEntries(dataSource, category));
         }
 
-        return new DatabaseData(dataSource.getLastSynchronizationDate(), databaseEntries, databaseCategories);
+        return databaseEntries;
     }
 
     private static Collection<DatabaseEntry> getDatabaseEntries(final PassSafeDataSource dataSource,

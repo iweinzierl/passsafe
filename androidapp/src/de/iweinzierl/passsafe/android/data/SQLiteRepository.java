@@ -196,6 +196,22 @@ public class SQLiteRepository {
         }
     }
 
+    public EntryCategory save(final EntryCategory category) {
+        openDatabaseIfNecessary();
+
+        ContentValues values = new ContentValues();
+        values.put("title", category.getTitle());
+        values.put("last_modified", DateUtils.formatDatabaseDate(new Date()));
+
+        long id = database.insert(TABLE_CATEGORY, null, values);
+
+        if (id > 0) {
+            return category;
+        } else {
+            return null;
+        }
+    }
+
     public Entry update(final Entry entry) {
         openDatabaseIfNecessary();
 
@@ -220,6 +236,15 @@ public class SQLiteRepository {
 
         DatabaseEntry dbEntry = (DatabaseEntry) entry;
         int delete = database.delete(TABLE_ENTRY, "_id = ?", new String[] {String.valueOf(dbEntry.getId())});
+
+        return delete > 0;
+    }
+
+    public boolean delete(final EntryCategory category) {
+        openDatabaseIfNecessary();
+
+        DatabaseEntryCategory dbCategory = (DatabaseEntryCategory) category;
+        int delete = database.delete(TABLE_CATEGORY, "_id = ?", new String[] {String.valueOf(dbCategory.getId())});
 
         return delete > 0;
     }
