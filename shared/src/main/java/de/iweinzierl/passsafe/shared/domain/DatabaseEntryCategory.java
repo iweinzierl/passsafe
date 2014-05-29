@@ -30,6 +30,11 @@ public class DatabaseEntryCategory extends EntryCategory {
             return this;
         }
 
+        public Builder withDeleted(final boolean deleted) {
+            category.setDeleted(deleted);
+            return this;
+        }
+
         public DatabaseEntryCategory build() {
             return category;
         }
@@ -76,6 +81,7 @@ public class DatabaseEntryCategory extends EntryCategory {
 
         DatabaseEntryCategory other = (DatabaseEntryCategory) obj;
 
-        return new EqualsBuilder().append(id, other.id).append(getTitle(), other.getTitle()).isEquals();
+        return new EqualsBuilder().append(id, other.id).append(getTitle(), other.getTitle())
+                                  .append(isDeleted(), other.isDeleted()).isEquals();
     }
 }

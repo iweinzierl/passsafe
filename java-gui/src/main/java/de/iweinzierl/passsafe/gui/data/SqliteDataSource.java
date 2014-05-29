@@ -40,15 +40,15 @@ public class SqliteDataSource implements PassSafeDataSource {
         "SELECT value FROM passsafe_metadata WHERE meta_key = ?";
 
     public static final String SQL_LOAD_CATEGORIES =
-        "SELECT \"_id\", title, last_modified FROM category ORDER BY title";
+        "SELECT \"_id\", title, last_modified FROM category WHERE deleted = 0 ORDER BY title";
 
     public static final String SQL_LOAD_ENTRIES =
-        "SELECT \"_id\", category_id, title, url, username, password, comment, last_modified FROM entry";
+        "SELECT \"_id\", category_id, title, url, username, password, comment, last_modified FROM entry WHERE deleted = 0";
 
     public static final String SQL_INSERT_ENTRY =
         "INSERT INTO entry (category_id, title, url, username, password, comment, last_modified) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    public static final String SQL_REMOVE_ENTRY = "DELETE FROM entry WHERE \"_id\" = ?";
+    public static final String SQL_REMOVE_ENTRY = "UPDATE entry SET deleted = 1 WHERE \"_id\" = ?";
 
     public static final String SQL_UPDATE_ENTRY =
         "UPDATE entry SET title = ?, url = ?, username = ?, password = ?, comment = ?, last_modified = ? WHERE \"_id\" = ?";
@@ -57,7 +57,7 @@ public class SqliteDataSource implements PassSafeDataSource {
 
     public static final String SQL_INSERT_CATEGORY = "INSERT INTO category (title, last_modified) VALUES (?, ?)";
 
-    public static final String SQL_REMOVE_CATEGORY = "DELETE FROM category WHERE \"_id\" = ?";
+    public static final String SQL_REMOVE_CATEGORY = "UPDATE category SET deleted = 1 WHERE \"_id\" = ?";
 
     public static final String SQL_REMOVE_CATEGORY_ENTRIES = "DELETE FROM entry WHERE category_id = ?";
 

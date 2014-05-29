@@ -10,11 +10,11 @@ public class SQLiteDatabaseCreator {
     }
 
     public static final String SQL_CREATE_CATEGORY = "CREATE TABLE category ("
-            + "  _id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, last_modified TEXT NOT NULL);";
+            + "  _id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, last_modified TEXT, deleted BOOLEAN NOT NULL);";
 
     public static final String SQL_CREATE_ENTRY = "CREATE TABLE entry (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
             + "  category_id INTEGER NOT NULL, " + "  title TEXT NOT NULL, " + "  url TEXT, " + "  username TEXT, "
-            + "  password TEXT NOT NULL, " + "  comment  TEXT, last_modified TEXT NOT NULL, "
+            + "  password TEXT NOT NULL, " + "  comment  TEXT, last_modified TEXT NOT NULL, deleted BOOLEAN, "
             + "  FOREIGN KEY (category_id) REFERENCES category(_id));";
 
     public static final String SQL_CREATE_ANDROID_METADATA = "CREATE TABLE android_metadata (locale text);";

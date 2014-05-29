@@ -26,6 +26,8 @@ public class DatabaseEntry extends Entry {
             withUsername(entry.getUsername());
             withPassword(entry.getPassword());
             withComment(entry.getComment());
+            withDeleted(entry.isDeleted());
+
             return this;
         }
 
@@ -66,6 +68,11 @@ public class DatabaseEntry extends Entry {
 
         public Builder withLastModified(final Date lastModified) {
             entry.setLastModified(lastModified);
+            return this;
+        }
+
+        public Builder withDeleted(final boolean deleted) {
+            entry.setDeleted(deleted);
             return this;
         }
 

@@ -10,6 +10,7 @@ public class EntryCategory implements Serializable {
     public static final EntryCategory DEFAULT_CATEGORY = new EntryCategory("default");
 
     private String title;
+    private boolean deleted;
 
     public EntryCategory() { }
 
@@ -23,6 +24,14 @@ public class EntryCategory implements Serializable {
 
     public void setTitle(final String title) {
         this.title = title;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(final boolean deleted) {
+        this.deleted = deleted;
     }
 
     @Override
@@ -43,6 +52,7 @@ public class EntryCategory implements Serializable {
 
         EntryCategory other = (EntryCategory) obj;
 
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(title, other.title).isEquals();
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(title, other.title)
+                                  .append(deleted, other.deleted).isEquals();
     }
 }

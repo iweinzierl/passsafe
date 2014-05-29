@@ -13,6 +13,7 @@ public class Entry implements Serializable {
     private String username;
     private String password;
     private String comment;
+    private boolean deleted;
 
     public Entry() { }
 
@@ -84,10 +85,19 @@ public class Entry implements Serializable {
         this.comment = comment;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(final boolean deleted) {
+        this.deleted = deleted;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this).appendSuper(super.toString()).append("category", category.getTitle())
                                         .append("title", title).append("url", url).append("username", username)
-                                        .append("password", password).append("comment", comment).toString();
+                                        .append("password", password).append("comment", comment)
+                                        .append("deleted", deleted).toString();
     }
 }
