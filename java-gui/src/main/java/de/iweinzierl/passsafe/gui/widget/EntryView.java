@@ -239,7 +239,17 @@ public class EntryView extends JPanel {
         initializeClipboardFunctions(usernameField);
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_USERNAME)), usernameField,
-                createSecretButtons(usernameField, userInvisible, userVisible));
+                createSecretButtons(usernameField, userInvisible, userVisible, new ValueProvider() {
+                        @Override
+                        public String getValue() {
+                            return entry.getUsername();
+                        }
+
+                        @Override
+                        public void setValue(final Entry entry, final String value) {
+                            entry.setUsername(value);
+                        }
+                    }));
     }
 
     private JPanel createPasswordRow() {
@@ -247,7 +257,17 @@ public class EntryView extends JPanel {
         initializeClipboardFunctions(passwordField);
 
         return createRow(new JLabel(Messages.getMessage(Messages.ENTRYVIEW_LABEL_PASSWORD)), passwordField,
-                createSecretButtons(passwordField, passInvisible, passVisible));
+                createSecretButtons(passwordField, passInvisible, passVisible, new ValueProvider() {
+                        @Override
+                        public String getValue() {
+                            return entry.getPassword();
+                        }
+
+                        @Override
+                        public void setValue(final Entry entry, final String value) {
+                            entry.setPassword(value);
+                        }
+                    }));
     }
 
     private void initializeClipboardFunctions(final JComponent textField) {
@@ -362,7 +382,7 @@ public class EntryView extends JPanel {
     }
 
     private JPanel createSecretButtons(final SwitchablePasswordField secretField, final JButton hide,
-            final JButton show) {
+            final JButton show, final ValueProvider valueProvider) {
 
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -385,22 +405,29 @@ public class EntryView extends JPanel {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
 
-                    EventBus.getInstance().fire(new Event() {
-                            @Override
-                            public EventType getType() {
-                                return EventType.MODIFY_ENTRY;
-                            }
+                    try {
+                        String encryptedValue = controller.getPasswordHandler().encrypt(secretField.getPassword());
+                        valueProvider.setValue(entry, encryptedValue);
 
-                            @Override
-                            public Object getData() {
-                                return entry;
-                            }
-                        });
+                        EventBus.getInstance().fire(new Event() {
+                                @Override
+                                public EventType getType() {
+                                    return EventType.MODIFY_ENTRY;
+                                }
 
-                    secretField.setEditable(false);
-                    save.setEnabled(false);
-                    cancel.setEnabled(false);
-                    edit.setEnabled(true);
+                                @Override
+                                public Object getData() {
+                                    return entry;
+                                }
+                            });
+
+                        secretField.setEditable(false);
+                        save.setEnabled(false);
+                        cancel.setEnabled(false);
+                        edit.setEnabled(true);
+                    } catch (PassSafeSecurityException ex) {
+                        LOGGER.error(ex.getMessage(), ex);
+                    }
                 }
             });
 

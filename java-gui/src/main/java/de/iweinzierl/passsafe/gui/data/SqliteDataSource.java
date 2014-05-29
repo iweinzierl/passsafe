@@ -396,7 +396,7 @@ public class SqliteDataSource implements PassSafeDataSource {
             updateEntry.setString(3, entry.getUsername());
             updateEntry.setString(4, entry.getPassword());
             updateEntry.setString(5, entry.getComment());
-            updateEntry.setString(6, DateUtils.formatDatabaseDate(sqliteEntry.getLastModified()));
+            updateEntry.setString(6, DateUtils.formatDatabaseDate(new Date()));
             updateEntry.setInt(7, sqliteEntry.getId());
 
             int affected = updateEntry.executeUpdate();
