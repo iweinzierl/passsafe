@@ -146,6 +146,8 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
                 connect();
             }
         }
+
+        callback.onSyncFinished();
     }
 
     private void startDatabaseSync() {

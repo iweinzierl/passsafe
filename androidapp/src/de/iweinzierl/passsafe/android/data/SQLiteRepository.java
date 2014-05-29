@@ -80,7 +80,7 @@ public class SQLiteRepository {
 
         List<Entry> entries = new ArrayList<Entry>();
 
-        Cursor cursor = database.query(TABLE_ENTRY, TABLE_ENTRY_COLUMNS, null, null, null, null, "title");
+        Cursor cursor = database.query(TABLE_ENTRY, TABLE_ENTRY_COLUMNS, "deleted = 0", null, null, null, "title");
         if (!cursor.moveToFirst()) {
             return entries;
         }
@@ -107,7 +107,9 @@ public class SQLiteRepository {
 
         List<EntryCategory> categories = new ArrayList<EntryCategory>();
 
-        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, null, null, null, null, "title");
+        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, "deleted = 0", null, null, null,
+                "title");
+
         if (!cursor.moveToFirst()) {
             return categories;
         }
@@ -144,7 +146,8 @@ public class SQLiteRepository {
     public EntryCategory findCategory(final int id) {
         openDatabaseIfNecessary();
 
-        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, "_id = " + id, null, null, null, null);
+        Cursor cursor = database.query(TABLE_CATEGORY, TABLE_CATEGORY_COLUMNS, "_id = " + id + " and deleted = 0", null,
+                null, null, null);
 
         if (cursor.moveToFirst()) {
             return newEntryCategoryFromCursor(cursor);
@@ -156,8 +159,8 @@ public class SQLiteRepository {
     public List<Entry> findEntries(final int categoryId) {
         openDatabaseIfNecessary();
 
-        Cursor cursor = database.query(TABLE_ENTRY, TABLE_ENTRY_COLUMNS, "category_id = " + categoryId, null, null,
-                null, "title");
+        Cursor cursor = database.query(TABLE_ENTRY, TABLE_ENTRY_COLUMNS,
+                "category_id = " + categoryId + " and deleted = 0", null, null, null, "title");
 
         List<Entry> entries = new ArrayList<Entry>();
 
@@ -234,19 +237,26 @@ public class SQLiteRepository {
     public boolean delete(final Entry entry) {
         openDatabaseIfNecessary();
 
-        DatabaseEntry dbEntry = (DatabaseEntry) entry;
-        int delete = database.delete(TABLE_ENTRY, "_id = ?", new String[] {String.valueOf(dbEntry.getId())});
+        ContentValues values = new ContentValues();
+        values.put("deleted", "1");
 
-        return delete > 0;
+        DatabaseEntry dbEntry = (DatabaseEntry) entry;
+        int update = database.update(TABLE_ENTRY, values, "_id = ?", new String[] {String.valueOf(dbEntry.getId())});
+
+        return update > 0;
     }
 
     public boolean delete(final EntryCategory category) {
         openDatabaseIfNecessary();
 
-        DatabaseEntryCategory dbCategory = (DatabaseEntryCategory) category;
-        int delete = database.delete(TABLE_CATEGORY, "_id = ?", new String[] {String.valueOf(dbCategory.getId())});
+        ContentValues values = new ContentValues();
+        values.put("deleted", "1");
 
-        return delete > 0;
+        DatabaseEntryCategory dbCategory = (DatabaseEntryCategory) category;
+        int update = database.update(TABLE_CATEGORY, values, "_id = ?",
+                new String[] {String.valueOf(dbCategory.getId())});
+
+        return update > 0;
     }
 
     private void openDatabaseIfNecessary() {

@@ -1,5 +1,7 @@
 package de.iweinzierl.passsafe.android.activity.login;
 
+import java.io.File;
+
 import android.app.Activity;
 
 import android.content.Intent;
@@ -14,6 +16,7 @@ import de.iweinzierl.passsafe.android.activity.list.ListActivityIntent;
 import de.iweinzierl.passsafe.android.activity.sync.SyncActivity;
 import de.iweinzierl.passsafe.android.logging.Logger;
 import de.iweinzierl.passsafe.android.util.Constants;
+import de.iweinzierl.passsafe.android.util.FileUtils;
 
 public class LoginActivity extends Activity implements LoginFragment.ActionHandler {
 
@@ -47,10 +50,18 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
             LOGGER.info("Returned to Activity (request code = %d | result code = %d)", requestCode, resultCode);
 
             if (resultCode == Constants.ACTIVITY_SYNC_FINISHED_SUCCESSFUL) {
+                checkOrCreateDatabase();
                 startActivity(new ListActivityIntent(this));
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void checkOrCreateDatabase() {
+        File databaseFile = FileUtils.getDatabaseFile(this);
+        if (!databaseFile.exists()) {
+            ((PassSafeApplication) getApplication()).createNewDatabase();
         }
     }
 }
