@@ -40,6 +40,12 @@ public class DatabaseSyncProcessor {
     public boolean sync() {
         LOGGER.info("Start synchronizing databases");
 
+        LOGGER.debug("Online repository contains %d entries in %d categories", onlineRepository.listEntries().size(),
+            onlineRepository.listCategories().size());
+
+        LOGGER.debug("Local repository contains %d entries in %d categories", localRepository.listEntries().size(),
+            localRepository.listCategories().size());
+
         insertCategories(databaseSyncHelper.getNewCategories());
         removeCategories(databaseSyncHelper.getRemovedCategories());
 
@@ -62,7 +68,7 @@ public class DatabaseSyncProcessor {
     }
 
     private boolean insertCategories(final List<DatabaseEntryCategory> newCategories) {
-        LOGGER.info("Found {} categories that need to be inserted", newCategories.size());
+        LOGGER.info("Found %d categories that need to be inserted", newCategories.size());
         for (DatabaseEntryCategory category : newCategories) {
             localRepository.save(category);
         }
@@ -71,7 +77,7 @@ public class DatabaseSyncProcessor {
     }
 
     private boolean removeCategories(final List<DatabaseEntryCategory> removedCategories) {
-        LOGGER.info("Found {} categories that need to be removed", removedCategories.size());
+        LOGGER.info("Found %d categories that need to be removed", removedCategories.size());
         for (DatabaseEntryCategory category : removedCategories) {
             localRepository.delete(category);
         }
@@ -80,6 +86,7 @@ public class DatabaseSyncProcessor {
     }
 
     private boolean updateExistingEntries(final List<DatabaseEntry> entriesWithRequiredUpdate) {
+        LOGGER.info("Found %d entries that need an update", entriesWithRequiredUpdate.size());
         for (DatabaseEntry entry : entriesWithRequiredUpdate) {
             localRepository.update(entry);
         }
@@ -88,6 +95,7 @@ public class DatabaseSyncProcessor {
     }
 
     private boolean insertEntries(final List<DatabaseEntry> newEntries) {
+        LOGGER.info("Found %d entries that need to be inserted", newEntries.size());
         for (DatabaseEntry entry : newEntries) {
             localRepository.save(entry);
         }
@@ -96,6 +104,7 @@ public class DatabaseSyncProcessor {
     }
 
     private boolean removeEntries(final List<DatabaseEntry> removedEntries) {
+        LOGGER.info("Found %d entries that need to be removed", removedEntries.size());
         for (DatabaseEntry entry : removedEntries) {
             localRepository.delete(entry);
         }

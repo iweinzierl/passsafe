@@ -189,6 +189,11 @@ public class SQLiteRepository {
         values.put("password", entry.getPassword());
         values.put("comment", entry.getComment());
         values.put("last_modified", DateUtils.formatDatabaseDate(new Date()));
+        values.put("deleted", entry.isDeleted() ? "1" : "0");
+
+        if (entry instanceof DatabaseEntry && ((DatabaseEntry) entry).getId() > 0) {
+            values.put("_id", ((DatabaseEntry) entry).getId());
+        }
 
         long id = database.insert(TABLE_ENTRY, null, values);
 
@@ -205,6 +210,11 @@ public class SQLiteRepository {
         ContentValues values = new ContentValues();
         values.put("title", category.getTitle());
         values.put("last_modified", DateUtils.formatDatabaseDate(new Date()));
+        values.put("deleted", category.isDeleted() ? "1" : "0");
+
+        if (category instanceof DatabaseEntryCategory && ((DatabaseEntryCategory) category).getId() > 0) {
+            values.put("_id", ((DatabaseEntryCategory) category).getId());
+        }
 
         long id = database.insert(TABLE_CATEGORY, null, values);
 

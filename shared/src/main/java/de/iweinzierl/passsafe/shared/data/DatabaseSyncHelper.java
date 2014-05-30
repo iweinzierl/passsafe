@@ -35,7 +35,7 @@ public final class DatabaseSyncHelper {
             return new ArrayList<DatabaseEntryCategory>(0);
         }
 
-        return findRemoved(localTable.getCategories(), upstreamTable.getCategories());
+        return findRemovedCategories(localTable.getCategories(), upstreamTable.getCategories());
     }
 
     public List<DatabaseEntry> getEntriesWithRequiredUpdate() {
@@ -59,7 +59,7 @@ public final class DatabaseSyncHelper {
             return new ArrayList<DatabaseEntry>(0);
         }
 
-        return findRemoved(localTable.getLastSynchronization(), localTable.getEntries(), upstreamTable.getEntries());
+        return findRemoved(localTable.getEntries(), upstreamTable.getEntries());
     }
 
     public boolean isUploadRequired(final List<DatabaseEntry> localEntries, final List<DatabaseEntry> upstreamEntries) {
@@ -151,22 +151,20 @@ public final class DatabaseSyncHelper {
         return newCategories;
     }
 
-    private List<DatabaseEntryCategory> findRemoved(final List<DatabaseEntryCategory> local,
+    private List<DatabaseEntryCategory> findRemovedCategories(final List<DatabaseEntryCategory> local,
             final List<DatabaseEntryCategory> upstream) {
 
         List<DatabaseEntryCategory> removedCategories = new ArrayList<DatabaseEntryCategory>();
-
-        A:
 
         for (DatabaseEntryCategory localCategory : local) {
             for (DatabaseEntryCategory upstreamCategory : upstream) {
 
                 if (localCategory.getId() == upstreamCategory.getId()) {
-                    continue A;
+                    if (upstreamCategory.isDeleted() && !localCategory.isDeleted()) {
+                        removedCategories.add(localCategory);
+                    }
                 }
             }
-
-            removedCategories.add(localCategory);
         }
 
         return removedCategories;
@@ -216,22 +214,18 @@ public final class DatabaseSyncHelper {
         return newEntries;
     }
 
-    private List<DatabaseEntry> findRemoved(final Date lastSynchronization, final List<DatabaseEntry> local,
-            final List<DatabaseEntry> upstream) {
+    private List<DatabaseEntry> findRemoved(final List<DatabaseEntry> local, final List<DatabaseEntry> upstream) {
 
         List<DatabaseEntry> removedEntries = new ArrayList<DatabaseEntry>();
 
-        A:
         for (DatabaseEntry localEntry : local) {
             for (DatabaseEntry upstreamEntry : upstream) {
 
                 if (localEntry.getId() == upstreamEntry.getId()) {
-                    continue A;
+                    if (upstreamEntry.isDeleted() && !localEntry.isDeleted()) {
+                        removedEntries.add(localEntry);
+                    }
                 }
-            }
-
-            if (localEntry.getLastModified().before(lastSynchronization)) {
-                removedEntries.add(localEntry);
             }
         }
 
