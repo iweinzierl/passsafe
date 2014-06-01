@@ -17,4 +17,24 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="AppTheme.Text" parent="AppTheme">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="AppTheme.Text.Small" parent="AppTheme.Text">
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="AppTheme.Text.Default" parent="AppTheme.Text">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="AppTheme.Text.Big" parent="AppTheme.Text">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="AppTheme.Text.Bigger" parent="AppTheme.Text">
+        <item name="android:textSize">22sp</item>
+    </style>
+
 </resources>
