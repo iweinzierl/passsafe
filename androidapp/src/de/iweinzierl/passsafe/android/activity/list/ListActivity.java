@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
+import de.iweinzierl.passsafe.android.activity.addcategory.AddCategoryActivity;
 import de.iweinzierl.passsafe.android.activity.addentry.AddEntryActivity;
 import de.iweinzierl.passsafe.android.activity.editentry.EditEntryIntent;
 import de.iweinzierl.passsafe.android.activity.entry.EntryActivityIntent;
@@ -124,6 +125,11 @@ public class ListActivity extends Activity implements ListFragment.Callback {
             case R.id.add_entry :
 
                 startActivity(new Intent(this, AddEntryActivity.class));
+                return true;
+
+            case R.id.add_category :
+
+                startActivity(new Intent(this, AddCategoryActivity.class));
                 return true;
 
             case R.id.settings :

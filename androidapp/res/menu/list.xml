@@ -7,6 +7,12 @@
             android:showAsAction="ifRoom"/>
 
     <item
+        android:id="@+id/add_category"
+        android:title="@string/action_addcategory"
+        android:icon="@android:drawable/ic_menu_add"
+        android:showAsAction="never"/>
+
+    <item
             android:id="@+id/search"
             android:title="@string/action_search"
             android:icon="@android:drawable/ic_menu_search"

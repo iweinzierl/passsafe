@@ -5,6 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_search">Suche</string>
     <string name="action_addentry">Neuer Eintrag</string>
+    <string name="action_addcategory">Neue Kategorie</string>
     <string name="action_removeentry">Eintrag entfernen</string>
     <string name="action_editentry">Eintrag bearbeiten</string>
 
@@ -69,6 +70,12 @@
         bestätigen.
     </string>
     <string name="fragment_addentry_error_passwordverificationfailed">Die beiden Passwörter sind nicht gleich.</string>
+
+    <string name="fragment_addcategory_label_title">Titel: *</string>
+    <string name="fragment_addcategory_button_save">Speichern</string>
+    <string name="fragment_addcategory_error_titlemissing">Sie müssen einen Namen eingeben.</string>
+    <string name="fragment_addcategory_savedsuccessfully">Kategorie gespeichert.</string>
+    <string name="fragment_addcategory_savefailed">Speichern fehlgeschlagen.</string>
 
     <string name="fragment_editentry_updatesuccessful">Eintrag aktualisiert.</string>
     <string name="fragment_editentry_updatefailed">Eintrag konnte nicht aktualisiert werden.</string>
