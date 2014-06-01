@@ -21,6 +21,8 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
 
     public interface Callback {
         void onSyncFinished();
+
+        void onSyncFailed();
     }
 
     public enum State {
@@ -140,14 +142,15 @@ public class GoogleDriveSync implements GoogleApiClient.ConnectionCallbacks,
         if (connectionResult.hasResolution() && !googleApiClient.isConnecting()) {
             try {
                 LOGGER.info("Trying to resolve connection result");
-                connectionResult.startResolutionForResult(activity, 1);
+                connectionResult.startResolutionForResult(activity, ConnectionResult.SIGN_IN_REQUIRED);
+
             } catch (IntentSender.SendIntentException e) {
                 LOGGER.warn("Connection failed after trying to resolve result");
                 connect();
             }
         }
 
-        callback.onSyncFinished();
+        callback.onSyncFailed();
     }
 
     private void startDatabaseSync() {

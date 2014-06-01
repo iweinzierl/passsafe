@@ -17,8 +17,6 @@ public class SyncActivity extends Activity implements GoogleDriveSync.Callback {
 
     private static final Logger LOGGER = new Logger("SyncActivity");
 
-    private GoogleDriveSync sync;
-
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +27,7 @@ public class SyncActivity extends Activity implements GoogleDriveSync.Callback {
     protected void onStart() {
         super.onStart();
 
-        sync = new GoogleDriveSync(this);
+        GoogleDriveSync sync = new GoogleDriveSync(this);
         sync.sync();
     }
 
@@ -53,6 +51,14 @@ public class SyncActivity extends Activity implements GoogleDriveSync.Callback {
 
         setResult(Constants.ACTIVITY_SYNC_FINISHED_SUCCESSFUL);
         finish();
+    }
+
+    @Override
+    public void onSyncFailed() {
+        LOGGER.info("Finish activity with failed result");
+
+        GoogleDriveSync sync = new GoogleDriveSync(this);
+        sync.sync();
     }
 
     private void onGDriveLoginResult(final int resultCode, final Intent data) {
