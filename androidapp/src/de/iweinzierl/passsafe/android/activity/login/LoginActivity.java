@@ -72,33 +72,34 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
     }
 
     private void displayFirstAppStartDialog() {
-        if (isFirstAppStartAndUpdate()) {
+        if (isFirstAppStart()) {
             //J-
             new FirstAppStartDialog.Builder(this)
                     .withCallback(new FirstAppStartDialog.Callback() {
                         @Override
                         public void onCreateNewDatabase() {
                             createNewDatabase();
+                            updateFirstAppStart();
                         }
 
                         @Override
                         public void onSynchronizeDatabase() {
                             enableDatabaseSync();
+                            updateFirstAppStart();
                         }
                     }).build();
             //J+
         }
     }
 
-    public boolean isFirstAppStartAndUpdate() {
+    public boolean isFirstAppStart() {
         ApplicationPreferences preferences = ((PassSafeApplication) getApplication()).getApplicationPreferences();
-        boolean firstAppStart = preferences.isFirstAppStart();
+        return preferences.isFirstAppStart();
+    }
 
-        if (firstAppStart) {
-            preferences.setFirstAppStart(false);
-        }
-
-        return firstAppStart;
+    private void updateFirstAppStart() {
+        ApplicationPreferences preferences = ((PassSafeApplication) getApplication()).getApplicationPreferences();
+        preferences.setFirstAppStart(false);
     }
 
     private void createNewDatabase() {

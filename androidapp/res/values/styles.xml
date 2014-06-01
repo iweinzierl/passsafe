@@ -17,6 +17,13 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="AppTheme.Container" parent="AppTheme">
+    </style>
+
+    <style name="AppTheme.Container.WithPadding" parent="AppTheme.Container">
+        <item name="android:padding">10dp</item>
+    </style>
+
     <style name="AppTheme.Text" parent="AppTheme">
         <item name="android:textColor">@color/black</item>
     </style>
