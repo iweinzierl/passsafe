@@ -15,8 +15,10 @@ import de.iweinzierl.passsafe.android.R;
 import de.iweinzierl.passsafe.android.activity.list.ListActivityIntent;
 import de.iweinzierl.passsafe.android.activity.sync.SyncActivity;
 import de.iweinzierl.passsafe.android.logging.Logger;
+import de.iweinzierl.passsafe.android.preferences.ApplicationPreferences;
 import de.iweinzierl.passsafe.android.util.Constants;
 import de.iweinzierl.passsafe.android.util.FileUtils;
+import de.iweinzierl.passsafe.android.widget.dialog.FirstAppStartDialog;
 
 public class LoginActivity extends Activity implements LoginFragment.ActionHandler {
 
@@ -36,12 +38,23 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        displayFirstAppStartDialog();
+    }
+
+    @Override
     public void login(final String password) {
         LOGGER.info("Received login() event");
         ((PassSafeApplication) getApplication()).setPassword(password);
 
-        // TODO Verify password
-        startActivityForResult(new Intent(this, SyncActivity.class), Constants.ACTIVITY_SYNC_REQUEST);
+        if (isSyncEnabled()) {
+            synchronizeDatabase();
+        } else {
+            checkOrCreateDatabase();
+            startActivity(new ListActivityIntent(this));
+        }
     }
 
     @Override
@@ -58,10 +71,58 @@ public class LoginActivity extends Activity implements LoginFragment.ActionHandl
         }
     }
 
+    private void displayFirstAppStartDialog() {
+        if (isFirstAppStartAndUpdate()) {
+            //J-
+            new FirstAppStartDialog.Builder(this)
+                    .withCallback(new FirstAppStartDialog.Callback() {
+                        @Override
+                        public void onCreateNewDatabase() {
+                            createNewDatabase();
+                        }
+
+                        @Override
+                        public void onSynchronizeDatabase() {
+                            enableDatabaseSync();
+                        }
+                    }).build();
+            //J+
+        }
+    }
+
+    public boolean isFirstAppStartAndUpdate() {
+        ApplicationPreferences preferences = ((PassSafeApplication) getApplication()).getApplicationPreferences();
+        boolean firstAppStart = preferences.isFirstAppStart();
+
+        if (firstAppStart) {
+            preferences.setFirstAppStart(false);
+        }
+
+        return firstAppStart;
+    }
+
+    private void createNewDatabase() {
+        ((PassSafeApplication) getApplication()).createNewDatabase();
+    }
+
+    private void enableDatabaseSync() {
+        ApplicationPreferences preferences = ((PassSafeApplication) getApplication()).getApplicationPreferences();
+        preferences.enableDatabaseSync();
+    }
+
+    private void synchronizeDatabase() {
+        startActivityForResult(new Intent(this, SyncActivity.class), Constants.ACTIVITY_SYNC_REQUEST);
+    }
+
+    private boolean isSyncEnabled() {
+        ApplicationPreferences preferences = ((PassSafeApplication) getApplication()).getApplicationPreferences();
+        return preferences.isSyncEnabled();
+    }
+
     private void checkOrCreateDatabase() {
         File databaseFile = FileUtils.getDatabaseFile(this);
         if (!databaseFile.exists()) {
-            ((PassSafeApplication) getApplication()).createNewDatabase();
+            createNewDatabase();
         }
     }
 }

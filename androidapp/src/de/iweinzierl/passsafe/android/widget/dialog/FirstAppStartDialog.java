@@ -10,29 +10,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import android.widget.Button;
-import android.widget.Toast;
 
-import de.iweinzierl.passsafe.android.PassSafeApplication;
 import de.iweinzierl.passsafe.android.R;
-import de.iweinzierl.passsafe.android.logging.Logger;
-import de.iweinzierl.passsafe.android.sync.gdrive.GoogleDriveSync;
 import de.iweinzierl.passsafe.android.util.UiUtils;
 
 public class FirstAppStartDialog {
 
     public interface Callback {
 
-        void onNewDatabaseCreated();
+        void onCreateNewDatabase();
 
-        void onSettingsAdjusted();
+        void onSynchronizeDatabase();
     }
 
     public static class Builder {
 
-        private static final Logger LOGGER = new Logger("FirstAppStartDialog.Builder");
-
         private Activity context;
         private Callback callback;
+        private AlertDialog instance;
 
         public Builder(final Activity context) {
             this.context = context;
@@ -47,35 +42,38 @@ public class FirstAppStartDialog {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View content = layoutInflater.inflate(R.layout.dialog_firstappstart, null, false);
 
+            buildNewDatabaseButton(content);
+            buildSynchronizeDatabaseButton(content);
+
+            instance = new AlertDialog.Builder(context).setCancelable(false).setView(content).show();
+
+            return instance;
+        }
+
+        private void buildSynchronizeDatabaseButton(final View content) {
+            Button synchronizeDatabase = UiUtils.getButton(content, R.id.synchronizedatabases);
+            if (synchronizeDatabase != null) {
+                synchronizeDatabase.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(final View v) {
+                            callback.onSynchronizeDatabase();
+                            instance.dismiss();
+                        }
+                    });
+            }
+        }
+
+        private void buildNewDatabaseButton(final View content) {
             Button newDatabase = UiUtils.getButton(content, R.id.newdatabase);
             if (newDatabase != null) {
                 newDatabase.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
-                            Toast.makeText(context, "Neue Datenbank erstellen", Toast.LENGTH_SHORT).show();
-                            ((PassSafeApplication) context.getApplication()).createNewDatabase();
+                            callback.onCreateNewDatabase();
+                            instance.dismiss();
                         }
                     });
             }
-
-            Button gotoSettings = UiUtils.getButton(content, R.id.gotosettings);
-            if (gotoSettings != null) {
-                gotoSettings.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(final View v) {
-                            Toast.makeText(context, "Einstellungen öffnen", Toast.LENGTH_SHORT).show();
-                            synchronizeDatabase();
-                        }
-                    });
-            }
-
-            return new AlertDialog.Builder(context).setView(content).show();
-        }
-
-        public void synchronizeDatabase() {
-
-            new GoogleDriveSync(context).sync();
-            callback.onNewDatabaseCreated();
         }
     }
 }

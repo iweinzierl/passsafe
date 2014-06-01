@@ -23,8 +23,8 @@
                 android:layout_height="wrap_content"/>
 
         <Button
-                android:id="@+id/gotosettings"
-                android:text="@string/dialog_firstappstart_gotosettings"
+                android:id="@+id/synchronizedatabases"
+                android:text="@string/dialog_firstappstart_synchronizedatabase"
                 android:layout_weight="0.5"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>

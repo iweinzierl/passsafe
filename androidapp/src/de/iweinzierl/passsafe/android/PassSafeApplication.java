@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import de.iweinzierl.passsafe.android.data.SQLiteRepository;
 import de.iweinzierl.passsafe.android.logging.Logger;
+import de.iweinzierl.passsafe.android.preferences.ApplicationPreferences;
 import de.iweinzierl.passsafe.android.secure.AesPasswordHandler;
 import de.iweinzierl.passsafe.android.secure.PasswordHandler;
 import de.iweinzierl.passsafe.android.util.FileUtils;
@@ -22,6 +23,7 @@ public class PassSafeApplication extends Application {
 
     private PasswordHandler passwordHandler;
     private SQLiteRepository repository;
+    private ApplicationPreferences applicationPreferences;
 
     @Override
     public void onCreate() {
@@ -32,6 +34,7 @@ public class PassSafeApplication extends Application {
     private void initializeSingletons() {
         LOGGER.info("initializeSingletons()");
         repository = new SQLiteRepository(this, FileUtils.getDatabaseFile(this));
+        applicationPreferences = new ApplicationPreferences(this);
     }
 
     public void setPassword(final String password) {
@@ -44,6 +47,10 @@ public class PassSafeApplication extends Application {
 
     public SQLiteRepository getRepository() {
         return repository;
+    }
+
+    public ApplicationPreferences getApplicationPreferences() {
+        return applicationPreferences;
     }
 
     public void createNewDatabase() {

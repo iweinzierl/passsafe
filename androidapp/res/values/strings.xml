@@ -8,12 +8,9 @@
     <string name="action_removeentry">Eintrag entfernen</string>
     <string name="action_editentry">Eintrag bearbeiten</string>
 
-    <string name="dialog_firstappstart_title">Dies ist das erste Mal, dass Sie PassSafe starten. Haben Sie bereits eine
-        Datenbank online gespeichert, dann wählen Sie nun bitte "Einstellungen". Andernfalls wird eine neue Datenbank
-        erstellt.
-    </string>
-    <string name="dialog_firstappstart_newdatabase">Neue Datenbank</string>
-    <string name="dialog_firstappstart_gotosettings">Einstellungen...</string>
+    <string name="dialog_firstappstart_title">Dies ist das erste Mal, dass Sie PassSafe starten. Sie haben die Möglichkeit eine neue Datenbank zu erstellen oder eine bereits vorhandene online Datenbank zu nutzen.</string>
+    <string name="dialog_firstappstart_newdatabase">Neue Datenbank erstellen</string>
+    <string name="dialog_firstappstart_synchronizedatabase">Datenbank synchronisieren</string>
 
     <string name="fragment_preferences_sync">Synchronisierung</string>
     <string name="fragment_preferences_sync_activation">Synchronisierung einschalten</string>
