@@ -1,4 +1,5 @@
-#/usr/bin
+#/bin/bash
+set -x
 
 echo "Build installation from java-gui"
 
@@ -13,10 +14,10 @@ mvn -f $MODULE_DIR/../shared/pom.xml clean install
 mvn -f $MODULE_DIR/pom.xml clean package
 
 if [[ -d "$INSTALL_DIR" ]]; then
+    echo "Passsafe install dir already existing"
+else
     echo "Create Passsafe install dir: $INSTALL_DIR"
     mkdir -p $INSTALL_DIR
-else
-    echo "Passsafe install dir already existing"
 fi
 
 cp $MODULE_DIR/target/$JAR_NAME $INSTALL_DIR/
