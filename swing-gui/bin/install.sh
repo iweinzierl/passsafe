@@ -3,6 +3,7 @@ set -x
 
 echo "Build installation from java-gui"
 
+HOME=$(getent passwd iweinzierl | cut -d: -f6)
 BASE_DIR=`dirname $0`
 BASE_DIR=`realpath $BASE_DIR`
 MODULE_DIR=`realpath $BASE_DIR/..`
